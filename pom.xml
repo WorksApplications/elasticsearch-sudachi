@@ -14,6 +14,16 @@
 		<java.version>1.8</java.version>
 		<elasticsearch.version>5.6.1</elasticsearch.version>
 		<sudachi.version>0.1-SNAPSHOT</sudachi.version>
+		<jacoco.skip>true</jacoco.skip>
+		<sonar.skip>true</sonar.skip>
+		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
+		<sonar.language>java</sonar.language>
+		<sonar.organization>worksapplications</sonar.organization>
+		<sonar.links.homepage>https://github.com/WorksApplications/elasticsearch-sudachi</sonar.links.homepage>
+		<sonar.links.ci>https://travis-ci.org/WorksApplications/elasticsearch-sudachi</sonar.links.ci>
+		<sonar.links.issue>https://github.com/WorksApplications/elasticsearch-sudachi/issues</sonar.links.issue>
+		<sonar.junit.reportsPath/>
+		<sonar.junit.reportPaths>${project.build.directory}/surefire-reports</sonar.junit.reportPaths>
 	</properties>
 
 	<repositories>
@@ -67,17 +77,17 @@
 							</execution>
 						</executions>
 					</plugin>
-		      <plugin>
-		        <artifactId>maven-antrun-plugin</artifactId>
+					<plugin>
+						<artifactId>maven-antrun-plugin</artifactId>
 						<version>1.8</version>
-		        <executions>
-		          <execution>
+						<executions>
+							<execution>
 							<phase>generate-test-resources</phase>
 								<goals>
 									<goal>run</goal>
 								</goals>
-		            <configuration>
-		              <target>
+								<configuration>
+									<target>
 										<copy
 											todir="src/test/resources/com/worksap/nlp/lucene/sudachi/ja"
 											flatten="true">
@@ -85,13 +95,43 @@
 												<include name="**/system.dic" />
 											</fileset>
 										</copy>
-		              </target>
-		            </configuration>
-		          </execution>
-		        </executions>
-		      </plugin>
+									</target>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
 				</plugins>
 			</build>
+		</profile>
+		<profile>
+			<id>pre-merge</id>
+			<activation>
+				<property>
+					<name>env.TRAVIS_EVENT_TYPE</name>
+					<value>pull_request</value>
+				</property>
+			</activation>
+			<properties>
+				<sonar.skip>false</sonar.skip>
+				<sonar.analysis.mode>preview</sonar.analysis.mode>
+				<sonar.github.oauth>${env.GITHUB_TOKEN}</sonar.github.oauth>
+				<sonar.github.pullRequest>${env.TRAVIS_PULL_REQUEST}</sonar.github.pullRequest>
+				<sonar.github.repository>${env.TRAVIS_REPO_SLUG}</sonar.github.repository>
+				<jacoco.skip>false</jacoco.skip>
+			</properties>
+		</profile>
+		<profile>
+			<id>post-merge</id>
+			<activation>
+				<property>
+					<name>env.TRAVIS_BRANCH</name>
+					<value>develop</value>
+				</property>
+			</activation>
+			<properties>
+				<sonar.skip>false</sonar.skip>
+				<jacoco.skip>false</jacoco.skip>
+			</properties>
 		</profile>
 	</profiles>
 	<build>
@@ -134,20 +174,30 @@
 					</excludes>
 				</configuration>
 			</plugin>
-		  <plugin>
-		    <artifactId>maven-clean-plugin</artifactId>
-		    <version>3.0.0</version>
-		    <configuration>
-		      <filesets>
-		        <fileset>
-		          <directory>src/test/resources/com/worksap/nlp/lucene/sudachi/ja</directory>
-		          <includes>
-		            <include>system.dic</include>
-		          </includes>
-		        </fileset>
-		      </filesets>
-		    </configuration>
-		  </plugin>
+			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>3.0.0</version>
+				<configuration>
+					<filesets>
+						<fileset>
+							<directory>src/test/resources/com/worksap/nlp/lucene/sudachi/ja</directory>
+							<includes>
+								<include>system.dic</include>
+							</includes>
+						</fileset>
+					</filesets>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.sonarsource.scanner.maven</groupId>
+				<artifactId>sonar-maven-plugin</artifactId>
+				<version>3.3.0.603</version>
+			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.7.9</version>
+			</plugin>
 		</plugins>
 	</build>
 	<dependencies>
@@ -207,40 +257,40 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-  <url>https://github.com/WorksApplications/elasticsearch-sudachi</url>
-  <description>The Japanese analysis plugin for elasticsearch</description>
-  <inceptionYear>2017</inceptionYear>
-  <licenses>
-    <license>
-      <name>Apache License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0</url>
-    </license>
-  </licenses>
-  <organization>
-    <name>Works Applications Co., Ltd.</name>
-    <url>http://www.worksap.com/</url>
-  </organization>
-  <developers>
-    <developer>
-      <id>kazuma-t</id>
-      <name>Kazuma TAKAOKA</name>
-      <email>takaoka_k@worksap.co.jp</email>
-      <timezone>Asia/Tokyo</timezone>
-    </developer>
-  </developers>
-  <issueManagement>
-    <system>GitHub Issues</system>
-    <url>https://github.com/WorksApplications/elasticsearch-sudachi/issues</url>
-  </issueManagement>
-  <scm>
-    <connection>scm:git:git@github.com:WorksApplications/elasticsearch-sudachi.git</connection>
-    <developerConnection>scm:git:git@github.com:WorksApplications/elasticsearch-sudachi.git</developerConnection>
-    <url>https://github.com/WorksApplications/elasticsearch-sudachi</url>
-  </scm>
-  <distributionManagement>
-    <snapshotRepository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-    </snapshotRepository>
-  </distributionManagement>
+	<url>https://github.com/WorksApplications/elasticsearch-sudachi</url>
+	<description>The Japanese analysis plugin for elasticsearch</description>
+	<inceptionYear>2017</inceptionYear>
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0</url>
+		</license>
+	</licenses>
+	<organization>
+		<name>Works Applications Co., Ltd.</name>
+		<url>http://www.worksap.com/</url>
+	</organization>
+	<developers>
+		<developer>
+			<id>kazuma-t</id>
+			<name>Kazuma TAKAOKA</name>
+			<email>takaoka_k@worksap.co.jp</email>
+			<timezone>Asia/Tokyo</timezone>
+		</developer>
+	</developers>
+	<issueManagement>
+		<system>GitHub Issues</system>
+		<url>https://github.com/WorksApplications/elasticsearch-sudachi/issues</url>
+	</issueManagement>
+	<scm>
+		<connection>scm:git:git@github.com:WorksApplications/elasticsearch-sudachi.git</connection>
+		<developerConnection>scm:git:git@github.com:WorksApplications/elasticsearch-sudachi.git</developerConnection>
+		<url>https://github.com/WorksApplications/elasticsearch-sudachi</url>
+	</scm>
+	<distributionManagement>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
 </project>
