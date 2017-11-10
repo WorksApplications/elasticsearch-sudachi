@@ -12,7 +12,7 @@ env:
     - secure: "Iqsmknto7LfqqyimLpAd9iAdHGuQN1tJ99hQ/2yNm31g6SxPxBiWEgifZvdJadjsY2YS/YMD6irEsvtgWhL1Meah2Cl8DdPGQTNxz5OOZIYPRwnTsLcE1JcNJbSqgmcWYv6bcaLSJgXDHgRW+C/FwkkEgvXvvWzdxw924vQlUh5h4StCjjOR5u5gFYvTDn4jMXC2TXv9wfh7Kby5DXHGviJk7idtwpl0YcmG/pgdX2RQR2UlNGRFVoDiUse5TmKkPIcIeUICz5I16SeOEEWbM1YbvAaSTMgnHC8t6lej5e7F0McW4IMXKQKPGABnDwc8gxssu3GP/3vbdZn3/JD3DOOSej7mEJhVAkhDOjCQCnyOIuVlSa+BnRwPtKyE7W9JMxMszNmFktFrzJzHVyXfddKEFWjlFMjeccVLFur4fkE8itgZ2uGVNzxMUG35qRIBPkuW4gCDGVmASYheal1KuPupZO7EmnhYQsvwaG8ZM2Ym5eEBMqTneLOsVLzyJeEDDE7Kyi4mzsrJw0ho/QfbNeCZFG9llaU5uQie+ws1TX7T19WjbvmuRB4OpYJylXkdUroPEFqTMMooq7Y+uz+sbnk9GEiPcel/toLJWb878MQO+iEbaEDCaOV2O7IvAFZgL+fFJfLOjXBVA/i1iFmflH7PIIKoeEuqyxfrQzEjcB4="
 before_install:
   # Decrypt settings.xml which is necessary to deploy to Sonatype Maven Repositories
-  - if [ -n "$encrypted_6cebf91f1d36_key" ]; then openssl aes-256-cbc -K $encrypted_6cebf91f1d36_key -iv $encrypted_6cebf91f1d36_iv -in settings.xml.enc -out .travis/settings.xml -d; fi
+  - if [ -n "$encrypted_6cebf91f1d36_key" ]; then openssl aes-256-cbc -K $encrypted_6cebf91f1d36_key -iv $encrypted_6cebf91f1d36_iv -in .travis/settings.xml.enc -out .travis/settings.xml -d; fi
 script:
   - mvn jacoco:prepare-agent test -B -V
 after_success:
