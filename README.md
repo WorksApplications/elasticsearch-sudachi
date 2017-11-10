@@ -1,11 +1,15 @@
-# Sudachi
-Sudachi is Japanese morphological analyzer.
+# analysis-sudachi
+analysis-sudachi is Elasticsearch plugin based on Sudachi the Japanese morphological analyzer.
+
+[![Build Status](https://travis-ci.org/WorksApplications/elasticsearch-sudachi.svg?branch=develop)](https://travis-ci.org/WorksApplications/elasticsearch-sudachi)
+[![Bugs](https://sonarcloud.io/api/badges/measure?key=com.worksap.nlp%3Aanalysis-sudachi&metric=bugs)](https://sonarcloud.io/project/issues?id=com.worksap.nlp%3Aanalysis-sudachi&resolved=false&types=BUG)
+[![Debt](https://sonarcloud.io/api/badges/measure?key=com.worksap.nlp%3Aanalysis-sudachi&metric=sqale_debt_ratio)](https://sonarcloud.io/component_measures/domain/Maintainability?id=com.worksap.nlp%3Aanalysis-sudachi)
+[![Coverage](https://sonarcloud.io/api/badges/measure?key=com.worksap.nlp%3Aanalysis-sudachi&metric=coverage)](https://sonarcloud.io/component_measures/metric/coverage/list?id=com.worksap.nlp%3Aanalysis-sudachi)
 
 # Build
 
-1. Build and install Sudachi.
-2. Copy files [system.dic / *.def / sudachiSettings.json] in package of Sudachi and place them under  "src/test/resources/com/worksap/nlp/lucene/sudachi/ja".
-3. Build analysis-sudachi.
+1. Copy files sudachiSettings.json in package of [Sudachi](https://github.com/WorksApplications/Sudachi) and place them under  "src/test/resources/com/worksap/nlp/lucene/sudachi/ja".
+2. Build analysis-sudachi.
 ```
    $ mvn package
 ```

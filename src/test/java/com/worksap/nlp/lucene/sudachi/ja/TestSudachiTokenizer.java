@@ -37,6 +37,8 @@ import org.junit.rules.TemporaryFolder;
 public class TestSudachiTokenizer {
     private static final String RESOURCE_NAME_SUDACHI_SETTINGS = "sudachiSettings.json";
     private static final String RESOURCE_NAME_SYSTEM_DIC = "system.dic";
+
+    // *.def files are packaged into sudachi.jar
     private static final String RESOURCE_NAME_CHAR_DEF = "char.def";
     private static final String RESOURCE_NAME_UNK_DEF = "unk.def";
     private static final String RESOURCE_NAME_REWRITE_DEF = "rewrite.def";
@@ -62,13 +64,13 @@ public class TestSudachiTokenizer {
                 .getResourceAsStream(RESOURCE_NAME_SYSTEM_DIC),
                 Paths.get(tempFile.getPath()).resolve(RESOURCE_NAME_SYSTEM_DIC));
         Files.copy(TestAnalysisSudachi.class
-                .getResourceAsStream(RESOURCE_NAME_CHAR_DEF),
+                .getResourceAsStream("/" + RESOURCE_NAME_CHAR_DEF),
                 Paths.get(tempFile.getPath()).resolve(RESOURCE_NAME_CHAR_DEF));
         Files.copy(TestAnalysisSudachi.class
-                .getResourceAsStream(RESOURCE_NAME_UNK_DEF),
+                .getResourceAsStream("/" + RESOURCE_NAME_UNK_DEF),
                 Paths.get(tempFile.getPath()).resolve(RESOURCE_NAME_UNK_DEF));
         Files.copy(TestAnalysisSudachi.class
-                .getResourceAsStream(RESOURCE_NAME_REWRITE_DEF),
+                .getResourceAsStream("/" + RESOURCE_NAME_REWRITE_DEF),
                 Paths.get(tempFile.getPath())
                         .resolve(RESOURCE_NAME_REWRITE_DEF));
 
