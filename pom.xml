@@ -8,7 +8,6 @@
 	<packaging>jar</packaging>
 
 	<name>analysis-sudachi</name>
-	<url>http://maven.apache.org</url>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -208,4 +207,40 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+  <url>https://github.com/WorksApplications/elasticsearch-sudachi</url>
+  <description>The Japanese analysis plugin for elasticsearch</description>
+  <inceptionYear>2017</inceptionYear>
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+    </license>
+  </licenses>
+  <organization>
+    <name>Works Applications Co., Ltd.</name>
+    <url>http://www.worksap.com/</url>
+  </organization>
+  <developers>
+    <developer>
+      <id>kazuma-t</id>
+      <name>Kazuma TAKAOKA</name>
+      <email>takaoka_k@worksap.co.jp</email>
+      <timezone>Asia/Tokyo</timezone>
+    </developer>
+  </developers>
+  <issueManagement>
+    <system>GitHub Issues</system>
+    <url>https://github.com/WorksApplications/elasticsearch-sudachi/issues</url>
+  </issueManagement>
+  <scm>
+    <connection>scm:git:git@github.com:WorksApplications/elasticsearch-sudachi.git</connection>
+    <developerConnection>scm:git:git@github.com:WorksApplications/elasticsearch-sudachi.git</developerConnection>
+    <url>https://github.com/WorksApplications/elasticsearch-sudachi</url>
+  </scm>
+  <distributionManagement>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+  </distributionManagement>
 </project>
