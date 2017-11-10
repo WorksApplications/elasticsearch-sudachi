@@ -16,6 +16,20 @@
 		<elasticsearch.version>5.6.1</elasticsearch.version>
 	</properties>
 
+	<repositories>
+		<repository>
+			<id>sonatype-snapshot</id>
+			<name>Sonatype Snapshot Repository</name>
+			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+			<layout>default</layout>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 	<build>
 		<plugins>
 			<plugin>
