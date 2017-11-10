@@ -56,16 +56,18 @@ import junit.framework.TestCase;
 public class TestSudachiAnalyzer extends TestCase {
     private static final String RESOURCE_NAME_SUDACHI_SETTINGS = "sudachiSettings.json";
     private static final String RESOURCE_NAME_SYSTEM_DIC = "system.dic";
+
+    // *.def files are packaged into sudachi.jar
     private static final String RESOURCE_NAME_CHAR_DEF = "char.def";
     private static final String RESOURCE_NAME_UNK_DEF = "unk.def";
     private static final String RESOURCE_NAME_REWRITE_DEF = "rewrite.def";
-    
+
     private SudachiAnalyzer analyzer;
     private Directory dir;
 
     @Rule
     public TemporaryFolder tempFolder = new TemporaryFolder();
-    
+
     @Rule
     public TemporaryFolder tempFolderForDictionary = new TemporaryFolder();
 
@@ -82,16 +84,16 @@ public class TestSudachiAnalyzer extends TestCase {
                 .getResourceAsStream(RESOURCE_NAME_SYSTEM_DIC),
                 Paths.get(tempFileForDictionary.getPath()).resolve(RESOURCE_NAME_SYSTEM_DIC));
         Files.copy(TestAnalysisSudachi.class
-                .getResourceAsStream(RESOURCE_NAME_CHAR_DEF),
+                .getResourceAsStream("/" + RESOURCE_NAME_CHAR_DEF),
                 Paths.get(tempFileForDictionary.getPath()).resolve(RESOURCE_NAME_CHAR_DEF));
         Files.copy(TestAnalysisSudachi.class
-                .getResourceAsStream(RESOURCE_NAME_UNK_DEF),
+                .getResourceAsStream("/" + RESOURCE_NAME_UNK_DEF),
                 Paths.get(tempFileForDictionary.getPath()).resolve(RESOURCE_NAME_UNK_DEF));
         Files.copy(TestAnalysisSudachi.class
-                .getResourceAsStream(RESOURCE_NAME_REWRITE_DEF),
+                .getResourceAsStream("/" + RESOURCE_NAME_REWRITE_DEF),
                 Paths.get(tempFileForDictionary.getPath())
                         .resolve(RESOURCE_NAME_REWRITE_DEF));
-        
+
         analyzer = new SudachiAnalyzer(SudachiTokenizer.Mode.EXTENDED, tempFileForDictionary.getPath(),
                 SudachiAnalyzer.DefaultSudachiSettingsReader(),
                 SudachiAnalyzer.getDefaultStopSet(),

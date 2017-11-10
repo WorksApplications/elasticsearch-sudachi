@@ -47,10 +47,6 @@ import com.worksap.nlp.elasticsearch.sudachi.plugin.AnalysisSudachiPlugin;
 
 public class TestAnalysisSudachi extends ESTestCase {
     private static final String RESOURCE_NAME_SUDACHI_SETTINGS = "sudachiSettings.json";
-    private static final String RESOURCE_NAME_SYSTEM_DIC = "system.dic";
-    private static final String RESOURCE_NAME_CHAR_DEF = "char.def";
-    private static final String RESOURCE_NAME_UNK_DEF = "unk.def";
-    private static final String RESOURCE_NAME_REWRITE_DEF = "rewrite.def";
     private static final String RESOURCE_NAME_SUDACHI_ANALYSIS_JSON = "/com/worksap/nlp/lucene/sudachi/ja/sudachiAnalysis.json";
 
     private static Path home;
@@ -168,10 +164,6 @@ public class TestAnalysisSudachi extends ESTestCase {
     public static void initializeTest() throws IOException {
         home = createTempDir();
         Files.copy(TestAnalysisSudachi.class.getResourceAsStream(RESOURCE_NAME_SUDACHI_SETTINGS), home.resolve(RESOURCE_NAME_SUDACHI_SETTINGS));
-        Files.copy(TestAnalysisSudachi.class.getResourceAsStream(RESOURCE_NAME_SYSTEM_DIC), home.resolve(RESOURCE_NAME_SYSTEM_DIC));
-        Files.copy(TestAnalysisSudachi.class.getResourceAsStream(RESOURCE_NAME_CHAR_DEF), home.resolve(RESOURCE_NAME_CHAR_DEF));
-        Files.copy(TestAnalysisSudachi.class.getResourceAsStream(RESOURCE_NAME_UNK_DEF), home.resolve(RESOURCE_NAME_UNK_DEF));
-        Files.copy(TestAnalysisSudachi.class.getResourceAsStream(RESOURCE_NAME_REWRITE_DEF), home.resolve(RESOURCE_NAME_REWRITE_DEF));
     }
 
     @AfterClass

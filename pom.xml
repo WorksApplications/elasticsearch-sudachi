@@ -14,6 +14,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
 		<elasticsearch.version>5.6.1</elasticsearch.version>
+		<sudachi.version>0.1-SNAPSHOT</sudachi.version>
 	</properties>
 
 	<repositories>
@@ -30,6 +31,70 @@
 			</snapshots>
 		</repository>
 	</repositories>
+	<profiles>
+		<profile>
+			<id>extract-system-dic</id>
+			<activation>
+				<file>
+					<missing>src/test/resources/com/worksap/nlp/lucene/sudachi/ja/system.dic</missing>
+				</file>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<version>3.0.2</version>
+						<executions>
+							<execution>
+								<id>unpack-system-dic</id>
+								<phase>generate-test-resources</phase>
+								<goals>
+									<goal>unpack</goal>
+								</goals>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>com.worksap.nlp</groupId>
+											<artifactId>sudachi</artifactId>
+											<classifier>executable</classifier>
+											<version>${sudachi.version}</version>
+											<type>zip</type>
+											<outputDirectory>${project.build.directory}/sudachi-executable</outputDirectory>
+											<includes>**/system.dic</includes>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+		      <plugin>
+		        <artifactId>maven-antrun-plugin</artifactId>
+						<version>1.8</version>
+		        <executions>
+		          <execution>
+							<phase>generate-test-resources</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+		            <configuration>
+		              <target>
+										<copy
+											todir="src/test/resources/com/worksap/nlp/lucene/sudachi/ja"
+											flatten="true">
+											<fileset dir="${project.build.directory}/sudachi-executable/">
+												<include name="**/system.dic" />
+											</fileset>
+										</copy>
+		              </target>
+		            </configuration>
+		          </execution>
+		        </executions>
+		      </plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 	<build>
 		<plugins>
 			<plugin>
@@ -70,14 +135,28 @@
 					</excludes>
 				</configuration>
 			</plugin>
+		  <plugin>
+		    <artifactId>maven-clean-plugin</artifactId>
+		    <version>3.0.0</version>
+		    <configuration>
+		      <filesets>
+		        <fileset>
+		          <directory>src/test/resources/com/worksap/nlp/lucene/sudachi/ja</directory>
+		          <includes>
+		            <include>system.dic</include>
+		          </includes>
+		        </fileset>
+		      </filesets>
+		    </configuration>
+		  </plugin>
 		</plugins>
 	</build>
 	<dependencies>
-	   <!-- Sudachi -->
+		<!-- Sudachi -->
 		<dependency>
 			<groupId>com.worksap.nlp</groupId>
 			<artifactId>sudachi</artifactId>
-			<version>0.1-SNAPSHOT</version>
+			<version>${sudachi.version}</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.elasticsearch/elasticsearch -->
 		<dependency>

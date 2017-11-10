@@ -4,7 +4,7 @@ Sudachi is Japanese morphological analyzer.
 # Build
 
 1. Build and install Sudachi.
-2. Copy files [system.dic / *.def / sudachiSettings.json] in package of Sudachi and place them under  "src/test/resources/com/worksap/nlp/lucene/sudachi/ja".
+2. Copy files sudachiSettings.json in package of Sudachi and place them under  "src/test/resources/com/worksap/nlp/lucene/sudachi/ja".
 3. Build analysis-sudachi.
 ```
    $ mvn package
