@@ -22,7 +22,7 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.util.TokenFilterFactory;
 
 public class SudachiReadingFormFilterFactory extends TokenFilterFactory {
-    private final String ROMAJI_PARAM = "useRomaji";
+    private static final String ROMAJI_PARAM = "useRomaji";
 
     private final boolean useRomaji;
 

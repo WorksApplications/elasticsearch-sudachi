@@ -32,7 +32,7 @@ import com.worksap.nlp.lucene.sudachi.ja.SudachiPartOfSpeechStopFilter;
 public class SudachiPartOfSpeechFilterFactory extends
         AbstractTokenFilterFactory {
 
-    private final Set<String> stopTags = new HashSet<String>();
+    private final Set<String> stopTags = new HashSet<>();
 
     public SudachiPartOfSpeechFilterFactory(IndexSettings indexSettings,
             Environment env, String name, Settings settings) {

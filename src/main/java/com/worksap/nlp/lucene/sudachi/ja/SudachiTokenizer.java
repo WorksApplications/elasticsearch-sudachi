@@ -33,6 +33,7 @@ import org.apache.lucene.util.AttributeFactory;
 import com.worksap.nlp.lucene.sudachi.ja.tokenattribute.BaseFormAttribute;
 import com.worksap.nlp.lucene.sudachi.ja.tokenattribute.PartOfSpeechAttribute;
 import com.worksap.nlp.lucene.sudachi.ja.tokenattribute.ReadingAttribute;
+import com.worksap.nlp.sudachi.Dictionary;
 import com.worksap.nlp.sudachi.DictionaryFactory;
 import com.worksap.nlp.sudachi.Morpheme;
 import com.worksap.nlp.sudachi.Tokenizer;
@@ -43,10 +44,11 @@ public final class SudachiTokenizer extends
 
     public enum Mode {
         NORMAL, SEARCH, EXTENDED
-    };
+    }
 
     private final boolean discardPunctuation;
     private final Mode mode;
+    private final Dictionary dictionary;
     private final Tokenizer tokenizer;
     private final CharTermAttribute termAtt;
     private final BaseFormAttribute basicFormAtt;
@@ -55,7 +57,7 @@ public final class SudachiTokenizer extends
     private final OffsetAttribute offsetAtt;
     private final PositionIncrementAttribute posIncAtt;
     private final PositionLengthAttribute posLengthAtt;
-    private final char[] EOS_SYMBOL_LIST = { '。', '、', '.', ',' };
+    private static final char[] EOS_SYMBOL_LIST = { '。', '、', '.', ',' };
 
     private Iterator<Morpheme> iterator;
     private ListIterator<Morpheme> aUnitIterator;
@@ -80,7 +82,8 @@ public final class SudachiTokenizer extends
         super(factory);
         this.discardPunctuation = discardPunctuation;
         this.mode = mode;
-        tokenizer = new DictionaryFactory().create(path, settings).create();
+        dictionary = new DictionaryFactory().create(path, settings);
+        tokenizer = dictionary.create();
 
         termAtt = addAttribute(CharTermAttribute.class);
         basicFormAtt = addAttribute(BaseFormAttribute.class);
@@ -102,10 +105,8 @@ public final class SudachiTokenizer extends
             setAUnitAttribute(aUnitIterator.next());
             return true;
         }
-        if (iterator == null || !iterator.hasNext()) {
-            if (!tokenizeSentences()) {
-                return false;
-            }
+        if ((iterator == null || !iterator.hasNext()) && !tokenizeSentences()) {
+            return false;
         }
 
         Morpheme morpheme = iterator.next();
@@ -142,11 +143,8 @@ public final class SudachiTokenizer extends
         }
 
         iterator = tokenizer.tokenize(sentences).iterator();
-        if (!iterator.hasNext()) {
-            return false;
-        }
 
-        return true;
+        return iterator.hasNext();
     }
 
     private void setAttribute(Morpheme morpheme) throws IOException {
@@ -195,17 +193,17 @@ public final class SudachiTokenizer extends
 
     private void setTermAttribute(String str) throws IOException {
         int upto = 0;
-        char[] buffer = termAtt.buffer();
+        char[] termAttrBuffer = termAtt.buffer();
         Reader inputSudachi = new StringReader(str);
         while (true) {
-            final int length = inputSudachi.read(buffer, upto, buffer.length
+            final int length = inputSudachi.read(termAttrBuffer, upto, termAttrBuffer.length
                     - upto);
             if (length == -1) {
                 break;
             }
             upto += length;
-            if (upto == buffer.length) {
-                buffer = termAtt.resizeBuffer(1 + buffer.length);
+            if (upto == termAttrBuffer.length) {
+                termAttrBuffer = termAtt.resizeBuffer(1 + termAttrBuffer.length);
             }
         }
         termAtt.setLength(upto);

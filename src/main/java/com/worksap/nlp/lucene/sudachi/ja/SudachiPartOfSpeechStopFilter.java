@@ -48,7 +48,7 @@ public final class SudachiPartOfSpeechStopFilter extends FilteringTokenFilter {
     @Override
     protected boolean accept() {
         final List<String> posList = posAtt.getPartOfSpeechForArray();
-        if (posList == null || posList.size() == 0) {
+        if (posList == null || posList.isEmpty()) {
             return true;
         }
         for (String pos : posList) {

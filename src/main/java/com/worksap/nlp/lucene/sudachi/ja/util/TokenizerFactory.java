@@ -54,5 +54,5 @@ public abstract class TokenizerFactory extends AbstractAnalysisFactory {
         return create(TokenStream.DEFAULT_TOKEN_ATTRIBUTE_FACTORY);
     }
 
-    abstract public Tokenizer create(AttributeFactory factory);
+    public abstract Tokenizer create(AttributeFactory factory);
 }

@@ -79,7 +79,7 @@ public class SudachiAnalyzer extends StopwordAnalyzerBase {
                         SudachiAnalyzer.class, "stoptags.txt", "#");
                 DEFAULT_STOP_TAGS = new HashSet<>();
                 for (Object element : tagset) {
-                    char chars[] = (char[]) element;
+                    char[] chars = (char[]) element;
                     DEFAULT_STOP_TAGS.add(new String(chars));
                 }
             } catch (IOException e) {
