@@ -52,56 +52,6 @@
 				<plugins>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-dependency-plugin</artifactId>
-						<version>3.0.2</version>
-						<executions>
-							<execution>
-								<id>unpack-system-dic</id>
-								<phase>generate-test-resources</phase>
-								<goals>
-									<goal>unpack</goal>
-								</goals>
-								<configuration>
-									<artifactItems>
-										<artifactItem>
-											<groupId>com.worksap.nlp</groupId>
-											<artifactId>sudachi</artifactId>
-											<classifier>executable</classifier>
-											<version>${sudachi.version}</version>
-											<type>zip</type>
-											<outputDirectory>${project.build.directory}/sudachi-executable</outputDirectory>
-											<includes>**/system.dic</includes>
-										</artifactItem>
-									</artifactItems>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<version>1.8</version>
-						<executions>
-							<execution>
-							<phase>generate-test-resources</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-								<configuration>
-									<target>
-										<copy
-											todir="src/test/resources/com/worksap/nlp/lucene/sudachi/ja"
-											flatten="true">
-											<fileset dir="${project.build.directory}/sudachi-executable/">
-												<include name="**/system.dic" />
-											</fileset>
-										</copy>
-									</target>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
 						<version>3.0.0-M1</version>
 						<executions>
@@ -213,6 +163,33 @@
 						</fileset>
 					</filesets>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>3.0.2</version>
+				<executions>
+					<execution>
+						<id>unpack-system-dic</id>
+						<phase>generate-test-resources</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>com.worksap.nlp</groupId>
+									<artifactId>sudachi</artifactId>
+									<classifier>dictionary</classifier>
+									<version>${sudachi.version}</version>
+									<type>zip</type>
+									<outputDirectory>src/test/resources/com/worksap/nlp/lucene/sudachi/ja</outputDirectory>
+									<includes>system.dic</includes>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.sonarsource.scanner.maven</groupId>
