@@ -120,7 +120,7 @@
 						<fileset>
 							<directory>src/test/resources/com/worksap/nlp/lucene/sudachi/ja</directory>
 							<includes>
-								<include>system.dic</include>
+								<include>system_core.dic</include>
 							</includes>
 						</fileset>
 					</filesets>
@@ -142,11 +142,11 @@
 								<artifactItem>
 									<groupId>com.worksap.nlp</groupId>
 									<artifactId>sudachi</artifactId>
-									<classifier>dictionary</classifier>
+									<classifier>dictionary-core</classifier>
 									<version>${sudachi.version}</version>
 									<type>zip</type>
 									<outputDirectory>src/test/resources/com/worksap/nlp/lucene/sudachi/ja</outputDirectory>
-									<includes>system.dic</includes>
+									<includes>system_core.dic</includes>
 								</artifactItem>
 							</artifactItems>
 						</configuration>

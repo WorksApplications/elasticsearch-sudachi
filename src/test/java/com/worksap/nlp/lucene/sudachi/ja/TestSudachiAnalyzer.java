@@ -55,7 +55,7 @@ import junit.framework.TestCase;
 
 public class TestSudachiAnalyzer extends TestCase {
     private static final String RESOURCE_NAME_SUDACHI_SETTINGS = "sudachiSettings.json";
-    private static final String RESOURCE_NAME_SYSTEM_DIC = "system.dic";
+    private static final String RESOURCE_NAME_SYSTEM_DIC = "system_core.dic";
 
     // *.def files are packaged into sudachi.jar
     private static final String RESOURCE_NAME_CHAR_DEF = "char.def";
