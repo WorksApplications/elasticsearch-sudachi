@@ -227,7 +227,7 @@ public final class SudachiTokenizer extends
         }
         n += offset;
 
-        int eos = indexOfEos(buffer, n);
+        int eos = lastIndexOfEos(buffer, n);
         String sentences = new String(buffer, 0, eos);
         remainSize = n - eos;
         System.arraycopy(buffer, eos, buffer, 0, remainSize);
@@ -235,7 +235,7 @@ public final class SudachiTokenizer extends
         return sentences;
     }
 
-    private int indexOfEos(char[] buffer, int length) {
+    private int lastIndexOfEos(char[] buffer, int length) {
         for (int i = length - 1; i > 0; i--) {
             for (char c : EOS_SYMBOL_LIST) {
                 if (buffer[i] == c) {
