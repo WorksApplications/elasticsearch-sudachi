@@ -25,6 +25,8 @@ import org.apache.lucene.util.AttributeReflector;
 import com.worksap.nlp.sudachi.Morpheme;
 
 public class PartOfSpeechAttributeImpl extends AttributeImpl implements PartOfSpeechAttribute {
+    static final String EMPTY_COLUMN = "*";
+
     private Morpheme morpheme;
 
     public List<String> getPartOfSpeechForArray() {
@@ -40,7 +42,7 @@ public class PartOfSpeechAttributeImpl extends AttributeImpl implements PartOfSp
             if (i == 4) {
                 posList.add(posBuilder.toString());
             }
-            if (pos.equals("*")) {
+            if (EMPTY_COLUMN.equals(pos)) {
                 i++;
                 continue;
             }
