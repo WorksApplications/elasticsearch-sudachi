@@ -87,6 +87,8 @@ public class SudachiAnalyzer extends StopwordAnalyzerBase {
                 throw new UncheckedIOException(e);
             }
         }
+
+        private DefaultSetHolder() {}
     }
 
     static String defaultSudachiSettingsReader() {
