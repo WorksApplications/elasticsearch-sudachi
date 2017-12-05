@@ -21,8 +21,7 @@ import org.apache.lucene.util.AttributeReflector;
 
 import com.worksap.nlp.sudachi.Morpheme;
 
-public class BaseFormAttributeImpl extends AttributeImpl implements
-        BaseFormAttribute, Cloneable {
+public class BaseFormAttributeImpl extends AttributeImpl implements BaseFormAttribute {
     private Morpheme morpheme;
 
     public String getBaseForm() {

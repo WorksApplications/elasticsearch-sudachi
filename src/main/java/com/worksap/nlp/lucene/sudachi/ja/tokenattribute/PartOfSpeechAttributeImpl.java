@@ -24,8 +24,7 @@ import org.apache.lucene.util.AttributeReflector;
 
 import com.worksap.nlp.sudachi.Morpheme;
 
-public class PartOfSpeechAttributeImpl extends AttributeImpl implements
-        PartOfSpeechAttribute, Cloneable {
+public class PartOfSpeechAttributeImpl extends AttributeImpl implements PartOfSpeechAttribute {
     private Morpheme morpheme;
 
     public List<String> getPartOfSpeechForArray() {

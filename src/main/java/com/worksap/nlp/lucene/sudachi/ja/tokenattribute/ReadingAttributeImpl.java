@@ -21,8 +21,7 @@ import org.apache.lucene.util.AttributeReflector;
 
 import com.worksap.nlp.sudachi.Morpheme;
 
-public class ReadingAttributeImpl extends AttributeImpl implements
-        ReadingAttribute, Cloneable {
+public class ReadingAttributeImpl extends AttributeImpl implements ReadingAttribute {
     private Morpheme morpheme;
 
     public String getReading() {
