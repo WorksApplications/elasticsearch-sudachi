@@ -16,10 +16,15 @@
 
 package com.worksap.nlp.lucene.sudachi.ja;
 
+import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -44,6 +49,7 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.BytesRef;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -53,7 +59,7 @@ import com.worksap.nlp.lucene.sudachi.ja.SudachiAnalyzer;
 
 import junit.framework.TestCase;
 
-public class TestSudachiAnalyzer extends TestCase {
+public class TestSudachiAnalyzer {
     private static final String RESOURCE_NAME_SUDACHI_SETTINGS = "sudachiSettings.json";
     private static final String RESOURCE_NAME_SYSTEM_DIC = "system_core.dic";
 
@@ -61,6 +67,9 @@ public class TestSudachiAnalyzer extends TestCase {
     private static final String RESOURCE_NAME_CHAR_DEF = "char.def";
     private static final String RESOURCE_NAME_UNK_DEF = "unk.def";
     private static final String RESOURCE_NAME_REWRITE_DEF = "rewrite.def";
+
+    private static final String INPUT_TEXT = "東京都へ行った。私は宇宙人です。";
+    private static final String FIELD_NAME = "txt";
 
     private SudachiAnalyzer analyzer;
     private Directory dir;
@@ -104,77 +113,80 @@ public class TestSudachiAnalyzer extends TestCase {
         File tempFile = tempFolder.newFolder("sudachi");
         dir = FSDirectory.open(Paths.get(tempFile.getPath()));
 
-        IndexWriter writer = new IndexWriter(dir, config);
-        createIndex(writer);
-        checkIndex(writer);
-        writer.close();
+        try (IndexWriter writer = new IndexWriter(dir, config)) {
+            createIndex(writer);
+        }
     }
 
-    private void createIndex(IndexWriter writer) throws IOException {
+    @After
+    public void tearDown() throws IOException {
+        if (dir != null) {
+            dir.close();
+        }
+        if (analyzer != null) {
+            analyzer.close();
+        }
+    }
+
+    private static void createIndex(IndexWriter writer) throws IOException {
         Document doc = new Document();
-        doc.add(new TextField("txt", "東京都へ行った。私は宇宙人です。", Field.Store.YES));
+        doc.add(new TextField(FIELD_NAME, INPUT_TEXT, Field.Store.YES));
         writer.addDocument(doc);
         writer.commit();
         writer.isOpen();
     }
 
-    private void checkIndex(IndexWriter writer) throws IOException {
-        try (IndexReader reader = DirectoryReader.open(writer, false, false);) {
+    @Test
+    public void testTerms() throws IOException {
+        try (IndexReader reader = DirectoryReader.open(dir)) {
             List<LeafReaderContext> atomicReaderContextList = reader.leaves();
+            assertThat(atomicReaderContextList.size(), is(1));
+            LeafReaderContext leafReaderContext = atomicReaderContextList.get(0);
 
-            for (LeafReaderContext leafReaderContext : atomicReaderContextList) {
-                LeafReader leafReader = leafReaderContext.reader();
-                Fields fields = leafReader.fields();
-                Iterator<String> itrFieldName = fields.iterator();
+            LeafReader leafReader = leafReaderContext.reader();
+            Fields fields = leafReader.fields();
+            assertThat(fields.size(), is(1));
 
-                while (itrFieldName.hasNext()) {
-                    String fieldName = itrFieldName.next();
-                    System.out.println("----- fieldName:" + fieldName
-                            + " -----");
-                    Terms terms = fields.terms(fieldName);
-                    TermsEnum termsEnum = terms.iterator();
-                    BytesRef bytesRef = null;
+            String fieldName = fields.iterator().next();
+            assertThat(fieldName, is(FIELD_NAME));
 
-                    while ((bytesRef = termsEnum.next()) != null) {
-                        String fieldText = bytesRef.utf8ToString();
-                        System.out.println(fieldText);
-                    }
-                }
+            Terms terms = fields.terms(fieldName);
+            assertThat(terms.size(), is(7L));
+
+            List<String> termList = new ArrayList<>();
+            TermsEnum termsEnum = terms.iterator();
+            BytesRef bytesRef = null;
+            while ((bytesRef = termsEnum.next()) != null) {
+                String fieldText = bytesRef.utf8ToString();
+                termList.add(fieldText);
             }
+            assertThat(termList, hasItems("東京", "東京都", "都", "行く", "私", "宇宙", "人"));
         }
     }
 
     @Test
-    public void test() throws Exception {
-        String searchText = "岩波";
-        try (IndexReader reader = DirectoryReader.open(dir);) {
+    public void testQuery() throws Exception {
+        try (IndexReader reader = DirectoryReader.open(dir)) {
             IndexSearcher searcher = new IndexSearcher(reader);
-            QueryParser queryParser = new QueryParser("txt", analyzer);
-            Query query = queryParser.parse(searchText);
+            QueryParser queryParser = new QueryParser(FIELD_NAME, analyzer);
+
+            Query query = queryParser.parse("東京");
             TopDocs topDocs = searcher.search(query, 5);
             ScoreDoc[] scoreDocs = topDocs.scoreDocs;
+            assertThat(scoreDocs.length, is(1));
+            ScoreDoc scoreDoc = scoreDocs[0];
+            int docId = scoreDoc.doc;
+            assertThat(docId, is(0));
+            Document doc = searcher.doc(docId);
+            String[] values = doc.getValues(FIELD_NAME);
+            assertThat(values.length, is(1));
+            assertThat(values[0], is(INPUT_TEXT));
 
-            for (ScoreDoc scoreDoc : scoreDocs) {
-                int docId = scoreDoc.doc;
-                System.out.println("----- docId:" + docId + " -----");
-                Document doc = searcher.doc(docId);
-                List<IndexableField> indexableFieldList = doc.getFields();
+            query = queryParser.parse("京都");
+            assertThat(searcher.search(query, 5).totalHits, is(0));
 
-                for (IndexableField indexableField : indexableFieldList) {
-                    String fieldName = indexableField.name();
-                    System.out.println("----- fieldName:" + fieldName
-                            + " -----");
-                    String fieldText = indexableField.stringValue();
-                    System.out.println("fieldText:" + fieldText);
-                }
-            }
-        } finally {
-            if (analyzer != null) {
-                analyzer.close();
-            }
-            if (dir != null) {
-                dir.close();
-            }
+            query = queryParser.parse("岩波");
+            assertThat(searcher.search(query, 5).totalHits, is(0));
         }
     }
 }
