@@ -45,7 +45,7 @@ public class SudachiAnalyzer extends StopwordAnalyzerBase {
     private final Set<String> stoptags;
 
     public SudachiAnalyzer() {
-        this(SudachiTokenizer.DEFAULT_MODE, "", DefaultSudachiSettingsReader(),
+        this(SudachiTokenizer.DEFAULT_MODE, "", defaultSudachiSettingsReader(),
                 DefaultSetHolder.DEFAULT_STOP_SET,
                 DefaultSetHolder.DEFAULT_STOP_TAGS);
     }
@@ -88,7 +88,7 @@ public class SudachiAnalyzer extends StopwordAnalyzerBase {
         }
     }
 
-    static String DefaultSudachiSettingsReader() {
+    static String defaultSudachiSettingsReader() {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(
                 SudachiAnalyzer.class
                         .getResourceAsStream("sudachiSettings.json"), StandardCharsets.UTF_8));) {

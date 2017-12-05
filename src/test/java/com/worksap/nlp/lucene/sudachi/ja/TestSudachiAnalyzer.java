@@ -95,7 +95,7 @@ public class TestSudachiAnalyzer extends TestCase {
                         .resolve(RESOURCE_NAME_REWRITE_DEF));
 
         analyzer = new SudachiAnalyzer(SudachiTokenizer.Mode.EXTENDED, tempFileForDictionary.getPath(),
-                SudachiAnalyzer.DefaultSudachiSettingsReader(),
+                SudachiAnalyzer.defaultSudachiSettingsReader(),
                 SudachiAnalyzer.getDefaultStopSet(),
                 SudachiAnalyzer.getDefaultStopTags());
         IndexWriterConfig config = new IndexWriterConfig(analyzer);
