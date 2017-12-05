@@ -20,6 +20,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Set;
@@ -29,7 +30,6 @@ import org.apache.lucene.analysis.StopwordAnalyzerBase;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.core.StopFilter;
-import org.elasticsearch.ElasticsearchException;
 
 import com.worksap.nlp.lucene.sudachi.ja.SudachiTokenizer.Mode;
 
@@ -83,7 +83,7 @@ public class SudachiAnalyzer extends StopwordAnalyzerBase {
                     DEFAULT_STOP_TAGS.add(new String(chars));
                 }
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new UncheckedIOException(e);
             }
         }
     }
@@ -99,10 +99,10 @@ public class SudachiAnalyzer extends StopwordAnalyzerBase {
             }
             return sb.toString();
         } catch (FileNotFoundException e) {
-            throw new ElasticsearchException(
+            throw new UncheckedIOException(
                     "Sudachi Settings File not Found.", e);
         } catch (IOException e) {
-            throw new ElasticsearchException(
+            throw new UncheckedIOException(
                     "Fail to load Sudachi Settings File.", e);
         }
     }
@@ -113,7 +113,7 @@ public class SudachiAnalyzer extends StopwordAnalyzerBase {
         try {
             tokenizer = new SudachiTokenizer(true, mode, resourcesPath, settings);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new UncheckedIOException(e);
         }
         TokenStream stream = new SudachiBaseFormFilter(tokenizer);
         stream = new SudachiPartOfSpeechStopFilter(stream, stoptags);
