@@ -194,19 +194,19 @@ public final class SudachiTokenizer extends
     private void setTermAttribute(String str) throws IOException {
         int upto = 0;
         char[] termAttrBuffer = termAtt.buffer();
-        Reader inputSudachi = new StringReader(str);
-        while (true) {
-            final int length = inputSudachi.read(termAttrBuffer, upto, termAttrBuffer.length
-                    - upto);
-            if (length == -1) {
-                break;
+        try (Reader inputSudachi = new StringReader(str)) {
+            while (true) {
+                final int length = inputSudachi.read(termAttrBuffer, upto, termAttrBuffer.length - upto);
+                if (length == -1) {
+                    break;
+                }
+                upto += length;
+                if (upto == termAttrBuffer.length) {
+                    termAttrBuffer = termAtt.resizeBuffer(1 + termAttrBuffer.length);
+                }
             }
-            upto += length;
-            if (upto == termAttrBuffer.length) {
-                termAttrBuffer = termAtt.resizeBuffer(1 + termAttrBuffer.length);
-            }
+            termAtt.setLength(upto);
         }
-        termAtt.setLength(upto);
     }
 
     String readSentences() throws IOException {
