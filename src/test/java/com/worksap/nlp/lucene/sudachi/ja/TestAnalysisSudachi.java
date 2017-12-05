@@ -75,8 +75,6 @@ public class TestAnalysisSudachi extends ESTestCase {
         List<String> actual = getAsList(stream);
         List<String> expected = Arrays.asList("tōkyōto", "tōkyō", "to", "e", "i", "ta");
         assertThat(actual, is(expected));
-        tokenizer.end();
-        tokenizer.reset();
     }
     
     @Test
@@ -90,8 +88,6 @@ public class TestAnalysisSudachi extends ESTestCase {
         List<String> actual = getAsList(stream);
         List<String> expected = Arrays.asList("トウキョウト", "トウキョウ", "ト", "エ", "イッ", "タ");
         assertThat(actual, is(expected));
-        tokenizer.end();
-        tokenizer.reset();
     }
     
     @Test
@@ -105,8 +101,6 @@ public class TestAnalysisSudachi extends ESTestCase {
         List<String> actual = getAsList(stream);
         List<String> expected = Arrays.asList("差し出だす", "差す", "出だす");
         assertThat(actual, is(expected));
-        tokenizer.end();
-        tokenizer.reset();
     }
     
     @Test
@@ -120,8 +114,6 @@ public class TestAnalysisSudachi extends ESTestCase {
         List<String> actual = getAsList(stream);
         List<String> expected = Arrays.asList("東京都", "東京", "都", "行く");
         assertThat(actual, is(expected));
-        tokenizer.end();
-        tokenizer.reset();
     }
     
     @Test
@@ -135,8 +127,6 @@ public class TestAnalysisSudachi extends ESTestCase {
         List<String> actual = getAsList(stream);
         List<String> expected = Arrays.asList("東京都", "東京", "都", "行く");
         assertThat(actual, is(expected));
-        tokenizer.end();
-        tokenizer.reset();
     }
 
     private static List<String> getAsList(TokenStream stream) throws IOException {
