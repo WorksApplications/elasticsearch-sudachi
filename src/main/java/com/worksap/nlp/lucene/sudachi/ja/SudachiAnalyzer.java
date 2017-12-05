@@ -19,6 +19,7 @@ package com.worksap.nlp.lucene.sudachi.ja;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
@@ -89,9 +90,9 @@ public class SudachiAnalyzer extends StopwordAnalyzerBase {
     }
 
     static String defaultSudachiSettingsReader() {
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-                SudachiAnalyzer.class
-                        .getResourceAsStream("sudachiSettings.json"), StandardCharsets.UTF_8));) {
+        try (InputStream input = SudachiAnalyzer.class.getResourceAsStream("sudachiSettings.json");
+             InputStreamReader inputReader =  new InputStreamReader(input, StandardCharsets.UTF_8);
+             BufferedReader reader = new BufferedReader(inputReader)) {
             StringBuilder sb = new StringBuilder();
             String line;
             while ((line = reader.readLine()) != null) {
