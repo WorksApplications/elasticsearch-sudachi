@@ -23,7 +23,6 @@ import static org.junit.Assert.assertThat;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.lucene.document.Field;
@@ -34,7 +33,6 @@ import org.apache.lucene.index.Fields;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.Terms;
@@ -54,8 +52,6 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import com.worksap.nlp.lucene.sudachi.ja.SudachiAnalyzer;
-
-import junit.framework.TestCase;
 
 public class TestSudachiAnalyzer {
     private static final String INPUT_TEXT = "東京都へ行った。私は宇宙人です。";
