@@ -23,8 +23,6 @@ import static org.junit.Assert.assertThat;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
@@ -35,14 +33,6 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 public class TestSudachiTokenizer {
-    private static final String RESOURCE_NAME_SUDACHI_SETTINGS = "sudachiSettings.json";
-    private static final String RESOURCE_NAME_SYSTEM_DIC = "system_core.dic";
-
-    // *.def files are packaged into sudachi.jar
-    private static final String RESOURCE_NAME_CHAR_DEF = "char.def";
-    private static final String RESOURCE_NAME_UNK_DEF = "unk.def";
-    private static final String RESOURCE_NAME_REWRITE_DEF = "rewrite.def";
-
     private SudachiTokenizer tokenizer;
     private SudachiTokenizer tokenizerExtended;
     private SudachiTokenizer tokenizerNormal;
@@ -56,23 +46,7 @@ public class TestSudachiTokenizer {
         tempFolder.create();
         File tempFile = tempFolder.newFolder("sudachiDictionary");
 
-        Files.copy(TestAnalysisSudachi.class
-                .getResourceAsStream(RESOURCE_NAME_SUDACHI_SETTINGS), Paths
-                .get(tempFile.getPath())
-                .resolve(RESOURCE_NAME_SUDACHI_SETTINGS));
-        Files.copy(TestAnalysisSudachi.class
-                .getResourceAsStream(RESOURCE_NAME_SYSTEM_DIC),
-                Paths.get(tempFile.getPath()).resolve(RESOURCE_NAME_SYSTEM_DIC));
-        Files.copy(TestAnalysisSudachi.class
-                .getResourceAsStream("/" + RESOURCE_NAME_CHAR_DEF),
-                Paths.get(tempFile.getPath()).resolve(RESOURCE_NAME_CHAR_DEF));
-        Files.copy(TestAnalysisSudachi.class
-                .getResourceAsStream("/" + RESOURCE_NAME_UNK_DEF),
-                Paths.get(tempFile.getPath()).resolve(RESOURCE_NAME_UNK_DEF));
-        Files.copy(TestAnalysisSudachi.class
-                .getResourceAsStream("/" + RESOURCE_NAME_REWRITE_DEF),
-                Paths.get(tempFile.getPath())
-                        .resolve(RESOURCE_NAME_REWRITE_DEF));
+        ResourceUtil.copy(tempFile);
 
         tokenizer = new SudachiTokenizer(true, SudachiTokenizer.Mode.SEARCH,
                 tempFile.getPath(),

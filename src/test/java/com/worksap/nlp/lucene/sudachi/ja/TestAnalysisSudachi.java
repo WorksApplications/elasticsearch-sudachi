@@ -19,9 +19,9 @@ package com.worksap.nlp.lucene.sudachi.ja;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.instanceOf;
 
+import java.io.InputStream;
 import java.io.IOException;
 import java.io.StringReader;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,7 +38,6 @@ import org.elasticsearch.env.Environment;
 import org.elasticsearch.index.Index;
 import org.elasticsearch.index.analysis.TokenizerFactory;
 import org.elasticsearch.test.ESTestCase;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -46,7 +45,6 @@ import com.worksap.nlp.elasticsearch.sudachi.index.SudachiTokenizerFactory;
 import com.worksap.nlp.elasticsearch.sudachi.plugin.AnalysisSudachiPlugin;
 
 public class TestAnalysisSudachi extends ESTestCase {
-    private static final String RESOURCE_NAME_SUDACHI_SETTINGS = "sudachiSettings.json";
     private static final String RESOURCE_NAME_SUDACHI_ANALYSIS_JSON = "/com/worksap/nlp/lucene/sudachi/ja/sudachiAnalysis.json";
 
     private static Path home;
@@ -140,12 +138,16 @@ public class TestAnalysisSudachi extends ESTestCase {
     }
 
     private static TestAnalysis createTestAnalysis() throws IOException {
-        Settings settings = Settings.builder()
-            .loadFromStream(RESOURCE_NAME_SUDACHI_ANALYSIS_JSON, AnalysisSudachiPlugin.class.getResourceAsStream(RESOURCE_NAME_SUDACHI_ANALYSIS_JSON))
-            .put("index.analysis.tokenizer.sudachi_tokenizer.settings_path", home.resolve(RESOURCE_NAME_SUDACHI_SETTINGS))
-            .put("index.analysis.tokenizer.sudachi_tokenizer.resources_path", home)
-            .put(IndexMetaData.SETTING_VERSION_CREATED, Version.CURRENT)
-            .build();
+        Settings settings;
+        try (InputStream input = AnalysisSudachiPlugin.class.getResourceAsStream(RESOURCE_NAME_SUDACHI_ANALYSIS_JSON)) {
+            settings = Settings.builder()
+                .loadFromStream(RESOURCE_NAME_SUDACHI_ANALYSIS_JSON, input)
+                .put("index.analysis.tokenizer.sudachi_tokenizer.settings_path", home.resolve(ResourceUtil.RESOURCE_NAME_SUDACHI_SETTINGS))
+                .put("index.analysis.tokenizer.sudachi_tokenizer.resources_path", home)
+                .put(IndexMetaData.SETTING_VERSION_CREATED, Version.CURRENT)
+                .build();
+        }
+
         Settings nodeSettings = Settings.builder().put(Environment.PATH_HOME_SETTING.getKey(), home).build();
         return createTestAnalysis(new Index("test", "_na_"), nodeSettings, settings, new AnalysisSudachiPlugin());
     }
@@ -153,11 +155,7 @@ public class TestAnalysisSudachi extends ESTestCase {
     @BeforeClass
     public static void initializeTest() throws IOException {
         home = createTempDir();
-        Files.copy(TestAnalysisSudachi.class.getResourceAsStream(RESOURCE_NAME_SUDACHI_SETTINGS), home.resolve(RESOURCE_NAME_SUDACHI_SETTINGS));
-    }
-
-    @AfterClass
-    public static void finalizeTest() {
-        
+        ResourceUtil.copyResource(ResourceUtil.RESOURCE_NAME_SUDACHI_SETTINGS,
+                                  home.toFile(), false);
     }
 }

@@ -22,8 +22,6 @@ import static org.junit.Assert.assertThat;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -60,14 +58,6 @@ import com.worksap.nlp.lucene.sudachi.ja.SudachiAnalyzer;
 import junit.framework.TestCase;
 
 public class TestSudachiAnalyzer {
-    private static final String RESOURCE_NAME_SUDACHI_SETTINGS = "sudachiSettings.json";
-    private static final String RESOURCE_NAME_SYSTEM_DIC = "system_core.dic";
-
-    // *.def files are packaged into sudachi.jar
-    private static final String RESOURCE_NAME_CHAR_DEF = "char.def";
-    private static final String RESOURCE_NAME_UNK_DEF = "unk.def";
-    private static final String RESOURCE_NAME_REWRITE_DEF = "rewrite.def";
-
     private static final String INPUT_TEXT = "東京都へ行った。私は宇宙人です。";
     private static final String FIELD_NAME = "txt";
 
@@ -85,23 +75,7 @@ public class TestSudachiAnalyzer {
         tempFolderForDictionary.create();
         File tempFileForDictionary = tempFolderForDictionary.newFolder("sudachiDictionary");
 
-        Files.copy(TestAnalysisSudachi.class
-                .getResourceAsStream(RESOURCE_NAME_SUDACHI_SETTINGS), Paths
-                .get(tempFileForDictionary.getPath())
-                .resolve(RESOURCE_NAME_SUDACHI_SETTINGS));
-        Files.copy(TestAnalysisSudachi.class
-                .getResourceAsStream(RESOURCE_NAME_SYSTEM_DIC),
-                Paths.get(tempFileForDictionary.getPath()).resolve(RESOURCE_NAME_SYSTEM_DIC));
-        Files.copy(TestAnalysisSudachi.class
-                .getResourceAsStream("/" + RESOURCE_NAME_CHAR_DEF),
-                Paths.get(tempFileForDictionary.getPath()).resolve(RESOURCE_NAME_CHAR_DEF));
-        Files.copy(TestAnalysisSudachi.class
-                .getResourceAsStream("/" + RESOURCE_NAME_UNK_DEF),
-                Paths.get(tempFileForDictionary.getPath()).resolve(RESOURCE_NAME_UNK_DEF));
-        Files.copy(TestAnalysisSudachi.class
-                .getResourceAsStream("/" + RESOURCE_NAME_REWRITE_DEF),
-                Paths.get(tempFileForDictionary.getPath())
-                        .resolve(RESOURCE_NAME_REWRITE_DEF));
+        ResourceUtil.copy(tempFileForDictionary);
 
         analyzer = new SudachiAnalyzer(SudachiTokenizer.Mode.EXTENDED, tempFileForDictionary.getPath(),
                 SudachiAnalyzer.defaultSudachiSettingsReader(),
@@ -111,7 +85,7 @@ public class TestSudachiAnalyzer {
 
         tempFolder.create();
         File tempFile = tempFolder.newFolder("sudachi");
-        dir = FSDirectory.open(Paths.get(tempFile.getPath()));
+        dir = FSDirectory.open(tempFile.toPath());
 
         try (IndexWriter writer = new IndexWriter(dir, config)) {
             createIndex(writer);
