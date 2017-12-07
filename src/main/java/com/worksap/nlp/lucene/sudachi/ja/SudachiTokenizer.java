@@ -42,7 +42,7 @@ public final class SudachiTokenizer extends
         org.apache.lucene.analysis.Tokenizer {
     public static final Mode DEFAULT_MODE = Mode.SEARCH;
 
-    public enum Mode {
+    public static enum Mode {
         NORMAL, SEARCH, EXTENDED
     }
 
