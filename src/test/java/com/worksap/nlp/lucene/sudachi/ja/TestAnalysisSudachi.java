@@ -31,6 +31,7 @@ import org.apache.lucene.analysis.StopFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.elasticsearch.Version;
 import org.elasticsearch.cluster.metadata.IndexMetaData;
 import org.elasticsearch.common.settings.Settings;
@@ -127,12 +128,52 @@ public class TestAnalysisSudachi extends ESTestCase {
         assertThat(actual, is(expected));
     }
 
+    @Test
+    public void testOffset() throws IOException {
+        TestAnalysis analysis = createTestAnalysis();
+        TokenizerFactory tokenizerFactory = analysis.tokenizer.get("sudachi_tokenizer");
+
+        Tokenizer tokenizer = tokenizerFactory.create();
+        tokenizer.setReader(new StringReader("東京都へ行った。"));
+        List<Integer> actual = getAsOffsetList(tokenizer);
+        List<Integer> expected = Arrays.asList(0, 0, 2, 3, 4, 6);
+        assertThat(actual, is(expected));
+    }
+
+    @Test
+    public void testOffsetWithLongInput() throws IOException {
+        TestAnalysis analysis = createTestAnalysis();
+        TokenizerFactory tokenizerFactory = analysis.tokenizer.get("sudachi_tokenizer");
+
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < 1000; i++) {
+            builder.append("東京都へ行った。");
+        }
+        Tokenizer tokenizer = tokenizerFactory.create();
+        tokenizer.setReader(new StringReader(builder.toString()));
+        int prevOffset = 0;
+        for (int offset : getAsOffsetList(tokenizer)) {
+            assertTrue(offset >= prevOffset);
+            prevOffset = offset;
+        }
+    }
+
     private static List<String> getAsList(TokenStream stream) throws IOException {
         stream.reset();
         CharTermAttribute termAttr = stream.getAttribute(CharTermAttribute.class);
         List<String> result = new ArrayList<>();
         while (stream.incrementToken()) {
             result.add(termAttr.toString());
+        }
+        return result;
+    }
+
+    private static List<Integer> getAsOffsetList(TokenStream stream) throws IOException {
+        stream.reset();
+        OffsetAttribute offsetAttr = stream.getAttribute(OffsetAttribute.class);
+        List<Integer> result = new ArrayList<>();
+        while (stream.incrementToken()) {
+            result.add(offsetAttr.startOffset());
         }
         return result;
     }

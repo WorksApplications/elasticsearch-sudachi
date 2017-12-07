@@ -65,6 +65,8 @@ public final class SudachiTokenizer extends
 
     private static final int BUFFER_SIZE = 512;
     private char[] buffer = new char[BUFFER_SIZE];
+    private int baseOffset = 0;
+    private int nextBaseOffset = 0;
     private int remainSize = 0;
     private int oovBegin = 0;
     private int aUnitSize = 0;
@@ -175,7 +177,8 @@ public final class SudachiTokenizer extends
         basicFormAtt.setMorpheme(morpheme);
         posAtt.setMorpheme(morpheme);
         readingAtt.setMorpheme(morpheme);
-        offsetAtt.setOffset(morpheme.begin(), morpheme.end());
+        offsetAtt.setOffset(baseOffset + morpheme.begin(),
+                            baseOffset + morpheme.end());
         setTermAttribute(morpheme.normalizedForm());
     }
 
@@ -232,6 +235,9 @@ public final class SudachiTokenizer extends
         remainSize = n - eos;
         System.arraycopy(buffer, eos, buffer, 0, remainSize);
 
+        baseOffset = nextBaseOffset;
+        //nextBaseOffset += eos;
+
         return sentences;
     }
 
@@ -282,6 +288,7 @@ public final class SudachiTokenizer extends
     public void reset() throws IOException {
         super.reset();
         remainSize = 0;
+        baseOffset = 0;
         oovBegin = 0;
         iterator = null;
         aUnitIterator = null;
