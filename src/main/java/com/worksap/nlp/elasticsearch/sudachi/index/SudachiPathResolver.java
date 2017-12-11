@@ -37,7 +37,7 @@ public class SudachiPathResolver {
     
     public String resolvePathForDirectory(){
         if (filePath == null) {
-            return "";
+            return esConfig;
         }
         if(filePath.isEmpty()){
             return Paths.get(esConfig).toString();

@@ -41,7 +41,7 @@ public class SudachiTokenizerFactory extends AbstractTokenizerFactory {
         mode = getMode(settings);
         discardPunctuation = settings.getAsBoolean("discard_punctuation", true);
         resourcesPath = new SudachiPathResolver(env.configFile().toString(), 
-                settings.get("resources_path")).resolvePathForDirectory();
+                settings.get("resources_path", name)).resolvePathForDirectory();
         settingsPath = new SudachiSettingsReader(env.configFile().toString(), 
                 settings.get("settings_path")).read();
     }

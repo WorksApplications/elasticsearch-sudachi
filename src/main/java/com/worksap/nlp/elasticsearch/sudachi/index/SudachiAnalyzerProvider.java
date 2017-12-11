@@ -42,7 +42,7 @@ public class SudachiAnalyzerProvider extends
         final SudachiTokenizer.Mode mode = SudachiTokenizerFactory
                 .getMode(settings);
         final String resourcesPath = new SudachiPathResolver(env.configFile()
-                .toString(), settings.get("resources_path"))
+                .toString(), settings.get("resources_path", name))
                 .resolvePathForDirectory();
         final String settingsPath = new SudachiSettingsReader(env.configFile()
                 .toString(), settings.get("settings_path")).read();
