@@ -17,7 +17,7 @@ analysis-sudachi is Elasticsearch plugin based on Sudachi the Japanese morpholog
 Follow the steps below to install.
 1. Change the current directory "/usr/share/elasticsearch".
 2. Place the zip file created with "Build" on the moved directory.
-3. Command "sudo bin/elasticsearch-plugin install file///usr/share/elasticsearch/<zipfile-name>"
+3. Command "sudo bin/elasticsearch-plugin install file:///usr/share/elasticsearch/<zipfile-name>"
 4. Place files [system_core.dic or system_full.dic] under ES_HOME/sudachi.
 
 # Configuration
