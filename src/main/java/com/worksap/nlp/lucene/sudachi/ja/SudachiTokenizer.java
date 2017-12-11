@@ -183,7 +183,7 @@ public final class SudachiTokenizer extends
     }
 
     private void setOOVAttribute(String str) throws IOException {
-        offsetAtt.setOffset(oovBegin, oovBegin+1);
+        offsetAtt.setOffset(baseOffset + oovBegin, baseOffset + oovBegin + 1);
         oovBegin += 1;
         posLengthAtt.setPositionLength(1);
         if (oovIterator.previousIndex() == 0) {
@@ -224,6 +224,7 @@ public final class SudachiTokenizer extends
             if (remainSize != 0) {
                 String lastSentence = new String(buffer, 0, remainSize);
                 remainSize = 0;
+                baseOffset = nextBaseOffset;
                 return lastSentence;
             }
             return null;
@@ -291,6 +292,7 @@ public final class SudachiTokenizer extends
         super.reset();
         remainSize = 0;
         baseOffset = 0;
+        nextBaseOffset = 0;
         oovBegin = 0;
         iterator = null;
         aUnitIterator = null;
