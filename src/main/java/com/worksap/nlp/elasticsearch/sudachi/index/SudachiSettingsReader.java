@@ -41,7 +41,7 @@ public class SudachiSettingsReader {
                 return new String(Files.readAllBytes(Paths.get(path)),
                         StandardCharsets.UTF_8);
             } else {
-                return "";
+                return null;
             }
         } catch (FileNotFoundException e) {
             throw new ElasticsearchException(

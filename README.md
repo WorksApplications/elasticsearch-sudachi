@@ -8,8 +8,7 @@ analysis-sudachi is Elasticsearch plugin based on Sudachi the Japanese morpholog
 
 # Build
 
-1. Copy files sudachiSettings.json in package of [Sudachi](https://github.com/WorksApplications/Sudachi) and place them under  "src/test/resources/com/worksap/nlp/lucene/sudachi/ja".
-2. Build analysis-sudachi.
+1. Build analysis-sudachi.
 ```
    $ mvn package
 ```
@@ -19,7 +18,7 @@ Follow the steps below to install.
 1. Change the current directory "/usr/share/elasticsearch".
 2. Place the zip file created with "Build" on the moved directory.
 3. Command "sudo bin/elasticsearch-plugin install file///usr/share/elasticsearch/<zipfile-name>"
-4. Place files [system_core.dic or system_full.dic / *.def / sudachiSettings.json] under ES_HOME.
+4. Place files [system_core.dic or system_full.dic] under ES_HOME/sudachi.
 
 # Configuration
 - tokenizer: Select tokenizer. (sudachi) (string)
@@ -44,9 +43,8 @@ Follow the steps below to install.
           "sudachi_tokenizer": {
             "type": "sudachi_tokenizer",
             "mode": "search",
-	        "discard_punctuation": true,
-            "settings_path": "/etc/elasticsearch/sudachiSettings.json",
-            "resources_path": "/etc/elasticsearch"
+	    "discard_punctuation": true,
+            "resources_path": "/etc/elasticsearch/sudachi"
           }
         },
         "analyzer": {
@@ -79,8 +77,7 @@ The sudachi\_part\_of\_speech token filter removes tokens that match a set of pa
         "tokenizer": {
           "sudachi_tokenizer": {
             "type": "sudachi_tokenizer",
-            "settings_path": "/etc/elasticsearch/sudachiSettings.json",
-            "resources_path": "/etc/elasticsearch"
+            "resources_path": "/etc/elasticsearch/sudachi"
           }
         },
         "analyzer": {
@@ -149,8 +146,7 @@ The sudachi\_ja\_stop token filter filters out Japanese stopwords (_japanese_), 
         "tokenizer": {
           "sudachi_tokenizer": {
             "type": "sudachi_tokenizer",
-            "settings_path": "/etc/elasticsearch/sudachiSettings.json",
-            "resources_path": "/etc/elasticsearch"
+            "resources_path": "/etc/elasticsearch/sudachi"
           }
         },
         "analyzer": {
@@ -228,8 +224,7 @@ The sudachi\_baseform token filter replaces terms with their SudachiBaseFormAttr
         "tokenizer": {
           "sudachi_tokenizer": {
             "type": "sudachi_tokenizer",
-            "settings_path": "/etc/elasticsearch/sudachiSettings.json",
-            "resources_path": "/etc/elasticsearch"
+            "resources_path": "/etc/elasticsearch/sudachi"
           }
         },
         "analyzer": {
@@ -297,8 +292,7 @@ The sudachi\_readingform token filter replaces the token with its reading form i
                 "tokenizer": {
                     "sudachi_tokenizer": {
                         "type": "sudachi_tokenizer",
-                        "settings_path": "/etc/elasticsearch/sudachiSettings.json",
-                        "resources_path": "/etc/elasticsearch"
+                        "resources_path": "/etc/elasticsearch/sudachi"
                     }
                 },
                 "analyzer": {

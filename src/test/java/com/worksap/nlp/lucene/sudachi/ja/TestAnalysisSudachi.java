@@ -183,7 +183,6 @@ public class TestAnalysisSudachi extends ESTestCase {
         try (InputStream input = AnalysisSudachiPlugin.class.getResourceAsStream(RESOURCE_NAME_SUDACHI_ANALYSIS_JSON)) {
             settings = Settings.builder()
                 .loadFromStream(RESOURCE_NAME_SUDACHI_ANALYSIS_JSON, input)
-                .put("index.analysis.tokenizer.sudachi_tokenizer.settings_path", home.resolve(ResourceUtil.RESOURCE_NAME_SUDACHI_SETTINGS))
                 .put("index.analysis.tokenizer.sudachi_tokenizer.resources_path", home)
                 .put(IndexMetaData.SETTING_VERSION_CREATED, Version.CURRENT)
                 .build();
@@ -196,7 +195,5 @@ public class TestAnalysisSudachi extends ESTestCase {
     @BeforeClass
     public static void initializeTest() throws IOException {
         home = createTempDir();
-        ResourceUtil.copyResource(ResourceUtil.RESOURCE_NAME_SUDACHI_SETTINGS,
-                                  home.toFile(), false);
     }
 }

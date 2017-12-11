@@ -22,23 +22,12 @@ import java.io.InputStream;
 import java.nio.file.Files;
 
 class ResourceUtil {
-
-    static final String RESOURCE_NAME_SUDACHI_SETTINGS = "sudachiSettings.json";
     static final String RESOURCE_NAME_SYSTEM_DIC = "system_core.dic";
-
-    // *.def files are packaged into sudachi.jar
-    static final String RESOURCE_NAME_CHAR_DEF = "char.def";
-    static final String RESOURCE_NAME_UNK_DEF = "unk.def";
-    static final String RESOURCE_NAME_REWRITE_DEF = "rewrite.def";
 
     private ResourceUtil() {}
 
     static void copy(File destDir) throws IOException {
-        copyResource(RESOURCE_NAME_SUDACHI_SETTINGS, destDir, false);
         copyResource(RESOURCE_NAME_SYSTEM_DIC, destDir, false);
-        copyResource(RESOURCE_NAME_CHAR_DEF, destDir, true);
-        copyResource(RESOURCE_NAME_UNK_DEF, destDir, true);
-        copyResource(RESOURCE_NAME_REWRITE_DEF, destDir, true);
     }
 
     static void copyResource(String filename, File destDir, boolean fromRoot)

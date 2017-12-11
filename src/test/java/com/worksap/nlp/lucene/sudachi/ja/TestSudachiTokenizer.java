@@ -49,20 +49,16 @@ public class TestSudachiTokenizer {
         ResourceUtil.copy(tempFile);
 
         tokenizer = new SudachiTokenizer(true, SudachiTokenizer.Mode.SEARCH,
-                tempFile.getPath(),
-                SudachiAnalyzer.defaultSudachiSettingsReader());
+                tempFile.getPath(), null);
 
         tokenizerExtended = new SudachiTokenizer(true,
-                SudachiTokenizer.Mode.EXTENDED, tempFile.getPath(),
-                SudachiAnalyzer.defaultSudachiSettingsReader());
+                SudachiTokenizer.Mode.EXTENDED, tempFile.getPath(), null);
 
         tokenizerNormal = new SudachiTokenizer(true,
-                SudachiTokenizer.Mode.NORMAL, tempFile.getPath(),
-                SudachiAnalyzer.defaultSudachiSettingsReader());
+                SudachiTokenizer.Mode.NORMAL, tempFile.getPath(), null);
 
         tokenizerPunctuation = new SudachiTokenizer(false,
-                SudachiTokenizer.Mode.SEARCH, tempFile.getPath(),
-                SudachiAnalyzer.defaultSudachiSettingsReader());
+                SudachiTokenizer.Mode.SEARCH, tempFile.getPath(), null);
     }
 
     @Test

@@ -16,13 +16,8 @@
 
 package com.worksap.nlp.lucene.sudachi.ja;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
-import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -46,7 +41,7 @@ public class SudachiAnalyzer extends StopwordAnalyzerBase {
     private final Set<String> stoptags;
 
     public SudachiAnalyzer() {
-        this(SudachiTokenizer.DEFAULT_MODE, "", defaultSudachiSettingsReader(),
+        this(SudachiTokenizer.DEFAULT_MODE, "", null,
                 DefaultSetHolder.DEFAULT_STOP_SET,
                 DefaultSetHolder.DEFAULT_STOP_TAGS);
     }
@@ -89,25 +84,6 @@ public class SudachiAnalyzer extends StopwordAnalyzerBase {
         }
 
         private DefaultSetHolder() {}
-    }
-
-    static String defaultSudachiSettingsReader() {
-        try (InputStream input = SudachiAnalyzer.class.getResourceAsStream("sudachiSettings.json");
-             InputStreamReader inputReader =  new InputStreamReader(input, StandardCharsets.UTF_8);
-             BufferedReader reader = new BufferedReader(inputReader)) {
-            StringBuilder sb = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                sb.append(line);
-            }
-            return sb.toString();
-        } catch (FileNotFoundException e) {
-            throw new UncheckedIOException(
-                    "Sudachi Settings File not Found.", e);
-        } catch (IOException e) {
-            throw new UncheckedIOException(
-                    "Fail to load Sudachi Settings File.", e);
-        }
     }
 
     @Override

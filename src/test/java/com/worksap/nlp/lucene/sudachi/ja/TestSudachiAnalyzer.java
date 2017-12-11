@@ -74,7 +74,7 @@ public class TestSudachiAnalyzer {
         ResourceUtil.copy(tempFileForDictionary);
 
         analyzer = new SudachiAnalyzer(SudachiTokenizer.Mode.EXTENDED, tempFileForDictionary.getPath(),
-                SudachiAnalyzer.defaultSudachiSettingsReader(),
+                null,
                 SudachiAnalyzer.getDefaultStopSet(),
                 SudachiAnalyzer.getDefaultStopTags());
         IndexWriterConfig config = new IndexWriterConfig(analyzer);
