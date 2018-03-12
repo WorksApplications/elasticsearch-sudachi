@@ -22,6 +22,7 @@ import static org.junit.Assert.assertThat;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,109 +55,115 @@ import org.junit.rules.TemporaryFolder;
 import com.worksap.nlp.lucene.sudachi.ja.SudachiAnalyzer;
 
 public class TestSudachiAnalyzer {
-    private static final String INPUT_TEXT = "東京都へ行った。私は宇宙人です。";
-    private static final String FIELD_NAME = "txt";
+	private static final String INPUT_TEXT = "東京都へ行った。";
+	private static final String FIELD_NAME = "txt";
 
-    private SudachiAnalyzer analyzer;
-    private Directory dir;
+	private SudachiAnalyzer analyzer;
+	private Directory dir;
 
-    @Rule
-    public TemporaryFolder tempFolder = new TemporaryFolder();
+	@Rule
+	public TemporaryFolder tempFolder = new TemporaryFolder();
 
-    @Rule
-    public TemporaryFolder tempFolderForDictionary = new TemporaryFolder();
+	@Rule
+	public TemporaryFolder tempFolderForDictionary = new TemporaryFolder();
 
-    @Before
-    public void setUp() throws IOException {
-        tempFolderForDictionary.create();
-        File tempFileForDictionary = tempFolderForDictionary.newFolder("sudachiDictionary");
+	@Before
+	public void setUp() throws IOException {
+		tempFolderForDictionary.create();
+		File tempFileForDictionary = tempFolderForDictionary
+				.newFolder("sudachiDictionary");
+		ResourceUtil.copy(tempFileForDictionary);
 
-        ResourceUtil.copy(tempFileForDictionary);
+		String settings;
+		try (InputStream is = this.getClass().getResourceAsStream(
+				"sudachi.json");) {
+			settings = ResourceUtil.getSudachiSetting(is);
+		}
 
-        analyzer = new SudachiAnalyzer(SudachiTokenizer.Mode.EXTENDED, tempFileForDictionary.getPath(),
-                null,
-                SudachiAnalyzer.getDefaultStopSet(),
-                SudachiAnalyzer.getDefaultStopTags());
-        IndexWriterConfig config = new IndexWriterConfig(analyzer);
+		analyzer = new SudachiAnalyzer(SudachiTokenizer.Mode.EXTENDED,
+				tempFileForDictionary.getPath(), settings,
+				SudachiAnalyzer.getDefaultStopSet(),
+				SudachiAnalyzer.getDefaultStopTags());
+		IndexWriterConfig config = new IndexWriterConfig(analyzer);
 
-        tempFolder.create();
-        File tempFile = tempFolder.newFolder("sudachi");
-        dir = FSDirectory.open(tempFile.toPath());
+		tempFolder.create();
+		File tempFile = tempFolder.newFolder("sudachi");
+		dir = FSDirectory.open(tempFile.toPath());
+		try (IndexWriter writer = new IndexWriter(dir, config)) {
+			createIndex(writer);
+		}
+	}
 
-        try (IndexWriter writer = new IndexWriter(dir, config)) {
-            createIndex(writer);
-        }
-    }
+	@After
+	public void tearDown() throws IOException {
+		if (dir != null) {
+			dir.close();
+		}
+		if (analyzer != null) {
+			analyzer.close();
+		}
+	}
 
-    @After
-    public void tearDown() throws IOException {
-        if (dir != null) {
-            dir.close();
-        }
-        if (analyzer != null) {
-            analyzer.close();
-        }
-    }
+	private static void createIndex(IndexWriter writer) throws IOException {
+		Document doc = new Document();
+		doc.add(new TextField(FIELD_NAME, INPUT_TEXT, Field.Store.YES));
+		writer.addDocument(doc);
+		writer.commit();
+		writer.isOpen();
+	}
 
-    private static void createIndex(IndexWriter writer) throws IOException {
-        Document doc = new Document();
-        doc.add(new TextField(FIELD_NAME, INPUT_TEXT, Field.Store.YES));
-        writer.addDocument(doc);
-        writer.commit();
-        writer.isOpen();
-    }
+	@Test
+	public void testTerms() throws IOException {
+		try (IndexReader reader = DirectoryReader.open(dir)) {
+			List<LeafReaderContext> atomicReaderContextList = reader.leaves();
+			assertThat(atomicReaderContextList.size(), is(1));
+			LeafReaderContext leafReaderContext = atomicReaderContextList
+					.get(0);
 
-    @Test
-    public void testTerms() throws IOException {
-        try (IndexReader reader = DirectoryReader.open(dir)) {
-            List<LeafReaderContext> atomicReaderContextList = reader.leaves();
-            assertThat(atomicReaderContextList.size(), is(1));
-            LeafReaderContext leafReaderContext = atomicReaderContextList.get(0);
+			LeafReader leafReader = leafReaderContext.reader();
+			Fields fields = leafReader.fields();
+			assertThat(fields.size(), is(1));
 
-            LeafReader leafReader = leafReaderContext.reader();
-            Fields fields = leafReader.fields();
-            assertThat(fields.size(), is(1));
+			String fieldName = fields.iterator().next();
+			assertThat(fieldName, is(FIELD_NAME));
 
-            String fieldName = fields.iterator().next();
-            assertThat(fieldName, is(FIELD_NAME));
+			Terms terms = fields.terms(fieldName);
+			assertThat(terms.size(), is(4L));
 
-            Terms terms = fields.terms(fieldName);
-            assertThat(terms.size(), is(7L));
+			List<String> termList = new ArrayList<>();
+			TermsEnum termsEnum = terms.iterator();
+			BytesRef bytesRef = null;
+			while ((bytesRef = termsEnum.next()) != null) {
+				String fieldText = bytesRef.utf8ToString();
+				termList.add(fieldText);
+			}
+			assertThat(termList, hasItems("東京", "東京都", "都", "行く"));
+		}
+	}
 
-            List<String> termList = new ArrayList<>();
-            TermsEnum termsEnum = terms.iterator();
-            BytesRef bytesRef = null;
-            while ((bytesRef = termsEnum.next()) != null) {
-                String fieldText = bytesRef.utf8ToString();
-                termList.add(fieldText);
-            }
-            assertThat(termList, hasItems("東京", "東京都", "都", "行く", "私", "宇宙", "人"));
-        }
-    }
+	@Test
+	public void testQuery() throws Exception {
+		try (IndexReader reader = DirectoryReader.open(dir)) {
+			IndexSearcher searcher = new IndexSearcher(reader);
+			QueryParser queryParser = new QueryParser(FIELD_NAME, analyzer);
 
-    @Test
-    public void testQuery() throws Exception {
-        try (IndexReader reader = DirectoryReader.open(dir)) {
-            IndexSearcher searcher = new IndexSearcher(reader);
-            QueryParser queryParser = new QueryParser(FIELD_NAME, analyzer);
+			Query query = queryParser.parse("東京");
+			TopDocs topDocs = searcher.search(query, 5);
+			ScoreDoc[] scoreDocs = topDocs.scoreDocs;
+			assertThat(scoreDocs.length, is(1));
+			ScoreDoc scoreDoc = scoreDocs[0];
+			int docId = scoreDoc.doc;
+			assertThat(docId, is(0));
+			Document doc = searcher.doc(docId);
+			String[] values = doc.getValues(FIELD_NAME);
+			assertThat(values.length, is(1));
+			assertThat(values[0], is(INPUT_TEXT));
 
-            Query query = queryParser.parse("東京");
-            TopDocs topDocs = searcher.search(query, 5);
-            ScoreDoc[] scoreDocs = topDocs.scoreDocs;
-            assertThat(scoreDocs.length, is(1));
-            ScoreDoc scoreDoc = scoreDocs[0];
-            int docId = scoreDoc.doc;
-            assertThat(docId, is(0));
-            Document doc = searcher.doc(docId);
-            String[] values = doc.getValues(FIELD_NAME);
-            assertThat(values.length, is(1));
-            assertThat(values[0], is(INPUT_TEXT));
+			query = queryParser.parse("京都");
+			assertThat(searcher.search(query, 5).totalHits, is(0));
 
-            query = queryParser.parse("京都");
-            assertThat(searcher.search(query, 5).totalHits, is(0));
-
-            query = queryParser.parse("岩波");
-            assertThat(searcher.search(query, 5).totalHits, is(0));
-        }
-    }
+			query = queryParser.parse("岩波");
+			assertThat(searcher.search(query, 5).totalHits, is(0));
+		}
+	}
 }
