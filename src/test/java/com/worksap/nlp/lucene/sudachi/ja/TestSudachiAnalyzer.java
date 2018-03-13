@@ -28,15 +28,7 @@ import java.util.List;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.TextField;
-import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.Fields;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.index.LeafReader;
-import org.apache.lucene.index.LeafReaderContext;
-import org.apache.lucene.index.Terms;
-import org.apache.lucene.index.TermsEnum;
+import org.apache.lucene.index.*;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -114,13 +106,13 @@ public class TestSudachiAnalyzer {
             LeafReaderContext leafReaderContext = atomicReaderContextList.get(0);
 
             LeafReader leafReader = leafReaderContext.reader();
-            Fields fields = leafReader.fields();
+            FieldInfos fields = leafReader.getFieldInfos();
             assertThat(fields.size(), is(1));
 
-            String fieldName = fields.iterator().next();
+            String fieldName = fields.iterator().next().name;
             assertThat(fieldName, is(FIELD_NAME));
 
-            Terms terms = fields.terms(fieldName);
+            Terms terms = leafReader.terms(fieldName);
             assertThat(terms.size(), is(7L));
 
             List<String> termList = new ArrayList<>();
@@ -153,10 +145,10 @@ public class TestSudachiAnalyzer {
             assertThat(values[0], is(INPUT_TEXT));
 
             query = queryParser.parse("京都");
-            assertThat(searcher.search(query, 5).totalHits, is(0));
+            assertThat(searcher.search(query, 5).totalHits, is(0L));
 
             query = queryParser.parse("岩波");
-            assertThat(searcher.search(query, 5).totalHits, is(0));
+            assertThat(searcher.search(query, 5).totalHits, is(0L));
         }
     }
 }

@@ -182,7 +182,7 @@ public class TestAnalysisSudachi extends ESTestCase {
         Settings settings;
         try (InputStream input = AnalysisSudachiPlugin.class.getResourceAsStream(RESOURCE_NAME_SUDACHI_ANALYSIS_JSON)) {
             settings = Settings.builder()
-                .loadFromStream(RESOURCE_NAME_SUDACHI_ANALYSIS_JSON, input)
+                .loadFromStream(RESOURCE_NAME_SUDACHI_ANALYSIS_JSON, input, true)
                 .put("index.analysis.tokenizer.sudachi_tokenizer.resources_path", home)
                 .put(IndexMetaData.SETTING_VERSION_CREATED, Version.CURRENT)
                 .build();

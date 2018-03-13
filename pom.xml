@@ -12,7 +12,8 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
-		<elasticsearch.version>5.6.1</elasticsearch.version>
+		<elasticsearch.version>6.2.2</elasticsearch.version>
+		<lucene.version>7.2.1</lucene.version>
 		<sudachi.version>0.1.1-SNAPSHOT</sudachi.version>
 		<jacoco.skip>true</jacoco.skip>
 		<sonar.skip>true</sonar.skip>
@@ -208,7 +209,7 @@
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
 			<artifactId>lucene-analyzers-kuromoji</artifactId>
-			<version>6.6.0</version>
+			<version>${lucene.version}</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
 		<dependency>
