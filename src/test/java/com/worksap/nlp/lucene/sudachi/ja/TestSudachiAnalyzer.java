@@ -54,6 +54,7 @@ import org.junit.rules.TemporaryFolder;
 
 import com.worksap.nlp.lucene.sudachi.ja.SudachiAnalyzer;
 
+// Test of character segmentation using analyzer
 public class TestSudachiAnalyzer {
     private static final String INPUT_TEXT = "東京都へ行った。";
     private static final String FIELD_NAME = "txt";

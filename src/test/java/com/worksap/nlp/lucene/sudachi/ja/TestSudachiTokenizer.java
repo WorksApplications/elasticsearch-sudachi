@@ -32,6 +32,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+// Test of character segmentation using incrementToken(tokenizer)
 public class TestSudachiTokenizer {
     private SudachiTokenizer tokenizer;
     private SudachiTokenizer tokenizerExtended;
