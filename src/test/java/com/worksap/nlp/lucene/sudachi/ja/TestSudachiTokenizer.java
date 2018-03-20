@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 package com.worksap.nlp.lucene.sudachi.ja;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -22,6 +21,7 @@ import static org.junit.Assert.assertThat;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
@@ -39,37 +39,41 @@ public class TestSudachiTokenizer {
     private SudachiTokenizer tokenizerPunctuation;
 
     @Rule
-    public TemporaryFolder tempFolder = new TemporaryFolder();
+    public TemporaryFolder tempFolderForDictionary = new TemporaryFolder();
 
     @Before
     public void setup() throws IOException {
-        tempFolder.create();
-        File tempFile = tempFolder.newFolder("sudachiDictionary");
+        tempFolderForDictionary.create();
+        File tempFileForDictionary = tempFolderForDictionary
+                .newFolder("sudachiDictionary");
+        ResourceUtil.copy(tempFileForDictionary);
 
-        ResourceUtil.copy(tempFile);
+        String settings;
+        try(InputStream is = this.getClass()
+                .getResourceAsStream("sudachi.json");){
+            settings = ResourceUtil.getSudachiSetting(is);
+        }
 
         tokenizer = new SudachiTokenizer(true, SudachiTokenizer.Mode.SEARCH,
-                tempFile.getPath(), null);
-
+                tempFileForDictionary.getPath(), settings);
         tokenizerExtended = new SudachiTokenizer(true,
-                SudachiTokenizer.Mode.EXTENDED, tempFile.getPath(), null);
-
+                SudachiTokenizer.Mode.EXTENDED, tempFileForDictionary.getPath(), settings);
         tokenizerNormal = new SudachiTokenizer(true,
-                SudachiTokenizer.Mode.NORMAL, tempFile.getPath(), null);
-
+                SudachiTokenizer.Mode.NORMAL, tempFileForDictionary.getPath(), settings);
         tokenizerPunctuation = new SudachiTokenizer(false,
-                SudachiTokenizer.Mode.SEARCH, tempFile.getPath(), null);
+                SudachiTokenizer.Mode.SEARCH, tempFileForDictionary.getPath(), settings);
     }
 
     @Test
     public void incrementTokenShiftJis() throws IOException {
-        String str = new String("私は宇宙人です。".getBytes("Shift_JIS"), "Shift_JIS");
+        String str = new String("東京都に行った。".getBytes("Shift_JIS"), "Shift_JIS");
         tokenizer.setReader(new StringReader(str));
         tokenizer.reset();
-        String[] answerListAUnit = { "私", "は", "宇宙", "人", "です" };
-        int[] answerListPosIncAUnit = { 1, 1, 1, 1, 1 };
-        int[] answerListPosLengthAUnit = { 1, 1, 1, 1, 1 };
+        String[] answerListAUnit = { "東京都", "東京", "都", "に", "行く", "た" };
+        int[] answerListPosIncAUnit = { 1, 0, 1, 1, 1, 1 };
+        int[] answerListPosLengthAUnit = { 2, 1, 1, 1, 1, 1 };
         int i = 0;
+
         while (tokenizer.incrementToken()) {
             assertThat(tokenizer.getAttribute(CharTermAttribute.class)
                     .toString(), is(answerListAUnit[i]));
@@ -83,27 +87,28 @@ public class TestSudachiTokenizer {
 
     @Test
     public void incrementToken() throws IOException {
-        tokenizer.setReader(new StringReader("私は宇宙人です。"));
+        tokenizer.setReader(new StringReader("東京都に行った。"));
         tokenizer.reset();
-        String[] answerList = { "私", "は", "宇宙", "人", "です" };
-        int[] answerListPosInc = { 1, 1, 1, 1, 1 };
-        int[] answerListPosLength = { 1, 1, 1, 1, 1 };
+        String[] answerListAUnit = { "東京都", "東京", "都", "に", "行く", "た" };
+        int[] answerListPosIncAUnit = { 1, 0, 1, 1, 1, 1 };
+        int[] answerListPosLengthAUnit = { 2, 1, 1, 1, 1, 1 };
         int i = 0;
+
         while (tokenizer.incrementToken()) {
             assertThat(tokenizer.getAttribute(CharTermAttribute.class)
-                    .toString(), is(answerList[i]));
+                    .toString(), is(answerListAUnit[i]));
             assertThat(tokenizer.getAttribute(PositionIncrementAttribute.class)
-                    .getPositionIncrement(), is(answerListPosInc[i]));
+                    .getPositionIncrement(), is(answerListPosIncAUnit[i]));
             assertThat(tokenizer.getAttribute(PositionLengthAttribute.class)
-                    .getPositionLength(), is(answerListPosLength[i]));
+                    .getPositionLength(), is(answerListPosLengthAUnit[i]));
             i++;
         }
 
-        tokenizerExtended.setReader(new StringReader("私は宇宙人です。"));
+        tokenizerExtended.setReader(new StringReader("東京都に行った。"));
         tokenizerExtended.reset();
-        String[] answerListExtended = { "私", "は", "宇宙", "人", "です" };
-        int[] answerListPosIncExtended = { 1, 1, 1, 1, 1 };
-        int[] answerListPosLengthExtended = { 1, 1, 1, 1, 1 };
+        String[] answerListExtended = { "東京都", "東京", "都", "に", "行く", "た" };
+        int[] answerListPosIncExtended = { 1, 0, 1, 1, 1, 1 };
+        int[] answerListPosLengthExtended = { 2, 1, 1, 1, 1, 1 };
         i = 0;
         while (tokenizerExtended.incrementToken()) {
             assertThat(tokenizerExtended.getAttribute(CharTermAttribute.class)
@@ -120,11 +125,11 @@ public class TestSudachiTokenizer {
             i++;
         }
 
-        tokenizerNormal.setReader(new StringReader("私は宇宙人です。"));
+        tokenizerNormal.setReader(new StringReader("東京都に行った。"));
         tokenizerNormal.reset();
-        String[] answerListNormal = { "私", "は", "宇宙", "人", "です" };
-        int[] answerListPosIncNormal = { 1, 1, 1, 1, 1 };
-        int[] answerListPosLengthNormal = { 1, 1, 1, 1, 1 };
+        String[] answerListNormal = { "東京都", "に", "行く", "た" };
+        int[] answerListPosIncNormal = { 1, 1, 1, 1 };
+        int[] answerListPosLengthNormal = { 1, 1, 1, 1 };
         i = 0;
         while (tokenizerNormal.incrementToken()) {
             assertThat(tokenizerNormal.getAttribute(CharTermAttribute.class)
@@ -141,11 +146,12 @@ public class TestSudachiTokenizer {
             i++;
         }
 
-        tokenizerPunctuation.setReader(new StringReader("私は宇宙人です。"));
+        tokenizerPunctuation.setReader(new StringReader("東京都に行った。"));
         tokenizerPunctuation.reset();
-        String[] answerListPunctuation = { "私", "は", "宇宙", "人", "です", "。" };
-        int[] answerListPosIncPunctuation = { 1, 1, 1, 1, 1, 1 };
-        int[] answerListPosLengthPunctuation = { 1, 1, 1, 1, 1, 1 };
+        String[] answerListPunctuation = { "東京都", "東京", "都", "に", "行く", "た",
+                "。" };
+        int[] answerListPosIncPunctuation = { 1, 0, 1, 1, 1, 1, 1 };
+        int[] answerListPosLengthPunctuation = { 2, 1, 1, 1, 1, 1, 1 };
         i = 0;
         while (tokenizerPunctuation.incrementToken()) {
             assertThat(
@@ -166,12 +172,12 @@ public class TestSudachiTokenizer {
 
     @Test
     public void incrementTokenPunctuation() throws IOException {
-        tokenizer.setReader(new StringReader("私は宇宙人です。東京都へ行った。"));
+        tokenizer.setReader(new StringReader("東京都に行った。東京都に行った。"));
         tokenizer.reset();
-        String[] answerList = { "私", "は", "宇宙", "人", "です", "東京都", "東京", "都",
-                "へ", "行く", "た" };
-        int[] answerListPosInc = { 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1 };
-        int[] answerListPosLength = { 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1 };
+        String[] answerList = { "東京都", "東京", "都", "に", "行く", "た", "東京都", "東京",
+                "都", "に", "行く", "た" };
+        int[] answerListPosInc = { 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1 };
+        int[] answerListPosLength = { 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1 };
         int i = 0;
         while (tokenizer.incrementToken()) {
             assertThat(tokenizer.getAttribute(CharTermAttribute.class)
@@ -183,13 +189,14 @@ public class TestSudachiTokenizer {
             i++;
         }
 
-        tokenizerExtended.setReader(new StringReader("私は宇宙人です。東京都へ行った。"));
+        tokenizerExtended.setReader(new StringReader("東京都に行った。東京都に行った。"));
         tokenizerExtended.reset();
-        String[] answerListExtended = { "私", "は", "宇宙", "人", "です", "東京都", "東京",
-                "都", "へ", "行く", "た" };
-        int[] answerListPosIncExtended = { 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1 };
-        int[] answerListPosLengthExtended = { 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1,
+        String[] answerListExtended = { "東京都", "東京", "都", "に", "行く", "た",
+                "東京都", "東京", "都", "に", "行く", "た" };
+        int[] answerListPosIncExtended = { 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1,
                 1 };
+        int[] answerListPosLengthExtended = { 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1,
+                1, 1 };
         i = 0;
         while (tokenizerExtended.incrementToken()) {
             assertThat(tokenizerExtended.getAttribute(CharTermAttribute.class)
@@ -206,10 +213,10 @@ public class TestSudachiTokenizer {
             i++;
         }
 
-        tokenizerNormal.setReader(new StringReader("私は宇宙人です。東京都へ行った。"));
+        tokenizerNormal.setReader(new StringReader("東京都に行った。東京都に行った。"));
         tokenizerNormal.reset();
-        String[] answerListNormal = { "私", "は", "宇宙", "人", "です", "東京都", "へ",
-                "行く", "た" };
+        String[] answerListNormal = { "東京都", "に", "行く", "た", "東京都", "に", "行く",
+                "た" };
         int[] answerListPosIncNormal = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
         int[] answerListPosLengthNormal = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
         i = 0;
@@ -228,14 +235,14 @@ public class TestSudachiTokenizer {
             i++;
         }
 
-        tokenizerPunctuation.setReader(new StringReader("私は宇宙人です。東京都へ行った。"));
+        tokenizerPunctuation.setReader(new StringReader("東京都に行った。東京都に行った。"));
         tokenizerPunctuation.reset();
-        String[] answerListPunctuation = { "私", "は", "宇宙", "人", "です", "。",
-                "東京都", "東京", "都", "へ", "行く", "た", "。" };
-        int[] answerListPosIncPunctuation = { 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1,
-                1, 1, 1 };
-        int[] answerListPosLengthPunctuation = { 1, 1, 1, 1, 1, 1, 2, 1, 1, 1,
+        String[] answerListPunctuation = { "東京都", "東京", "都", "に", "行く", "た",
+                "。", "東京都", "東京", "都", "に", "行く", "た", "。" };
+        int[] answerListPosIncPunctuation = { 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1,
                 1, 1, 1, 1 };
+        int[] answerListPosLengthPunctuation = { 2, 1, 1, 1, 1, 1, 1, 2, 1, 1,
+                1, 1, 1, 1, 1 };
         i = 0;
         while (tokenizerPunctuation.incrementToken()) {
             assertThat(
@@ -256,9 +263,9 @@ public class TestSudachiTokenizer {
 
     @Test
     public void incrementTokenAUnit() throws IOException {
-        tokenizer.setReader(new StringReader("東京都へ行った。"));
+        tokenizer.setReader(new StringReader("東京都に行った。"));
         tokenizer.reset();
-        String[] answerList = { "東京都", "東京", "都", "へ", "行く", "た" };
+        String[] answerList = { "東京都", "東京", "都", "に", "行く", "た" };
         int[] answerListPosInc = { 1, 0, 1, 1, 1, 1 };
         int[] answerListPosLength = { 2, 1, 1, 1, 1, 1 };
         int i = 0;
@@ -272,9 +279,9 @@ public class TestSudachiTokenizer {
             i++;
         }
 
-        tokenizerExtended.setReader(new StringReader("東京都へ行った。"));
+        tokenizerExtended.setReader(new StringReader("東京都に行った。"));
         tokenizerExtended.reset();
-        String[] answerListExtended = { "東京都", "東京", "都", "へ", "行く", "た" };
+        String[] answerListExtended = { "東京都", "東京", "都", "に", "行く", "た" };
         int[] answerListPosIncExtended = { 1, 0, 1, 1, 1, 1 };
         int[] answerListPosLengthExtended = { 2, 1, 1, 1, 1, 1 };
         i = 0;
@@ -293,9 +300,9 @@ public class TestSudachiTokenizer {
             i++;
         }
 
-        tokenizerNormal.setReader(new StringReader("東京都へ行った。"));
+        tokenizerNormal.setReader(new StringReader("東京都に行った。"));
         tokenizerNormal.reset();
-        String[] answerListNormal = { "東京都", "へ", "行く", "た" };
+        String[] answerListNormal = { "東京都", "に", "行く", "た" };
         int[] answerListPosIncNormal = { 1, 1, 1, 1 };
         int[] answerListPosLengthNormal = { 1, 1, 1, 1 };
         i = 0;
@@ -314,9 +321,9 @@ public class TestSudachiTokenizer {
             i++;
         }
 
-        tokenizerPunctuation.setReader(new StringReader("東京都へ行った。"));
+        tokenizerPunctuation.setReader(new StringReader("東京都に行った。"));
         tokenizerPunctuation.reset();
-        String[] answerListPunctuation = { "東京都", "東京", "都", "へ", "行く", "た",
+        String[] answerListPunctuation = { "東京都", "東京", "都", "に", "行く", "た",
                 "。" };
         int[] answerListPosIncPunctuation = { 1, 0, 1, 1, 1, 1, 1 };
         int[] answerListPosLengthPunctuation = { 2, 1, 1, 1, 1, 1, 1 };
@@ -340,11 +347,11 @@ public class TestSudachiTokenizer {
 
     @Test
     public void incrementTokenOOV() throws IOException {
-        tokenizer.setReader(new StringReader("私はカマンチョメンガーに乗る。"));
+        tokenizer.setReader(new StringReader("アマゾンに行った。"));
         tokenizer.reset();
-        String[] answerList = { "私", "は", "カマンチョメンガー", "に", "乗る" };
-        int[] answerListPosInc = { 1, 1, 1, 1, 1 };
-        int[] answerListPosLength = { 1, 1, 1, 1, 1 };
+        String[] answerList = { "アマゾン", "に", "行く", "た" };
+        int[] answerListPosInc = { 1, 1, 1, 1, 1, 1 };
+        int[] answerListPosLength = { 1, 1, 1, 1, 1, 1 };
         int i = 0;
         while (tokenizer.incrementToken()) {
             assertThat(tokenizer.getAttribute(CharTermAttribute.class)
@@ -356,14 +363,12 @@ public class TestSudachiTokenizer {
             i++;
         }
 
-        tokenizerExtended.setReader(new StringReader("私はカマンチョメンガーに乗る。"));
+        tokenizerExtended.setReader(new StringReader("アマゾンに行った。"));
         tokenizerExtended.reset();
-        String[] answerListExtended = { "私", "は", "カマンチョメンガー", "カ", "マ", "ン",
-                "チ", "ョ", "メ", "ン", "ガ", "ー", "に", "乗る" };
-        int[] answerListPosIncExtended = { 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1,
-                1, 1 };
-        int[] answerListPosLengthExtended = { 1, 1, 9, 1, 1, 1, 1, 1, 1, 1, 1,
-                1, 1, 1 };
+        String[] answerListExtended = { "アマゾン", "ア", "マ", "ゾ", "ン", "に", "行く",
+                "た" };
+        int[] answerListPosIncExtended = { 1, 0, 1, 1, 1, 1, 1, 1 };
+        int[] answerListPosLengthExtended = { 4, 1, 1, 1, 1, 1, 1, 1 };
         i = 0;
         while (tokenizerExtended.incrementToken()) {
             assertThat(tokenizerExtended.getAttribute(CharTermAttribute.class)
@@ -380,11 +385,11 @@ public class TestSudachiTokenizer {
             i++;
         }
 
-        tokenizerNormal.setReader(new StringReader("私はカマンチョメンガーに乗る。"));
+        tokenizerNormal.setReader(new StringReader("アマゾンに行った。"));
         tokenizerNormal.reset();
-        String[] answerListNormal = { "私", "は", "カマンチョメンガー", "に", "乗る" };
-        int[] answerListPosIncNormal = { 1, 1, 1, 1, 1 };
-        int[] answerListPosLengthNormal = { 1, 1, 1, 1, 1 };
+        String[] answerListNormal = { "アマゾン", "に", "行く", "た" };
+        int[] answerListPosIncNormal = { 1, 1, 1, 1 };
+        int[] answerListPosLengthNormal = { 1, 1, 1, 1 };
         i = 0;
         while (tokenizerNormal.incrementToken()) {
             assertThat(tokenizerNormal.getAttribute(CharTermAttribute.class)
@@ -401,12 +406,11 @@ public class TestSudachiTokenizer {
             i++;
         }
 
-        tokenizerPunctuation.setReader(new StringReader("私はカマンチョメンガーに乗る。"));
+        tokenizerPunctuation.setReader(new StringReader("アマゾンに行った。"));
         tokenizerPunctuation.reset();
-        String[] answerListPunctuation = { "私", "は", "カマンチョメンガー", "に", "乗る",
-                "。" };
+        String[] answerListPunctuation = { "アマゾン", "に", "行く", "た", "。" };
         int[] answerListPosIncPunctuation = { 1, 1, 1, 1, 1, 1 };
-        int[] answerListPosLengthPunctuation = { 1, 1, 1, 1, 1, 1, 1, 1 };
+        int[] answerListPosLengthPunctuation = { 1, 1, 1, 1, 1, 1, 1 };
         i = 0;
         while (tokenizerPunctuation.incrementToken()) {
             assertThat(
@@ -427,27 +431,27 @@ public class TestSudachiTokenizer {
 
     @Test
     public void testReadSentences() throws IOException {
-        tokenizer.setReader(new StringReader("私は宇宙人です。"));
+        tokenizer.setReader(new StringReader("東京都に行った。"));
         tokenizer.reset();
-        assertThat(tokenizer.readSentences(), is("私は宇宙人です。"));
+        assertThat(tokenizer.readSentences(), is("東京都に行った。"));
 
-        tokenizerExtended.setReader(new StringReader("私は宇宙人です。"));
+        tokenizerExtended.setReader(new StringReader("東京都に行った。"));
         tokenizerExtended.reset();
-        assertThat(tokenizerExtended.readSentences(), is("私は宇宙人です。"));
+        assertThat(tokenizerExtended.readSentences(), is("東京都に行った。"));
     }
 
     @Test
     public void testReadSentencesTwoSentences() throws IOException {
-        tokenizer.setReader(new StringReader("私は宇宙人です。東京都へ行った。"));
+        tokenizer.setReader(new StringReader("東京都に行った。東京都に行った。"));
         tokenizer.reset();
-        assertThat(tokenizer.readSentences(), is("私は宇宙人です。東京都へ行った。"));
+        assertThat(tokenizer.readSentences(), is("東京都に行った。東京都に行った。"));
     }
 
     @Test
     public void testReadSentencesNoLastPunctuation() throws IOException {
-        tokenizer.setReader(new StringReader("私は宇宙人です。東京都へ行った"));
+        tokenizer.setReader(new StringReader("東京都に行った。東京都に行った"));
         tokenizer.reset();
-        String[] answerList = { "私は宇宙人です。", "東京都へ行った" };
+        String[] answerList = { "東京都に行った。", "東京都に行った" };
         for (int i = 0; i < answerList.length; i++) {
             assertThat(tokenizer.readSentences(), is(answerList[i]));
         }
@@ -455,9 +459,9 @@ public class TestSudachiTokenizer {
 
     @Test
     public void testReadSentencesTwoPunctuation() throws IOException {
-        tokenizer.setReader(new StringReader("私は宇宙人です。。東京都へ行った"));
+        tokenizer.setReader(new StringReader("東京都に行った。。東京都に行った"));
         tokenizer.reset();
-        String[] answerList = { "私は宇宙人です。。", "東京都へ行った" };
+        String[] answerList = { "東京都に行った。。", "東京都に行った" };
         for (int i = 0; i < answerList.length; i++) {
             assertThat(tokenizer.readSentences(), is(answerList[i]));
         }
@@ -465,9 +469,9 @@ public class TestSudachiTokenizer {
 
     @Test
     public void testReadSentencesJapaneseComma() throws IOException {
-        tokenizer.setReader(new StringReader("私は宇宙人です、東京都へ行った"));
+        tokenizer.setReader(new StringReader("東京都に行った、東京都に行った"));
         tokenizer.reset();
-        String[] answerList = { "私は宇宙人です、", "東京都へ行った" };
+        String[] answerList = { "東京都に行った、", "東京都に行った" };
         for (int i = 0; i < answerList.length; i++) {
             assertThat(tokenizer.readSentences(), is(answerList[i]));
         }
@@ -475,16 +479,16 @@ public class TestSudachiTokenizer {
 
     @Test
     public void testReadSentencesPeriod() throws IOException {
-        tokenizer.setReader(new StringReader("私は宇宙人です。。東京都へ行った."));
+        tokenizer.setReader(new StringReader("東京都に行った。。東京都に行った."));
         tokenizer.reset();
-        assertThat(tokenizer.readSentences(), is("私は宇宙人です。。東京都へ行った."));
+        assertThat(tokenizer.readSentences(), is("東京都に行った。。東京都に行った."));
     }
 
     @Test
     public void testReadSentencesComma() throws IOException {
-        tokenizer.setReader(new StringReader("私は宇宙人です,東京都へ行った"));
+        tokenizer.setReader(new StringReader("東京都に行った,東京都に行った"));
         tokenizer.reset();
-        String[] answerList = { "私は宇宙人です,", "東京都へ行った" };
+        String[] answerList = { "東京都に行った,", "東京都に行った" };
         for (int i = 0; i < answerList.length; i++) {
             assertThat(tokenizer.readSentences(), is(answerList[i]));
         }

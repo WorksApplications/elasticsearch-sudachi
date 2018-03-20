@@ -22,6 +22,7 @@ import static org.junit.Assert.assertThat;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,7 +55,7 @@ import org.junit.rules.TemporaryFolder;
 import com.worksap.nlp.lucene.sudachi.ja.SudachiAnalyzer;
 
 public class TestSudachiAnalyzer {
-    private static final String INPUT_TEXT = "東京都へ行った。私は宇宙人です。";
+    private static final String INPUT_TEXT = "東京都へ行った。";
     private static final String FIELD_NAME = "txt";
 
     private SudachiAnalyzer analyzer;
@@ -69,12 +70,18 @@ public class TestSudachiAnalyzer {
     @Before
     public void setUp() throws IOException {
         tempFolderForDictionary.create();
-        File tempFileForDictionary = tempFolderForDictionary.newFolder("sudachiDictionary");
-
+        File tempFileForDictionary = tempFolderForDictionary
+                .newFolder("sudachiDictionary");
         ResourceUtil.copy(tempFileForDictionary);
 
-        analyzer = new SudachiAnalyzer(SudachiTokenizer.Mode.EXTENDED, tempFileForDictionary.getPath(),
-                null,
+        String settings;
+        try (InputStream is = this.getClass().getResourceAsStream(
+                "sudachi.json");) {
+            settings = ResourceUtil.getSudachiSetting(is);
+        }
+
+        analyzer = new SudachiAnalyzer(SudachiTokenizer.Mode.EXTENDED,
+                tempFileForDictionary.getPath(), settings,
                 SudachiAnalyzer.getDefaultStopSet(),
                 SudachiAnalyzer.getDefaultStopTags());
         IndexWriterConfig config = new IndexWriterConfig(analyzer);
@@ -82,7 +89,6 @@ public class TestSudachiAnalyzer {
         tempFolder.create();
         File tempFile = tempFolder.newFolder("sudachi");
         dir = FSDirectory.open(tempFile.toPath());
-
         try (IndexWriter writer = new IndexWriter(dir, config)) {
             createIndex(writer);
         }
@@ -111,7 +117,8 @@ public class TestSudachiAnalyzer {
         try (IndexReader reader = DirectoryReader.open(dir)) {
             List<LeafReaderContext> atomicReaderContextList = reader.leaves();
             assertThat(atomicReaderContextList.size(), is(1));
-            LeafReaderContext leafReaderContext = atomicReaderContextList.get(0);
+            LeafReaderContext leafReaderContext = atomicReaderContextList
+                    .get(0);
 
             LeafReader leafReader = leafReaderContext.reader();
             Fields fields = leafReader.fields();
@@ -121,7 +128,7 @@ public class TestSudachiAnalyzer {
             assertThat(fieldName, is(FIELD_NAME));
 
             Terms terms = fields.terms(fieldName);
-            assertThat(terms.size(), is(7L));
+            assertThat(terms.size(), is(4L));
 
             List<String> termList = new ArrayList<>();
             TermsEnum termsEnum = terms.iterator();
@@ -130,7 +137,7 @@ public class TestSudachiAnalyzer {
                 String fieldText = bytesRef.utf8ToString();
                 termList.add(fieldText);
             }
-            assertThat(termList, hasItems("東京", "東京都", "都", "行く", "私", "宇宙", "人"));
+            assertThat(termList, hasItems("東京", "東京都", "都", "行く"));
         }
     }
 
