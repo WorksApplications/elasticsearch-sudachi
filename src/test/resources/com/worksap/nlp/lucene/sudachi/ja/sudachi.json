@@ -8,7 +8,7 @@
           "cost" : 6000 }
     ],
     "pathRewritePlugin" : [
-    	{ "class" : "com.worksap.nlp.sudachi.JoinOovPlugin",
-    	  "oovPOS" : [ "名詞", "普通名詞", "一般", "*", "*", "*" ] }
+        { "class" : "com.worksap.nlp.sudachi.JoinOovPlugin",
+          "oovPOS" : [ "名詞", "普通名詞", "一般", "*", "*", "*" ] }
     ]
 }

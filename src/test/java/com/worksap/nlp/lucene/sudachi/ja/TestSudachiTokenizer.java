@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+
 package com.worksap.nlp.lucene.sudachi.ja;
 
 import static org.hamcrest.CoreMatchers.is;

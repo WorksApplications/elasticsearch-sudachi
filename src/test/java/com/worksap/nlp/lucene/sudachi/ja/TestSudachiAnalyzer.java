@@ -71,8 +71,8 @@ public class TestSudachiAnalyzer {
     @Before
     public void setUp() throws IOException {
         tempFolderForDictionary.create();
-        File tempFileForDictionary = tempFolderForDictionary
-                .newFolder("sudachiDictionary");
+        File tempFileForDictionary = tempFolderForDictionary.newFolder("sudachiDictionary");
+
         ResourceUtil.copy(tempFileForDictionary);
 
         String settings;
@@ -90,6 +90,7 @@ public class TestSudachiAnalyzer {
         tempFolder.create();
         File tempFile = tempFolder.newFolder("sudachi");
         dir = FSDirectory.open(tempFile.toPath());
+
         try (IndexWriter writer = new IndexWriter(dir, config)) {
             createIndex(writer);
         }
@@ -118,8 +119,7 @@ public class TestSudachiAnalyzer {
         try (IndexReader reader = DirectoryReader.open(dir)) {
             List<LeafReaderContext> atomicReaderContextList = reader.leaves();
             assertThat(atomicReaderContextList.size(), is(1));
-            LeafReaderContext leafReaderContext = atomicReaderContextList
-                    .get(0);
+            LeafReaderContext leafReaderContext = atomicReaderContextList.get(0);
 
             LeafReader leafReader = leafReaderContext.reader();
             Fields fields = leafReader.fields();
