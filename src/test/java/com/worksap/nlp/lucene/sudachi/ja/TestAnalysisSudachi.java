@@ -45,6 +45,7 @@ import org.junit.Test;
 import com.worksap.nlp.elasticsearch.sudachi.index.SudachiTokenizerFactory;
 import com.worksap.nlp.elasticsearch.sudachi.plugin.AnalysisSudachiPlugin;
 
+// Test of character segmentation using elasticsearch configuration file
 public class TestAnalysisSudachi extends ESTestCase {
     private static final String RESOURCE_NAME_SUDACHI_ANALYSIS_JSON = "/com/worksap/nlp/lucene/sudachi/ja/sudachiAnalysis.json";
 

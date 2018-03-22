@@ -16,15 +16,31 @@
 
 package com.worksap.nlp.lucene.sudachi.ja;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 
 class ResourceUtil {
-    static final String RESOURCE_NAME_SYSTEM_DIC = "system_core.dic";
+    static final String RESOURCE_NAME_SYSTEM_DIC = "system.dic";
 
     private ResourceUtil() {}
+
+    static String getSudachiSetting(InputStream is) throws IOException{
+        String settings;
+        try (BufferedReader br = new BufferedReader(
+                        new InputStreamReader(is));) {
+            String sudachiSettingsLine = "";
+            StringBuilder sb = new StringBuilder();
+            while ((sudachiSettingsLine = br.readLine()) != null) {
+                sb.append(sudachiSettingsLine);
+            }
+            settings = sb.toString();
+        }
+        return settings;
+    }
 
     static void copy(File destDir) throws IOException {
         copyResource(RESOURCE_NAME_SYSTEM_DIC, destDir, false);

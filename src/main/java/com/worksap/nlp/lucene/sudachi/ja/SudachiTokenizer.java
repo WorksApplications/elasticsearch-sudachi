@@ -237,7 +237,7 @@ public final class SudachiTokenizer extends
         System.arraycopy(buffer, eos, buffer, 0, remainSize);
 
         baseOffset = nextBaseOffset;
-        //nextBaseOffset += eos;
+        nextBaseOffset += eos;
 
         return sentences;
     }

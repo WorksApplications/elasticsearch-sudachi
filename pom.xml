@@ -114,47 +114,6 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<artifactId>maven-clean-plugin</artifactId>
-				<version>3.0.0</version>
-				<configuration>
-					<filesets>
-						<fileset>
-							<directory>src/test/resources/com/worksap/nlp/lucene/sudachi/ja</directory>
-							<includes>
-								<include>system_core.dic</include>
-							</includes>
-						</fileset>
-					</filesets>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<version>3.0.2</version>
-				<executions>
-					<execution>
-						<id>unpack-system-dic</id>
-						<phase>generate-test-resources</phase>
-						<goals>
-							<goal>unpack</goal>
-						</goals>
-						<configuration>
-							<artifactItems>
-								<artifactItem>
-									<groupId>com.worksap.nlp</groupId>
-									<artifactId>sudachi</artifactId>
-									<classifier>dictionary-core</classifier>
-									<version>${sudachi.version}</version>
-									<type>zip</type>
-									<outputDirectory>src/test/resources/com/worksap/nlp/lucene/sudachi/ja</outputDirectory>
-									<includes>system_core.dic</includes>
-								</artifactItem>
-							</artifactItems>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>3.0.0-M1</version>

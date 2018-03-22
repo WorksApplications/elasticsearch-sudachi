@@ -22,6 +22,7 @@ import static org.junit.Assert.assertThat;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,8 +46,9 @@ import org.junit.rules.TemporaryFolder;
 
 import com.worksap.nlp.lucene.sudachi.ja.SudachiAnalyzer;
 
+// Test of character segmentation using analyzer
 public class TestSudachiAnalyzer {
-    private static final String INPUT_TEXT = "東京都へ行った。私は宇宙人です。";
+    private static final String INPUT_TEXT = "東京都へ行った。";
     private static final String FIELD_NAME = "txt";
 
     private SudachiAnalyzer analyzer;
@@ -65,8 +67,14 @@ public class TestSudachiAnalyzer {
 
         ResourceUtil.copy(tempFileForDictionary);
 
-        analyzer = new SudachiAnalyzer(SudachiTokenizer.Mode.EXTENDED, tempFileForDictionary.getPath(),
-                null,
+        String settings;
+        try (InputStream is = this.getClass().getResourceAsStream(
+                "sudachi.json");) {
+            settings = ResourceUtil.getSudachiSetting(is);
+        }
+
+        analyzer = new SudachiAnalyzer(SudachiTokenizer.Mode.EXTENDED,
+                tempFileForDictionary.getPath(), settings,
                 SudachiAnalyzer.getDefaultStopSet(),
                 SudachiAnalyzer.getDefaultStopTags());
         IndexWriterConfig config = new IndexWriterConfig(analyzer);
@@ -113,7 +121,7 @@ public class TestSudachiAnalyzer {
             assertThat(fieldName, is(FIELD_NAME));
 
             Terms terms = leafReader.terms(fieldName);
-            assertThat(terms.size(), is(7L));
+            assertThat(terms.size(), is(4L));
 
             List<String> termList = new ArrayList<>();
             TermsEnum termsEnum = terms.iterator();
@@ -122,7 +130,7 @@ public class TestSudachiAnalyzer {
                 String fieldText = bytesRef.utf8ToString();
                 termList.add(fieldText);
             }
-            assertThat(termList, hasItems("東京", "東京都", "都", "行く", "私", "宇宙", "人"));
+            assertThat(termList, hasItems("東京", "東京都", "都", "行く"));
         }
     }
 
