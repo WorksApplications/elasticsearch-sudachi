@@ -4,7 +4,10 @@
 
 	<groupId>com.worksap.nlp</groupId>
 	<artifactId>analysis-sudachi</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <!-- for release
 	<version>${elasticsearch.version}.0</version>
+	 -->
 	<packaging>jar</packaging>
 
 	<name>analysis-sudachi</name>
