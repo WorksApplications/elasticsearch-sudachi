@@ -213,7 +213,7 @@
 	</dependencies>
 	<url>https://github.com/WorksApplications/elasticsearch-sudachi</url>
 	<description>The Japanese analysis plugin for elasticsearch</description>
-	<inceptionYear>2017-2018</inceptionYear>
+	<inceptionYear>2017</inceptionYear>
 	<licenses>
 		<license>
 			<name>Apache License, Version 2.0</name>
