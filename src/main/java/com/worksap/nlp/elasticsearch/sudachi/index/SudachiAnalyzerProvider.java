@@ -38,7 +38,7 @@ public class SudachiAnalyzerProvider extends
             Environment env, String name, Settings settings) throws IOException {
         super(indexSettings, name, settings);
         final Set<?> stopWords = Analysis.parseStopWords(env, settings,
-                SudachiAnalyzer.getDefaultStopSet());
+                SudachiAnalyzer.getDefaultStopSet(), false);
         final SudachiTokenizer.Mode mode = SudachiTokenizerFactory
                 .getMode(settings);
         final String resourcesPath = new SudachiPathResolver(env.configFile()
