@@ -19,8 +19,8 @@ package com.worksap.nlp.lucene.sudachi.ja;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.instanceOf;
 
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -183,7 +183,7 @@ public class TestAnalysisSudachi extends ESTestCase {
         Settings settings;
         try (InputStream input = AnalysisSudachiPlugin.class.getResourceAsStream(RESOURCE_NAME_SUDACHI_ANALYSIS_JSON)) {
             settings = Settings.builder()
-                .loadFromStream(RESOURCE_NAME_SUDACHI_ANALYSIS_JSON, input, true)
+                    .loadFromStream(RESOURCE_NAME_SUDACHI_ANALYSIS_JSON, input)
                 .put("index.analysis.tokenizer.sudachi_tokenizer.resources_path", home)
                 .put(IndexMetaData.SETTING_VERSION_CREATED, Version.CURRENT)
                 .build();
