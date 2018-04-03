@@ -28,18 +28,21 @@ import org.elasticsearch.index.analysis.AbstractTokenFilterFactory;
 import org.elasticsearch.index.analysis.Analysis;
 
 import com.worksap.nlp.lucene.sudachi.ja.SudachiPartOfSpeechStopFilter;
+import com.worksap.nlp.lucene.sudachi.ja.PartOfSpeechTrie;
 
 public class SudachiPartOfSpeechFilterFactory extends
         AbstractTokenFilterFactory {
 
-    private final Set<String> stopTags = new HashSet<>();
+    private final PartOfSpeechTrie stopTags = new PartOfSpeechTrie();
 
     public SudachiPartOfSpeechFilterFactory(IndexSettings indexSettings,
             Environment env, String name, Settings settings) {
         super(indexSettings, name, settings);
         List<String> wordList = Analysis.getWordList(env, settings, "stoptags");
         if (wordList != null) {
-            stopTags.addAll(wordList);
+            for (String word : wordList) {
+                stopTags.add(word.split(","));
+            }
         }
     }
 

@@ -49,16 +49,23 @@ public class TestSudachiPartOfSpeechStopFilter extends BaseTokenStreamTestCase {
             settings = ResourceUtil.getSudachiSetting(is);
         }
 
-        tokenStream = new SudachiTokenizer(true, SudachiTokenizer.Mode.NORMAL, tempFileForDictionary.getPath(), settings);
+        tokenStream = new SudachiTokenizer(true, SudachiTokenizer.Mode.SEARCH, tempFileForDictionary.getPath(), settings);
         ((Tokenizer)tokenStream).setReader(new StringReader("東京都に行った。"));
         factory = new SudachiPartOfSpeechStopFilterFactory(new HashMap<String, String>() {{ put("tags", "stoptags.txt"); }});
     }
 
-    public void testFullPOS() throws IOException {
+    public void testAllPOS() throws IOException {
         String tags = "動詞,非自立可能\n名詞,固有名詞,地名,一般\n";
         factory.inform(new StringResourceLoader(tags));
         tokenStream = factory.create(tokenStream);
-        assertTokenStreamContents(tokenStream, new String[] {"に", "た"});
+        assertTokenStreamContents(tokenStream, new String[] {"都", "に", "た"});
+    }
+
+    public void testPrefix() throws IOException {
+        String tags = "動詞\n名詞,固有名詞\n";
+        factory.inform(new StringResourceLoader(tags));
+        tokenStream = factory.create(tokenStream);
+        assertTokenStreamContents(tokenStream, new String[] {"都", "に", "た"});
     }
 
     public void testConjugationType() throws IOException {
@@ -66,7 +73,15 @@ public class TestSudachiPartOfSpeechStopFilter extends BaseTokenStreamTestCase {
         factory.inform(new StringResourceLoader(tags));
         tokenStream = factory.create(tokenStream);
         assertTokenStreamContents(tokenStream,
-                                  new String[] {"東京都", "に", "た"});
+                                  new String[] { "東京都", "東京", "都", "に", "た"});
+    }
+
+    public void testConjugationTypeAndForm() throws IOException {
+        String tags = "五段-カ行,終止形-一般\n";
+        factory.inform(new StringResourceLoader(tags));
+        tokenStream = factory.create(tokenStream);
+        assertTokenStreamContents(tokenStream,
+                                  new String[] { "東京都", "東京", "都", "に", "行く", "た"});
     }
 
     public void testConjugationForm() throws IOException {
@@ -74,6 +89,6 @@ public class TestSudachiPartOfSpeechStopFilter extends BaseTokenStreamTestCase {
         factory.inform(new StringResourceLoader(tags));
         tokenStream = factory.create(tokenStream);
         assertTokenStreamContents(tokenStream,
-                                  new String[] {"東京都", "に", "行く"});
+                                  new String[] {"東京都", "東京", "都", "に", "行く"});
     }
 }

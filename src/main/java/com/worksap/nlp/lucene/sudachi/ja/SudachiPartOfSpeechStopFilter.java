@@ -17,7 +17,7 @@
 package com.worksap.nlp.lucene.sudachi.ja;
 
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import org.apache.lucene.analysis.FilteringTokenFilter;
 import org.apache.lucene.analysis.TokenStream;
@@ -28,7 +28,7 @@ import com.worksap.nlp.lucene.sudachi.ja.tokenattribute.PartOfSpeechAttribute;
  * Removes tokens that match a set of part-of-speech tags.
  */
 public final class SudachiPartOfSpeechStopFilter extends FilteringTokenFilter {
-    private final Set<String> stopTags;
+    private final PartOfSpeechTrie stopTags;
     private final PartOfSpeechAttribute posAtt;
 
     /**
@@ -39,7 +39,7 @@ public final class SudachiPartOfSpeechStopFilter extends FilteringTokenFilter {
      * @param stopTags
      *            the part-of-speech tags that should be removed
      */
-    public SudachiPartOfSpeechStopFilter(TokenStream input, Set<String> stopTags) {
+    public SudachiPartOfSpeechStopFilter(TokenStream input, PartOfSpeechTrie stopTags) {
         super(input);
         this.stopTags = stopTags;
         posAtt = addAttribute(PartOfSpeechAttribute.class);
@@ -47,14 +47,14 @@ public final class SudachiPartOfSpeechStopFilter extends FilteringTokenFilter {
 
     @Override
     protected boolean accept() {
-        final List<String> posList = posAtt.getPartOfSpeechForArray();
-        if (posList == null || posList.isEmpty()) {
+        final List<String> pos = posAtt.getPartOfSpeechAsList();
+        if (pos == null) {
             return true;
         }
-        for (String pos : posList) {
-            if (stopTags.contains(pos)) {
-                return false;
-            }
+        if (stopTags.isPrefixOf(pos, 0, 4) || // POS w/o conjugation info
+            stopTags.isPrefixOf(pos, 4, 6) || // conjugation type and form
+            stopTags.isPrefixOf(pos, 5, 6)) { // only conjugation form
+            return false;
         }
         return true;
     }

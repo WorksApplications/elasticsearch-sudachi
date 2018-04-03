@@ -38,7 +38,7 @@ public class SudachiAnalyzer extends StopwordAnalyzerBase {
     private final Mode mode;
     private final String resourcesPath;
     private final String settings;
-    private final Set<String> stoptags;
+    private final PartOfSpeechTrie stoptags;
 
     public SudachiAnalyzer() {
         this(SudachiTokenizer.DEFAULT_MODE, "", null,
@@ -47,7 +47,7 @@ public class SudachiAnalyzer extends StopwordAnalyzerBase {
     }
 
     public SudachiAnalyzer(Mode mode, String resourcesPath, String settings,
-            CharArraySet stopwords, Set<String> stoptags) {
+            CharArraySet stopwords, PartOfSpeechTrie stoptags) {
         super(stopwords);
         this.mode = mode;
         this.resourcesPath = resourcesPath;
@@ -59,13 +59,13 @@ public class SudachiAnalyzer extends StopwordAnalyzerBase {
         return DefaultSetHolder.DEFAULT_STOP_SET;
     }
 
-    public static Set<String> getDefaultStopTags() {
+    public static PartOfSpeechTrie getDefaultStopTags() {
         return DefaultSetHolder.DEFAULT_STOP_TAGS;
     }
 
     private static class DefaultSetHolder {
         static final CharArraySet DEFAULT_STOP_SET;
-        static final Set<String> DEFAULT_STOP_TAGS;
+        static final PartOfSpeechTrie DEFAULT_STOP_TAGS;
 
         static {
             try {
@@ -73,10 +73,10 @@ public class SudachiAnalyzer extends StopwordAnalyzerBase {
                         "stopwords.txt", "#");
                 final CharArraySet tagset = loadStopwordSet(false,
                         SudachiAnalyzer.class, "stoptags.txt", "#");
-                DEFAULT_STOP_TAGS = new HashSet<>();
+                DEFAULT_STOP_TAGS = new PartOfSpeechTrie();
                 for (Object element : tagset) {
                     char[] chars = (char[]) element;
-                    DEFAULT_STOP_TAGS.add(new String(chars));
+                    DEFAULT_STOP_TAGS.add(new String(chars).split(","));
                 }
             } catch (IOException e) {
                 throw new UncheckedIOException(e);
