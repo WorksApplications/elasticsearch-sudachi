@@ -50,11 +50,8 @@ public final class SudachiPartOfSpeechStopFilter extends FilteringTokenFilter {
         if (pos.isEmpty()) {
             return true;
         }
-        if (stopTags.isPrefixOf(pos, 0, 4) || // POS w/o conjugation info
-            stopTags.isPrefixOf(pos, 4, 6) || // conjugation type and form
-            stopTags.isPrefixOf(pos, 5, 6)) { // only conjugation form
-            return false;
-        }
-        return true;
+        return !stopTags.isPrefixOf(pos, 0, 4) && // POS w/o conjugation info
+            !stopTags.isPrefixOf(pos, 4, 6) && // conjugation type and form
+            !stopTags.isPrefixOf(pos, 5, 6); // only conjugation form
     }
 }

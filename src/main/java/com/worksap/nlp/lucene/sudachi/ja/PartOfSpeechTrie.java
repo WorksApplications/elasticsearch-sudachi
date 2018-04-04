@@ -33,11 +33,8 @@ public class PartOfSpeechTrie {
                 break;
             }
             @SuppressWarnings("unchecked")
-            Map<String, Object> newNode = (Map<String, Object>)node.get(item);
-            if (newNode == null) {
-                newNode = new HashMap<String, Object>();
-                node.put(item, newNode);
-            }
+            Map<String, Object> newNode =
+                (Map<String, Object>)node.computeIfAbsent(item, k -> new HashMap<>());
             node = newNode;
         }
     }
