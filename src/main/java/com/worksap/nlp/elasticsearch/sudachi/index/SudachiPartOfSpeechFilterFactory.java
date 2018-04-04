@@ -16,9 +16,7 @@
 
 package com.worksap.nlp.elasticsearch.sudachi.index;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.lucene.analysis.TokenStream;
 import org.elasticsearch.common.settings.Settings;
@@ -38,10 +36,10 @@ public class SudachiPartOfSpeechFilterFactory extends
     public SudachiPartOfSpeechFilterFactory(IndexSettings indexSettings,
             Environment env, String name, Settings settings) {
         super(indexSettings, name, settings);
-        List<String> wordList = Analysis.getWordList(env, settings, "stoptags");
-        if (wordList != null) {
-            for (String word : wordList) {
-                stopTags.add(word.split(","));
+        List<String> tagList = Analysis.getWordList(env, settings, "stoptags");
+        if (tagList != null) {
+            for (String tag : tagList) {
+                stopTags.add(tag.split(","));
             }
         }
     }

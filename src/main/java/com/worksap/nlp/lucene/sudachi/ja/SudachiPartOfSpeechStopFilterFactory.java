@@ -33,15 +33,12 @@ public class SudachiPartOfSpeechStopFilterFactory extends TokenFilterFactory
     public SudachiPartOfSpeechStopFilterFactory(Map<String, String> args) {
         super(args);
         stopTagFiles = get(args, "tags");
-        if (args.containsKey("enablePositionIncrements")) {
-            throw new IllegalArgumentException(
-                    "enablePositionIncrements is not a valid option as of Lucene 5.0");
-        }
         if (!args.isEmpty()) {
             throw new IllegalArgumentException("Unknown parameters: " + args);
         }
     }
 
+    @Override
     public void inform(ResourceLoader loader) throws IOException {
         stopTags = null;
         CharArraySet cas = getWordSet(loader, stopTagFiles, false);

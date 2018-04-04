@@ -16,7 +16,7 @@
 
 package com.worksap.nlp.lucene.sudachi.ja.tokenattribute;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.lucene.util.AttributeImpl;
@@ -29,7 +29,7 @@ public class PartOfSpeechAttributeImpl extends AttributeImpl implements PartOfSp
 
     public List<String> getPartOfSpeechAsList() {
         if (morpheme == null) {
-            return null;
+            return Collections.emptyList();
         }
         return morpheme.partOfSpeech();
     }

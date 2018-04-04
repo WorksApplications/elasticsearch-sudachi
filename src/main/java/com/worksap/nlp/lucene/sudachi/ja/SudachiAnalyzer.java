@@ -18,8 +18,6 @@ package com.worksap.nlp.lucene.sudachi.ja;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.analysis.StopwordAnalyzerBase;

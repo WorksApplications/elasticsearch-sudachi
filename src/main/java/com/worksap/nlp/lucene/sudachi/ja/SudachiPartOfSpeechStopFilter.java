@@ -17,7 +17,6 @@
 package com.worksap.nlp.lucene.sudachi.ja;
 
 import java.util.List;
-import java.util.Map;
 
 import org.apache.lucene.analysis.FilteringTokenFilter;
 import org.apache.lucene.analysis.TokenStream;
@@ -48,7 +47,7 @@ public final class SudachiPartOfSpeechStopFilter extends FilteringTokenFilter {
     @Override
     protected boolean accept() {
         final List<String> pos = posAtt.getPartOfSpeechAsList();
-        if (pos == null) {
+        if (pos.isEmpty()) {
             return true;
         }
         if (stopTags.isPrefixOf(pos, 0, 4) || // POS w/o conjugation info
