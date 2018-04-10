@@ -16,9 +16,7 @@
 
 package com.worksap.nlp.elasticsearch.sudachi.index;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.lucene.analysis.TokenStream;
 import org.elasticsearch.common.settings.Settings;
@@ -28,18 +26,21 @@ import org.elasticsearch.index.analysis.AbstractTokenFilterFactory;
 import org.elasticsearch.index.analysis.Analysis;
 
 import com.worksap.nlp.lucene.sudachi.ja.SudachiPartOfSpeechStopFilter;
+import com.worksap.nlp.lucene.sudachi.ja.PartOfSpeechTrie;
 
 public class SudachiPartOfSpeechFilterFactory extends
         AbstractTokenFilterFactory {
 
-    private final Set<String> stopTags = new HashSet<>();
+    private final PartOfSpeechTrie stopTags = new PartOfSpeechTrie();
 
     public SudachiPartOfSpeechFilterFactory(IndexSettings indexSettings,
             Environment env, String name, Settings settings) {
         super(indexSettings, name, settings);
-        List<String> wordList = Analysis.getWordList(env, settings, "stoptags");
-        if (wordList != null) {
-            stopTags.addAll(wordList);
+        List<String> tagList = Analysis.getWordList(env, settings, "stoptags");
+        if (tagList != null) {
+            for (String tag : tagList) {
+                stopTags.add(tag.split(","));
+            }
         }
     }
 
