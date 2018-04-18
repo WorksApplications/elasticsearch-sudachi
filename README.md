@@ -6,6 +6,9 @@ analysis-sudachi is Elasticsearch plugin based on Sudachi the Japanese morpholog
 [![Debt](https://sonarcloud.io/api/badges/measure?key=com.worksap.nlp%3Aanalysis-sudachi&metric=sqale_debt_ratio)](https://sonarcloud.io/component_measures/domain/Maintainability?id=com.worksap.nlp%3Aanalysis-sudachi)
 [![Coverage](https://sonarcloud.io/api/badges/measure?key=com.worksap.nlp%3Aanalysis-sudachi&metric=coverage)](https://sonarcloud.io/component_measures/metric/coverage/list?id=com.worksap.nlp%3Aanalysis-sudachi)
 
+# What's new?
+- version 1.1.0: `part-of-speech forward matching` is available on `stoptags`; see [sudachi_part_of_speech](#sudachi_part_of_speech)
+
 # Build
 
 1. Build analysis-sudachi.
@@ -65,7 +68,23 @@ Follow the steps below to install.
 ## sudachi\_part\_of\_speech
 The sudachi\_part\_of\_speech token filter removes tokens that match a set of part-of-speech tags. It accepts the following setting:
 - stoptags
- An array of part-of-speech tags that should be removed. It defaults to the stoptags.txt file embedded in the lucene-analysis-sudachi.jar.
+
+ The `stopatgs` is an array of part-of-speech and/or inflection tags that should be removed. It defaults to the stoptags.txt file embedded in the lucene-analysis-sudachi.jar.
+ Sudachi POS information is a csv list, consisting 6 items;
+
+- 1-4 `part-of-speech hierarchy (品詞階層)`
+- 5 `inflectional type (活用型)`
+- 6 `inflectional form (活用形)`
+
+ With the `stoptags`, you can filter out the result in any of these forward matching forms;
+
+- 1 - e.g., `名詞`
+- 1,2 - e.g., `名詞,固有名詞`
+- 1,2,3 - e.g., `名詞,固有名詞,地名`
+- 1,2,3,4 - e.g., `名詞,固有名詞,地名,一般`
+- 5 - e.g., `五段-カ行`
+- 6 - e.g., `終止形-一般`
+- 5,6 - e.g., `五段-カ行,終止形-一般`
 
 **PUT sudachi_sample**
 ```
@@ -93,8 +112,10 @@ The sudachi\_part\_of\_speech token filter removes tokens that match a set of pa
          "my_posfilter":{
           "type":"sudachi_part_of_speech",
           "stoptags":[
-           "助詞,格助詞",
-           "助詞,終助詞"
+           "助詞",
+           "助動詞",
+           "補助記号,句点",
+           "補助記号,読点"
           ]
          }
         }
@@ -330,6 +351,23 @@ The sudachi\_readingform token filter replaces the token with its reading form i
 ```
 [1] Returns スシ.
 [2] Returns sushi.
+
+# Releases
+
+**1.1.0**
+- POS Filter: Allow forward matching; https://github.com/WorksApplications/elasticsearch-sudachi/issues/21
+
+**1.0.3**
+- Elasticsearch 6.1 API migration
+
+**1.0.2**
+- Elasticsearch 6.0 API migration
+
+**1.0.1**
+- fix exception over 512 characters
+
+**1.0.0**
+- first release
 
 # License
 Copyright (c) 2017 Works Applications Co., Ltd.

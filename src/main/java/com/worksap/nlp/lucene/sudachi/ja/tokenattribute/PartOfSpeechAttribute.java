@@ -23,7 +23,7 @@ import org.apache.lucene.util.Attribute;
 import com.worksap.nlp.sudachi.Morpheme;
 
 public interface PartOfSpeechAttribute extends Attribute {
-    public List<String> getPartOfSpeechForArray();
+    public List<String> getPartOfSpeechAsList();
 
     public String getPartOfSpeech();
 

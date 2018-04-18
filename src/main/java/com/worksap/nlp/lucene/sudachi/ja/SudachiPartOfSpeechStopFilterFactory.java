@@ -17,9 +17,7 @@
 package com.worksap.nlp.lucene.sudachi.ja;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.analysis.TokenStream;
@@ -30,28 +28,25 @@ import org.apache.lucene.analysis.util.TokenFilterFactory;
 public class SudachiPartOfSpeechStopFilterFactory extends TokenFilterFactory
         implements ResourceLoaderAware {
     private final String stopTagFiles;
-    private Set<String> stopTags;
+    private PartOfSpeechTrie stopTags;
 
     public SudachiPartOfSpeechStopFilterFactory(Map<String, String> args) {
         super(args);
         stopTagFiles = get(args, "tags");
-        if (args.containsKey("enablePositionIncrements")) {
-            throw new IllegalArgumentException(
-                    "enablePositionIncrements is not a valid option as of Lucene 5.0");
-        }
         if (!args.isEmpty()) {
             throw new IllegalArgumentException("Unknown parameters: " + args);
         }
     }
 
+    @Override
     public void inform(ResourceLoader loader) throws IOException {
         stopTags = null;
         CharArraySet cas = getWordSet(loader, stopTagFiles, false);
         if (cas != null) {
-            stopTags = new HashSet<>();
+            stopTags = new PartOfSpeechTrie();
             for (Object element : cas) {
                 char[] chars = (char[]) element;
-                stopTags.add(new String(chars));
+                stopTags.add(new String(chars).split(","));
             }
         }
     }
