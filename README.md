@@ -92,7 +92,6 @@ The sudachi\_part\_of\_speech token filter removes tokens that match a set of pa
   "settings": {
     "index": {
       "analysis": {
-        "filter": {},
         "tokenizer": {
           "sudachi_tokenizer": {
             "type": "sudachi_tokenizer",
@@ -163,7 +162,6 @@ The sudachi\_ja\_stop token filter filters out Japanese stopwords (_japanese_), 
   "settings": {
     "index": {
       "analysis": {
-        "filter": {},
         "tokenizer": {
           "sudachi_tokenizer": {
             "type": "sudachi_tokenizer",
@@ -241,7 +239,6 @@ The sudachi\_baseform token filter replaces terms with their SudachiBaseFormAttr
   "settings": {
     "index": {
       "analysis": {
-        "filter": {},
         "tokenizer": {
           "sudachi_tokenizer": {
             "type": "sudachi_tokenizer",
