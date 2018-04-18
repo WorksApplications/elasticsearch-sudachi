@@ -16,9 +16,8 @@
 
 package com.worksap.nlp.lucene.sudachi.ja;
 
-import static org.hamcrest.CoreMatchers.hasItems;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,11 +25,11 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.Fields;
+import org.apache.lucene.index.FieldInfos;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
@@ -51,8 +50,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-
-import com.worksap.nlp.lucene.sudachi.ja.SudachiAnalyzer;
 
 // Test of character segmentation using analyzer
 public class TestSudachiAnalyzer {
@@ -122,13 +119,13 @@ public class TestSudachiAnalyzer {
             LeafReaderContext leafReaderContext = atomicReaderContextList.get(0);
 
             LeafReader leafReader = leafReaderContext.reader();
-            Fields fields = leafReader.fields();
+            FieldInfos fields = leafReader.getFieldInfos();
             assertThat(fields.size(), is(1));
 
-            String fieldName = fields.iterator().next();
+            String fieldName = fields.iterator().next().name;
             assertThat(fieldName, is(FIELD_NAME));
 
-            Terms terms = fields.terms(fieldName);
+            Terms terms = leafReader.terms(fieldName);
             assertThat(terms.size(), is(4L));
 
             List<String> termList = new ArrayList<>();
