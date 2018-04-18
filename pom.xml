@@ -4,7 +4,7 @@
 
 	<groupId>com.worksap.nlp</groupId>
     <artifactId>analysis-sudachi-elasticsearch6.1</artifactId>
-    <version>1.0.3</version>
+    <version>1.1.0</version>
 	<packaging>jar</packaging>
 
 	<name>analysis-sudachi</name>
@@ -12,7 +12,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
-		<elasticsearch.version>6.1.4</elasticsearch.version>
+		<elasticsearch.version>6.1.0</elasticsearch.version>
 		<lucene.version>7.1.0</lucene.version>
 		<sudachi.version>0.1.1-SNAPSHOT</sudachi.version>
 		<jacoco.skip>true</jacoco.skip>

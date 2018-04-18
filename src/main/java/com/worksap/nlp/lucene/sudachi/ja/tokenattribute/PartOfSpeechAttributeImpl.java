@@ -16,7 +16,7 @@
 
 package com.worksap.nlp.lucene.sudachi.ja.tokenattribute;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.lucene.util.AttributeImpl;
@@ -25,54 +25,20 @@ import org.apache.lucene.util.AttributeReflector;
 import com.worksap.nlp.sudachi.Morpheme;
 
 public class PartOfSpeechAttributeImpl extends AttributeImpl implements PartOfSpeechAttribute {
-    static final String EMPTY_COLUMN = "*";
-
     private Morpheme morpheme;
 
-    public List<String> getPartOfSpeechForArray() {
+    public List<String> getPartOfSpeechAsList() {
         if (morpheme == null) {
-            return null;
+            return Collections.emptyList();
         }
-
-        int i = 0;
-        List<String> posList = new ArrayList<>();
-        StringBuilder posBuilder = new StringBuilder();
-
-        for (String pos : morpheme.partOfSpeech()) {
-            if (i == 4) {
-                posList.add(posBuilder.toString());
-            }
-            if (EMPTY_COLUMN.equals(pos)) {
-                i++;
-                continue;
-            }
-            if (i < 4) {
-                if (posBuilder.length() != 0) {
-                    posBuilder.append(",");
-                }
-                posBuilder.append(pos);
-
-            } else {
-                posList.add(pos);
-            }
-            i++;
-        }
-        return posList;
+        return morpheme.partOfSpeech();
     }
 
     public String getPartOfSpeech() {
         if (morpheme == null) {
-            return null;
+            return "";
         }
-
-        StringBuilder posBuilder = new StringBuilder();
-        for (String pos : morpheme.partOfSpeech()) {
-            if (posBuilder.length() != 0) {
-                posBuilder.append(",");
-            }
-            posBuilder.append(pos);
-        }
-        return posBuilder.toString();
+        return String.join(",", morpheme.partOfSpeech());
     }
 
     public void setMorpheme(Morpheme morpheme) {
