@@ -12,3 +12,4 @@ buildNumber.properties
 !/.mvn/wrapper/maven-wrapper.jar
 
 src/test/resources/com/worksap/nlp/lucene/sudachi/ja/system_core.dic
+bin/
