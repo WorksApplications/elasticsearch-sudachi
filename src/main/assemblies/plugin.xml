@@ -7,13 +7,11 @@
 	<files>
 		<file>
 			<source>src/main/extras/plugin-descriptor.properties</source>
-			<outputDirectory>elasticsearch</outputDirectory>
 			<filtered>true</filtered>
 		</file>
 	</files>
 	<dependencySets>
 		<dependencySet>
-			<outputDirectory>elasticsearch</outputDirectory>
 			<useProjectArtifact>true</useProjectArtifact>
 			<includes>
 				<include>com.worksap.nlp:*</include>
