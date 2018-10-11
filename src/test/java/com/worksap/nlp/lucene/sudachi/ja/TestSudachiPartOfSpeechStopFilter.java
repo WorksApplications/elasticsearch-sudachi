@@ -81,7 +81,7 @@ public class TestSudachiPartOfSpeechStopFilter extends BaseTokenStreamTestCase {
         factory.inform(new StringResourceLoader(tags));
         tokenStream = factory.create(tokenStream);
         assertTokenStreamContents(tokenStream,
-                                  new String[] { "東京都", "東京", "都", "に", "行く", "た"});
+                                  new String[] { "東京都", "東京", "都", "に", "行っ", "た"});
     }
 
     public void testConjugationForm() throws IOException {
@@ -89,6 +89,6 @@ public class TestSudachiPartOfSpeechStopFilter extends BaseTokenStreamTestCase {
         factory.inform(new StringResourceLoader(tags));
         tokenStream = factory.create(tokenStream);
         assertTokenStreamContents(tokenStream,
-                                  new String[] {"東京都", "東京", "都", "に", "行く"});
+                                  new String[] {"東京都", "東京", "都", "に", "行っ"});
     }
 }
