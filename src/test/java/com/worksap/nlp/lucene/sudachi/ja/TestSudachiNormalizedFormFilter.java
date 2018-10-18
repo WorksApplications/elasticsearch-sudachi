@@ -49,12 +49,19 @@ public class TestSudachiNormalizedFormFilter extends BaseTokenStreamTestCase {
         }
 
         tokenStream = new SudachiTokenizer(true, SudachiTokenizer.Mode.SEARCH, tempFileForDictionary.getPath(), settings);
-        ((Tokenizer)tokenStream).setReader(new StringReader("東京都に行った。"));
         factory = new SudachiNormalizedFormFilterFactory(Collections.emptyMap());
     }
 
     public void testNormalizedForm() throws IOException {
+        ((Tokenizer)tokenStream).setReader(new StringReader("東京都に行った。"));
         tokenStream = factory.create(tokenStream);
         assertTokenStreamContents(tokenStream, new String[] {"東京都", "東京", "都", "に", "行く", "た"});
     }
+
+    public void testNormalizedFormWithUnnormalizedWord() throws IOException {
+        ((Tokenizer)tokenStream).setReader(new StringReader("東京都にいった。"));
+        tokenStream = factory.create(tokenStream);
+        assertTokenStreamContents(tokenStream, new String[] {"東京都", "東京", "都", "に", "行く", "た"});
+    }
+
 }
