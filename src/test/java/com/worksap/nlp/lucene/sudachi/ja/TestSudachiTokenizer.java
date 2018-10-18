@@ -71,7 +71,7 @@ public class TestSudachiTokenizer {
         String str = new String("東京都に行った。".getBytes("Shift_JIS"), "Shift_JIS");
         tokenizer.setReader(new StringReader(str));
         tokenizer.reset();
-        String[] answerListAUnit = { "東京都", "東京", "都", "に", "行く", "た" };
+        String[] answerListAUnit = { "東京都", "東京", "都", "に", "行っ", "た" };
         int[] answerListPosIncAUnit = { 1, 0, 1, 1, 1, 1 };
         int[] answerListPosLengthAUnit = { 2, 1, 1, 1, 1, 1 };
         int i = 0;
@@ -91,7 +91,7 @@ public class TestSudachiTokenizer {
     public void incrementToken() throws IOException {
         tokenizer.setReader(new StringReader("東京都に行った。"));
         tokenizer.reset();
-        String[] answerListAUnit = { "東京都", "東京", "都", "に", "行く", "た" };
+        String[] answerListAUnit = { "東京都", "東京", "都", "に", "行っ", "た" };
         int[] answerListPosIncAUnit = { 1, 0, 1, 1, 1, 1 };
         int[] answerListPosLengthAUnit = { 2, 1, 1, 1, 1, 1 };
         int i = 0;
@@ -108,7 +108,7 @@ public class TestSudachiTokenizer {
 
         tokenizerExtended.setReader(new StringReader("東京都に行った。"));
         tokenizerExtended.reset();
-        String[] answerListExtended = { "東京都", "東京", "都", "に", "行く", "た" };
+        String[] answerListExtended = { "東京都", "東京", "都", "に", "行っ", "た" };
         int[] answerListPosIncExtended = { 1, 0, 1, 1, 1, 1 };
         int[] answerListPosLengthExtended = { 2, 1, 1, 1, 1, 1 };
         i = 0;
@@ -129,7 +129,7 @@ public class TestSudachiTokenizer {
 
         tokenizerNormal.setReader(new StringReader("東京都に行った。"));
         tokenizerNormal.reset();
-        String[] answerListNormal = { "東京都", "に", "行く", "た" };
+        String[] answerListNormal = { "東京都", "に", "行っ", "た" };
         int[] answerListPosIncNormal = { 1, 1, 1, 1 };
         int[] answerListPosLengthNormal = { 1, 1, 1, 1 };
         i = 0;
@@ -150,7 +150,7 @@ public class TestSudachiTokenizer {
 
         tokenizerPunctuation.setReader(new StringReader("東京都に行った。"));
         tokenizerPunctuation.reset();
-        String[] answerListPunctuation = { "東京都", "東京", "都", "に", "行く", "た",
+        String[] answerListPunctuation = { "東京都", "東京", "都", "に", "行っ", "た",
                 "。" };
         int[] answerListPosIncPunctuation = { 1, 0, 1, 1, 1, 1, 1 };
         int[] answerListPosLengthPunctuation = { 2, 1, 1, 1, 1, 1, 1 };
@@ -176,8 +176,8 @@ public class TestSudachiTokenizer {
     public void incrementTokenPunctuation() throws IOException {
         tokenizer.setReader(new StringReader("東京都に行った。東京都に行った。"));
         tokenizer.reset();
-        String[] answerList = { "東京都", "東京", "都", "に", "行く", "た", "東京都", "東京",
-                "都", "に", "行く", "た" };
+        String[] answerList = { "東京都", "東京", "都", "に", "行っ", "た", "東京都", "東京",
+                "都", "に", "行っ", "た" };
         int[] answerListPosInc = { 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1 };
         int[] answerListPosLength = { 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1 };
         int i = 0;
@@ -193,8 +193,8 @@ public class TestSudachiTokenizer {
 
         tokenizerExtended.setReader(new StringReader("東京都に行った。東京都に行った。"));
         tokenizerExtended.reset();
-        String[] answerListExtended = { "東京都", "東京", "都", "に", "行く", "た",
-                "東京都", "東京", "都", "に", "行く", "た" };
+        String[] answerListExtended = { "東京都", "東京", "都", "に", "行っ", "た",
+                "東京都", "東京", "都", "に", "行っ", "た" };
         int[] answerListPosIncExtended = { 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1,
                 1 };
         int[] answerListPosLengthExtended = { 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1,
@@ -217,7 +217,7 @@ public class TestSudachiTokenizer {
 
         tokenizerNormal.setReader(new StringReader("東京都に行った。東京都に行った。"));
         tokenizerNormal.reset();
-        String[] answerListNormal = { "東京都", "に", "行く", "た", "東京都", "に", "行く",
+        String[] answerListNormal = { "東京都", "に", "行っ", "た", "東京都", "に", "行っ",
                 "た" };
         int[] answerListPosIncNormal = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
         int[] answerListPosLengthNormal = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
@@ -239,8 +239,8 @@ public class TestSudachiTokenizer {
 
         tokenizerPunctuation.setReader(new StringReader("東京都に行った。東京都に行った。"));
         tokenizerPunctuation.reset();
-        String[] answerListPunctuation = { "東京都", "東京", "都", "に", "行く", "た",
-                "。", "東京都", "東京", "都", "に", "行く", "た", "。" };
+        String[] answerListPunctuation = { "東京都", "東京", "都", "に", "行っ", "た",
+                "。", "東京都", "東京", "都", "に", "行っ", "た", "。" };
         int[] answerListPosIncPunctuation = { 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1,
                 1, 1, 1, 1 };
         int[] answerListPosLengthPunctuation = { 2, 1, 1, 1, 1, 1, 1, 2, 1, 1,
@@ -267,7 +267,7 @@ public class TestSudachiTokenizer {
     public void incrementTokenAUnit() throws IOException {
         tokenizer.setReader(new StringReader("東京都に行った。"));
         tokenizer.reset();
-        String[] answerList = { "東京都", "東京", "都", "に", "行く", "た" };
+        String[] answerList = { "東京都", "東京", "都", "に", "行っ", "た" };
         int[] answerListPosInc = { 1, 0, 1, 1, 1, 1 };
         int[] answerListPosLength = { 2, 1, 1, 1, 1, 1 };
         int i = 0;
@@ -283,7 +283,7 @@ public class TestSudachiTokenizer {
 
         tokenizerExtended.setReader(new StringReader("東京都に行った。"));
         tokenizerExtended.reset();
-        String[] answerListExtended = { "東京都", "東京", "都", "に", "行く", "た" };
+        String[] answerListExtended = { "東京都", "東京", "都", "に", "行っ", "た" };
         int[] answerListPosIncExtended = { 1, 0, 1, 1, 1, 1 };
         int[] answerListPosLengthExtended = { 2, 1, 1, 1, 1, 1 };
         i = 0;
@@ -304,7 +304,7 @@ public class TestSudachiTokenizer {
 
         tokenizerNormal.setReader(new StringReader("東京都に行った。"));
         tokenizerNormal.reset();
-        String[] answerListNormal = { "東京都", "に", "行く", "た" };
+        String[] answerListNormal = { "東京都", "に", "行っ", "た" };
         int[] answerListPosIncNormal = { 1, 1, 1, 1 };
         int[] answerListPosLengthNormal = { 1, 1, 1, 1 };
         i = 0;
@@ -325,7 +325,7 @@ public class TestSudachiTokenizer {
 
         tokenizerPunctuation.setReader(new StringReader("東京都に行った。"));
         tokenizerPunctuation.reset();
-        String[] answerListPunctuation = { "東京都", "東京", "都", "に", "行く", "た",
+        String[] answerListPunctuation = { "東京都", "東京", "都", "に", "行っ", "た",
                 "。" };
         int[] answerListPosIncPunctuation = { 1, 0, 1, 1, 1, 1, 1 };
         int[] answerListPosLengthPunctuation = { 2, 1, 1, 1, 1, 1, 1 };
@@ -351,7 +351,7 @@ public class TestSudachiTokenizer {
     public void incrementTokenOOV() throws IOException {
         tokenizer.setReader(new StringReader("アマゾンに行った。"));
         tokenizer.reset();
-        String[] answerList = { "アマゾン", "に", "行く", "た" };
+        String[] answerList = { "アマゾン", "に", "行っ", "た" };
         int[] answerListPosInc = { 1, 1, 1, 1, 1, 1 };
         int[] answerListPosLength = { 1, 1, 1, 1, 1, 1 };
         int i = 0;
@@ -367,7 +367,7 @@ public class TestSudachiTokenizer {
 
         tokenizerExtended.setReader(new StringReader("アマゾンに行った。"));
         tokenizerExtended.reset();
-        String[] answerListExtended = { "アマゾン", "ア", "マ", "ゾ", "ン", "に", "行く",
+        String[] answerListExtended = { "アマゾン", "ア", "マ", "ゾ", "ン", "に", "行っ",
                 "た" };
         int[] answerListPosIncExtended = { 1, 0, 1, 1, 1, 1, 1, 1 };
         int[] answerListPosLengthExtended = { 4, 1, 1, 1, 1, 1, 1, 1 };
@@ -389,7 +389,7 @@ public class TestSudachiTokenizer {
 
         tokenizerNormal.setReader(new StringReader("アマゾンに行った。"));
         tokenizerNormal.reset();
-        String[] answerListNormal = { "アマゾン", "に", "行く", "た" };
+        String[] answerListNormal = { "アマゾン", "に", "行っ", "た" };
         int[] answerListPosIncNormal = { 1, 1, 1, 1 };
         int[] answerListPosLengthNormal = { 1, 1, 1, 1 };
         i = 0;
@@ -410,7 +410,7 @@ public class TestSudachiTokenizer {
 
         tokenizerPunctuation.setReader(new StringReader("アマゾンに行った。"));
         tokenizerPunctuation.reset();
-        String[] answerListPunctuation = { "アマゾン", "に", "行く", "た", "。" };
+        String[] answerListPunctuation = { "アマゾン", "に", "行っ", "た", "。" };
         int[] answerListPosIncPunctuation = { 1, 1, 1, 1, 1, 1 };
         int[] answerListPosLengthPunctuation = { 1, 1, 1, 1, 1, 1, 1 };
         i = 0;
