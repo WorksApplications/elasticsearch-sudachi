@@ -402,20 +402,22 @@ When using the pre-defined sudachi_readingform filter, use_romaji is set to true
 ```
 
 ### POST sudachi_sample
+
 ```json
 {
   "analyzer": "katakana_analyzer",
-  "text": "寿司"  ・・・[1]
+  "text": "寿司"
 }
 ```
+Returns `スシ`.
+
 ```
 {
   "analyzer": "romaji_analyzer",
-  "text": "寿司"  ・・・[2]
+  "text": "寿司"
 }
 ```
-[1] Returns スシ.
-[2] Returns sushi.
+Returns `sushi`.
 
 # Releases
 
