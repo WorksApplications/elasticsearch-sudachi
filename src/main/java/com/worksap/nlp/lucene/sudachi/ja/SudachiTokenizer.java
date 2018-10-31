@@ -289,6 +289,7 @@ public final class SudachiTokenizer extends
     @Override
     public final void end() throws IOException {
         super.end();
+        offsetAtt.setOffset(nextBaseOffset, nextBaseOffset);
     }
 
     @Override
