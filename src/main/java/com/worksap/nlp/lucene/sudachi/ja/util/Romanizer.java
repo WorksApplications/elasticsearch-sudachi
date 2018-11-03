@@ -976,6 +976,10 @@ public class Romanizer {
             case 'ー':
                 builder.append('-');
                 break;
+            case '・':
+            case '＝':
+                /* drop these characters */
+                break;
             default:
                 builder.append(ch);
                 break;
