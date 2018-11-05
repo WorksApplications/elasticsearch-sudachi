@@ -415,7 +415,7 @@ Returns `スシ`.
   "text": "寿司"
 }
 ```
-Returns `sushi`.
+Returns `susi`.
 
 # Releases
 
