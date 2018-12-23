@@ -31,6 +31,7 @@ import org.apache.lucene.analysis.tokenattributes.PositionLengthAttribute;
 import org.apache.lucene.util.AttributeFactory;
 
 import com.worksap.nlp.lucene.sudachi.ja.tokenattribute.BaseFormAttribute;
+import com.worksap.nlp.lucene.sudachi.ja.tokenattribute.NormalizedFormAttribute;
 import com.worksap.nlp.lucene.sudachi.ja.tokenattribute.PartOfSpeechAttribute;
 import com.worksap.nlp.lucene.sudachi.ja.tokenattribute.ReadingAttribute;
 import com.worksap.nlp.sudachi.Dictionary;
@@ -52,6 +53,7 @@ public final class SudachiTokenizer extends
     private final Tokenizer tokenizer;
     private final CharTermAttribute termAtt;
     private final BaseFormAttribute basicFormAtt;
+    private final NormalizedFormAttribute normFormAtt;
     private final PartOfSpeechAttribute posAtt;
     private final ReadingAttribute readingAtt;
     private final OffsetAttribute offsetAtt;
@@ -89,6 +91,7 @@ public final class SudachiTokenizer extends
 
         termAtt = addAttribute(CharTermAttribute.class);
         basicFormAtt = addAttribute(BaseFormAttribute.class);
+        normFormAtt = addAttribute(NormalizedFormAttribute.class);
         posAtt = addAttribute(PartOfSpeechAttribute.class);
         readingAtt = addAttribute(ReadingAttribute.class);
         offsetAtt = addAttribute(OffsetAttribute.class);
@@ -123,8 +126,8 @@ public final class SudachiTokenizer extends
 
         if (mode == Mode.EXTENDED && morpheme.isOOV()) {
             oovBegin = morpheme.begin();
-            oovSize = morpheme.normalizedForm().length();
-            oovIterator = Arrays.asList(morpheme.normalizedForm().split(""))
+            oovSize = morpheme.surface().length();
+            oovIterator = Arrays.asList(morpheme.surface().split(""))
                     .listIterator();
         } else if (mode != Mode.NORMAL) {
             List<Morpheme> aUnits = morpheme
@@ -175,11 +178,12 @@ public final class SudachiTokenizer extends
 
     private void setMorphemeAttributes(Morpheme morpheme) throws IOException {
         basicFormAtt.setMorpheme(morpheme);
+        normFormAtt.setMorpheme(morpheme);
         posAtt.setMorpheme(morpheme);
         readingAtt.setMorpheme(morpheme);
         offsetAtt.setOffset(baseOffset + morpheme.begin(),
                             baseOffset + morpheme.end());
-        setTermAttribute(morpheme.normalizedForm());
+        setTermAttribute(morpheme.surface());
     }
 
     private void setOOVAttribute(String str) throws IOException {
@@ -285,6 +289,7 @@ public final class SudachiTokenizer extends
     @Override
     public final void end() throws IOException {
         super.end();
+        offsetAtt.setOffset(nextBaseOffset, nextBaseOffset);
     }
 
     @Override
