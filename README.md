@@ -7,7 +7,15 @@ analysis-sudachi is an Elasticsearch plugin for tokenization of Japanese text us
 
 # What's new?
 
-- version 1.1.0: `part-of-speech forward matching` is available on `stoptags`; see [sudachi_part_of_speech](#sudachi_part_of_speech)
+- version 1.2.0
+    - Upgrading sudachi morphological analyzer to 1.2.0-SNAPSHOT
+    - New filter `sudachi_normalizedform` was added; see [sudachi_normalizedform](#sudachi_normalizedform)
+    - Default normalization behavior was changed; neather baseform filter and normalziedform filter not applied
+    - `sudachi_readingform` filter was changed with new romaji mappings based on MS-IME
+
+
+- version 1.1.0
+    - `part-of-speech forward matching` is available on `stoptags`; see [sudachi_part_of_speech](#sudachi_part_of_speech)
 
 # Build
 
