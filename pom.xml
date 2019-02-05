@@ -106,7 +106,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.20.1</version>
+				<version>2.22.1</version>
 				<configuration>
 					<excludes>
 						<exclude>**/TestAnalysisSudachi.java</exclude>
@@ -117,6 +117,9 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>3.0.0-M1</version>
+				<configuration>
+					<source>${java.version}</source>
+				</configuration>
 				<executions>
 					<execution>
 						<id>attach-javadocs</id>
