@@ -10,6 +10,11 @@
 			<outputDirectory>elasticsearch</outputDirectory>
 			<filtered>true</filtered>
 		</file>
+		<file>
+			<source>src/main/extras/plugin-security.policy</source>
+			<outputDirectory>elasticsearch</outputDirectory>
+			<filtered>false</filtered>
+		</file>
 	</files>
 	<dependencySets>
 		<dependencySet>

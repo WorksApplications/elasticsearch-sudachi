@@ -24,6 +24,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
+import java.lang.SecurityManager;
+import java.security.AccessController;
+import java.security.PrivilegedExceptionAction;
+import java.security.PrivilegedActionException;
+import org.elasticsearch.SpecialPermission;
+
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
@@ -86,7 +92,22 @@ public final class SudachiTokenizer extends
         super(factory);
         this.discardPunctuation = discardPunctuation;
         this.mode = mode;
-        dictionary = new DictionaryFactory().create(path, settings);
+
+        SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            sm.checkPermission(new SpecialPermission());
+        }
+
+        try {
+            dictionary = (Dictionary)AccessController.doPrivileged(new PrivilegedExceptionAction<Dictionary>() {
+                public Dictionary run() throws IOException {
+                    return new DictionaryFactory().create(path, settings);
+                }
+            });
+        } catch (PrivilegedActionException e) {
+            throw (IOException)e.getException();
+        }
+
         tokenizer = dictionary.create();
 
         termAtt = addAttribute(CharTermAttribute.class);
