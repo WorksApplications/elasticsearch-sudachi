@@ -7,8 +7,13 @@ analysis-sudachi is an Elasticsearch plugin for tokenization of Japanese text us
 
 # What's new?
 
+- version 1.3.0
+    - Upgrade sudachi morphological analyzer to 0.2.0
+    - Import sudachi from maven central repository
+    - Minor bug fix
+
 - version 1.2.0
-    - Upgrading sudachi morphological analyzer to 1.2.0-SNAPSHOT
+    - Upgrading sudachi morphological analyzer to 0.2.0-SNAPSHOT
     - New filter `sudachi_normalizedform` was added; see [sudachi_normalizedform](#sudachi_normalizedform)
     - Default normalization behavior was changed; neather baseform filter and normalziedform filter not applied
     - `sudachi_readingform` filter was changed with new romaji mappings based on MS-IME
@@ -16,6 +21,9 @@ analysis-sudachi is an Elasticsearch plugin for tokenization of Japanese text us
 
 - version 1.1.0
     - `part-of-speech forward matching` is available on `stoptags`; see [sudachi_part_of_speech](#sudachi_part_of_speech)
+
+- version 1.0.0
+    - first release
 
 # Build
 
@@ -26,12 +34,12 @@ analysis-sudachi is an Elasticsearch plugin for tokenization of Japanese text us
 
 # Installation
 
-Follow the steps below to install.
-
-1. Change the current directory "/usr/share/elasticsearch".
-2. Place the zip file created with "Build" on the moved directory.
-3. Command "sudo bin/elasticsearch-plugin install file:///usr/share/elasticsearch/<zipfile-name>"
-4. Place files [system_core.dic or system_full.dic] under ES_HOME/sudachi.
+1. Download analysis-sudachi-elasticsearch zip archive file
+2. Move current dir to $ES_HOME
+3. Execute "bin/elasticsearch-plugin install file:///<plugin-zip-path>"
+4. Download sudachi dictionary archive from https://github.com/WorksApplications/SudachiDict
+5. Extract dic file and place it to config/sudachi_tokenizer/system_core.dic
+6. Execute "bin/elasticsearch"
 
 # Configuration
 
@@ -425,25 +433,8 @@ Returns `スシ`.
 ```
 Returns `susi`.
 
-# Releases
-
-**1.1.0**
-- POS Filter: Allow forward matching; https://github.com/WorksApplications/elasticsearch-sudachi/issues/21
-
-**1.0.3**
-- Elasticsearch 6.1 API migration
-
-**1.0.2**
-- Elasticsearch 6.0 API migration
-
-**1.0.1**
-- fix exception over 512 characters
-
-**1.0.0**
-- first release
-
 # License
 
-Copyright (c) 2017 Works Applications Co., Ltd.
+Copyright (c) 2017-2019 Works Applications Co., Ltd.
 Originally under elasticsearch, https://www.elastic.co/jp/products/elasticsearch
 Originally under lucene, https://lucene.apache.org/
