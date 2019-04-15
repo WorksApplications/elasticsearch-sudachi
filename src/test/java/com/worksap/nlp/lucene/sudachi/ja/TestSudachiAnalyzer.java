@@ -153,10 +153,10 @@ public class TestSudachiAnalyzer {
             assertThat(values[0], is(INPUT_TEXT));
 
             query = queryParser.parse("京都");
-            assertThat(searcher.search(query, 5).totalHits, is(0L));
+            assertThat(searcher.search(query, 5).totalHits.value, is(0L));
 
             query = queryParser.parse("岩波");
-            assertThat(searcher.search(query, 5).totalHits, is(0L));
+            assertThat(searcher.search(query, 5).totalHits.value, is(0L));
         }
     }
 }
