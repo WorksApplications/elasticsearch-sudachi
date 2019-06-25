@@ -227,8 +227,9 @@ public final class SudachiTokenizer extends
         if (n < 0) {
             if (remainSize != 0) {
                 String lastSentence = new String(buffer, 0, remainSize);
-                remainSize = 0;
                 baseOffset = nextBaseOffset;
+                nextBaseOffset += remainSize;
+                remainSize = 0;
                 return lastSentence;
             }
             return null;

@@ -16,8 +16,9 @@
 
 package com.worksap.nlp.lucene.sudachi.ja;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,6 +51,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
+import com.worksap.nlp.lucene.sudachi.ja.SudachiAnalyzer;
 
 // Test of character segmentation using analyzer
 public class TestSudachiAnalyzer {
