@@ -23,6 +23,7 @@ import java.util.Map;
 public class PartOfSpeechTrie {
 
     static final String EMPTY_SYMBOL = "*";
+    static final String LEAF = "";
 
     Map<String, Object> root = new HashMap<>();
 
@@ -37,6 +38,7 @@ public class PartOfSpeechTrie {
                 (Map<String, Object>)node.computeIfAbsent(item, k -> new HashMap<>());
             node = newNode;
         }
+        node.put(LEAF, LEAF);
     }
 
     public boolean isPrefixOf(List<String> items, int begin, int end) {
@@ -47,17 +49,17 @@ public class PartOfSpeechTrie {
         for (int i = begin; i < end; i++) {
             String item = items.get(i);
             if (EMPTY_SYMBOL.equals(item)) {
-                return node.isEmpty();
+                return node.containsKey(LEAF);
             }
             @SuppressWarnings("unchecked")
             Map<String, Object> newNode = (Map<String, Object>)node.get(item);
             node = newNode;
             if (node == null) {
                 return false;
-            } else if (node.isEmpty()) {
+            } else if (node.containsKey(LEAF)) {
                 return true;
             }
         }
-        return true;
+        return node.containsKey(LEAF);
     }
 }

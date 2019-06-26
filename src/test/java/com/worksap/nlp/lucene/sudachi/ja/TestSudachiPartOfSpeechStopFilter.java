@@ -81,7 +81,7 @@ public class TestSudachiPartOfSpeechStopFilter extends BaseTokenStreamTestCase {
         factory.inform(new StringResourceLoader(tags));
         tokenStream = factory.create(tokenStream);
         assertTokenStreamContents(tokenStream,
-                                  new String[] { "東京都", "東京", "都", "に", "行く", "た"});
+                                  new String[] { "東京都", "東京", "都", "に", "行っ", "た"});
     }
 
     public void testConjugationForm() throws IOException {
@@ -89,6 +89,23 @@ public class TestSudachiPartOfSpeechStopFilter extends BaseTokenStreamTestCase {
         factory.inform(new StringResourceLoader(tags));
         tokenStream = factory.create(tokenStream);
         assertTokenStreamContents(tokenStream,
-                                  new String[] {"東京都", "東京", "都", "に", "行く"});
+                                  new String[] {"東京都", "東京", "都", "に", "行っ"});
     }
+
+    public void testPrefixWithUnmatchedSubcategory() throws IOException {
+        String tags = "助詞,格助詞\n助詞,格助詞,引用\n";
+        factory.inform(new StringResourceLoader(tags));
+        tokenStream = factory.create(tokenStream);
+        assertTokenStreamContents(tokenStream,
+                                  new String[] {"東京都", "東京", "都", "行っ", "た"});
+    }
+
+    public void testTooLongCategory() throws IOException {
+        String tags = "名詞,固有名詞,地名,一般,一般\n";
+        factory.inform(new StringResourceLoader(tags));
+        tokenStream = factory.create(tokenStream);
+        assertTokenStreamContents(tokenStream,
+                                  new String[] {"東京都", "東京", "都", "に", "行っ", "た"});
+    }
+
 }
