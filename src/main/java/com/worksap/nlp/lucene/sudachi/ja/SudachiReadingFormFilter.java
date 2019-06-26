@@ -20,10 +20,10 @@ import java.io.IOException;
 
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.ja.util.ToStringUtil;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 
 import com.worksap.nlp.lucene.sudachi.ja.tokenattribute.ReadingAttribute;
+import com.worksap.nlp.lucene.sudachi.ja.util.Romanizer;
 
 public final class SudachiReadingFormFilter extends TokenFilter {
     private final CharTermAttribute termAttr;
@@ -51,10 +51,10 @@ public final class SudachiReadingFormFilter extends TokenFilter {
             if (useRomaji) {
                 if (reading == null) {
                     buffer.setLength(0);
-                    ToStringUtil.getRomanization(buffer, termAttr);
+                    Romanizer.getRomanization(buffer, termAttr);
                     termAttr.setEmpty().append(buffer);
                 } else {
-                    ToStringUtil.getRomanization(termAttr.setEmpty(), reading);
+                    Romanizer.getRomanization(termAttr.setEmpty(), reading);
                 }
             } else {
                 if (reading != null) {
