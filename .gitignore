@@ -13,3 +13,13 @@ buildNumber.properties
 
 src/test/resources/com/worksap/nlp/lucene/sudachi/ja/system_core.dic
 bin/
+
+# IDE
+.metadata
+.project
+.classpath
+.checkstyle
+.factorypath
+.settings/
+*.iml
+.idea
