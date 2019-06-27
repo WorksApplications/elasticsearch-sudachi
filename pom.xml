@@ -40,38 +40,6 @@
             </snapshots>
         </repository>
     </repositories>
-    <profiles>
-        <profile>
-            <id>pre-merge</id>
-            <activation>
-                <property>
-                    <name>env.TRAVIS_EVENT_TYPE</name>
-                    <value>pull_request</value>
-                </property>
-            </activation>
-            <properties>
-                <sonar.skip>false</sonar.skip>
-                <sonar.analysis.mode>preview</sonar.analysis.mode>
-                <sonar.github.oauth>${env.GITHUB_TOKEN}</sonar.github.oauth>
-                <sonar.github.pullRequest>${env.TRAVIS_PULL_REQUEST}</sonar.github.pullRequest>
-                <sonar.github.repository>${env.TRAVIS_REPO_SLUG}</sonar.github.repository>
-                <jacoco.skip>false</jacoco.skip>
-            </properties>
-        </profile>
-        <profile>
-            <id>post-merge</id>
-            <activation>
-                <property>
-                    <name>env.TRAVIS_BRANCH</name>
-                    <value>develop</value>
-                </property>
-            </activation>
-            <properties>
-                <sonar.skip>false</sonar.skip>
-                <jacoco.skip>false</jacoco.skip>
-            </properties>
-        </profile>
-    </profiles>
     <build>
         <plugins>
             <plugin>
