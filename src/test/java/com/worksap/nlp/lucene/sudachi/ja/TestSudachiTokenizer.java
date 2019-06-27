@@ -25,16 +25,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 
-import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
-import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
-import org.apache.lucene.analysis.tokenattributes.PositionLengthAttribute;
+import org.apache.lucene.analysis.BaseTokenStreamTestCase;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 // Test of character segmentation using incrementToken(tokenizer)
-public class TestSudachiTokenizer {
+public class TestSudachiTokenizer extends BaseTokenStreamTestCase {
     private SudachiTokenizer tokenizer;
     private SudachiTokenizer tokenizerExtended;
     private SudachiTokenizer tokenizerNormal;
@@ -67,368 +66,160 @@ public class TestSudachiTokenizer {
     }
 
     @Test
-    public void incrementTokenShiftJis() throws IOException {
+    public void incrementTokenWithShiftJis() throws IOException {
         String str = new String("東京都に行った。".getBytes("Shift_JIS"), "Shift_JIS");
         tokenizer.setReader(new StringReader(str));
-        tokenizer.reset();
-        String[] answerListAUnit = { "東京都", "東京", "都", "に", "行っ", "た" };
-        int[] answerListPosIncAUnit = { 1, 0, 1, 1, 1, 1 };
-        int[] answerListPosLengthAUnit = { 2, 1, 1, 1, 1, 1 };
-        int i = 0;
-
-        while (tokenizer.incrementToken()) {
-            assertThat(tokenizer.getAttribute(CharTermAttribute.class)
-                    .toString(), is(answerListAUnit[i]));
-            assertThat(tokenizer.getAttribute(PositionIncrementAttribute.class)
-                    .getPositionIncrement(), is(answerListPosIncAUnit[i]));
-            assertThat(tokenizer.getAttribute(PositionLengthAttribute.class)
-                    .getPositionLength(), is(answerListPosLengthAUnit[i]));
-            i++;
-        }
+        assertTokenStreamContents(tokenizer,
+                                  new String[] { "東京都", "東京", "都", "に", "行っ", "た" },
+                                  new int[] { 0, 0, 2, 3, 4, 6 },
+                                  new int[] { 3, 2, 3, 4, 6, 7 },
+                                  new int[] { 1, 0, 1, 1, 1, 1 },
+                                  new int[] { 2, 1, 1, 1, 1, 1 },
+                                  8);
     }
 
     @Test
-    public void incrementToken() throws IOException {
+    public void incrementTokenByDefaultMode() throws IOException {
         tokenizer.setReader(new StringReader("東京都に行った。"));
-        tokenizer.reset();
-        String[] answerListAUnit = { "東京都", "東京", "都", "に", "行っ", "た" };
-        int[] answerListPosIncAUnit = { 1, 0, 1, 1, 1, 1 };
-        int[] answerListPosLengthAUnit = { 2, 1, 1, 1, 1, 1 };
-        int i = 0;
-
-        while (tokenizer.incrementToken()) {
-            assertThat(tokenizer.getAttribute(CharTermAttribute.class)
-                    .toString(), is(answerListAUnit[i]));
-            assertThat(tokenizer.getAttribute(PositionIncrementAttribute.class)
-                    .getPositionIncrement(), is(answerListPosIncAUnit[i]));
-            assertThat(tokenizer.getAttribute(PositionLengthAttribute.class)
-                    .getPositionLength(), is(answerListPosLengthAUnit[i]));
-            i++;
-        }
-
-        tokenizerExtended.setReader(new StringReader("東京都に行った。"));
-        tokenizerExtended.reset();
-        String[] answerListExtended = { "東京都", "東京", "都", "に", "行っ", "た" };
-        int[] answerListPosIncExtended = { 1, 0, 1, 1, 1, 1 };
-        int[] answerListPosLengthExtended = { 2, 1, 1, 1, 1, 1 };
-        i = 0;
-        while (tokenizerExtended.incrementToken()) {
-            assertThat(tokenizerExtended.getAttribute(CharTermAttribute.class)
-                    .toString(), is(answerListExtended[i]));
-            assertThat(
-                    tokenizerExtended.getAttribute(
-                            PositionIncrementAttribute.class)
-                            .getPositionIncrement(),
-                    is(answerListPosIncExtended[i]));
-            assertThat(
-                    tokenizerExtended.getAttribute(
-                            PositionLengthAttribute.class).getPositionLength(),
-                    is(answerListPosLengthExtended[i]));
-            i++;
-        }
-
-        tokenizerNormal.setReader(new StringReader("東京都に行った。"));
-        tokenizerNormal.reset();
-        String[] answerListNormal = { "東京都", "に", "行っ", "た" };
-        int[] answerListPosIncNormal = { 1, 1, 1, 1 };
-        int[] answerListPosLengthNormal = { 1, 1, 1, 1 };
-        i = 0;
-        while (tokenizerNormal.incrementToken()) {
-            assertThat(tokenizerNormal.getAttribute(CharTermAttribute.class)
-                    .toString(), is(answerListNormal[i]));
-            assertThat(
-                    tokenizerNormal.getAttribute(
-                            PositionIncrementAttribute.class)
-                            .getPositionIncrement(),
-                    is(answerListPosIncNormal[i]));
-            assertThat(
-                    tokenizerNormal.getAttribute(PositionLengthAttribute.class)
-                            .getPositionLength(),
-                    is(answerListPosLengthNormal[i]));
-            i++;
-        }
-
-        tokenizerPunctuation.setReader(new StringReader("東京都に行った。"));
-        tokenizerPunctuation.reset();
-        String[] answerListPunctuation = { "東京都", "東京", "都", "に", "行っ", "た",
-                "。" };
-        int[] answerListPosIncPunctuation = { 1, 0, 1, 1, 1, 1, 1 };
-        int[] answerListPosLengthPunctuation = { 2, 1, 1, 1, 1, 1, 1 };
-        i = 0;
-        while (tokenizerPunctuation.incrementToken()) {
-            assertThat(
-                    tokenizerPunctuation.getAttribute(CharTermAttribute.class)
-                            .toString(), is(answerListPunctuation[i]));
-            assertThat(
-                    tokenizerPunctuation.getAttribute(
-                            PositionIncrementAttribute.class)
-                            .getPositionIncrement(),
-                    is(answerListPosIncPunctuation[i]));
-            assertThat(
-                    tokenizerPunctuation.getAttribute(
-                            PositionLengthAttribute.class).getPositionLength(),
-                    is(answerListPosLengthPunctuation[i]));
-            i++;
-        }
+        assertTokenStreamContents(tokenizer,
+                                  new String[] { "東京都", "東京", "都", "に", "行っ", "た" },
+                                  new int[] { 0, 0, 2, 3, 4, 6 },
+                                  new int[] { 3, 2, 3, 4, 6, 7 },
+                                  new int[] { 1, 0, 1, 1, 1, 1 },
+                                  new int[] { 2, 1, 1, 1, 1, 1 },
+                                  8);
     }
 
     @Test
-    public void incrementTokenPunctuation() throws IOException {
+    public void incrementTokenByExtendedMode() throws IOException {
+        tokenizerExtended.setReader(new StringReader("東京都に行った。"));
+        assertTokenStreamContents(tokenizerExtended,
+                                  new String[] { "東京都", "東京", "都", "に", "行っ", "た" },
+                                  new int[] { 0, 0, 2, 3, 4, 6 },
+                                  new int[] { 3, 2, 3, 4, 6, 7 },
+                                  new int[] { 1, 0, 1, 1, 1, 1 },
+                                  new int[] { 2, 1, 1, 1, 1, 1 },
+                                  8);
+    }
+
+    @Test
+    public void incrementTokenByNormalMode() throws IOException {
+        tokenizerNormal.setReader(new StringReader("東京都に行った。"));
+        assertTokenStreamContents(tokenizerNormal,
+                                  new String[] { "東京都", "に", "行っ", "た" },
+                                  new int[] { 0, 3, 4, 6 },
+                                  new int[] { 3, 4, 6, 7 },
+                                  new int[] { 1, 1, 1, 1 },
+                                  new int[] { 1, 1, 1, 1 },
+                                  8);
+    }
+
+    @Test
+    public void incrementTokenByPunctuationMode() throws IOException {
+        tokenizerPunctuation.setReader(new StringReader("東京都に行った。"));
+        assertTokenStreamContents(tokenizerPunctuation,
+                                  new String[] { "東京都", "東京", "都", "に", "行っ", "た", "。" },
+                                  new int[] { 0, 0, 2, 3, 4, 6, 7 },
+                                  new int[] { 3, 2, 3, 4, 6, 7, 8 },
+                                  new int[] { 1, 0, 1, 1, 1, 1, 1 },
+                                  new int[] { 2, 1, 1, 1, 1, 1, 1 },
+                                  8);
+    }
+
+    @Test
+    public void incrementTokenWithPunctuationsByDefaultMode() throws IOException {
         tokenizer.setReader(new StringReader("東京都に行った。東京都に行った。"));
-        tokenizer.reset();
-        String[] answerList = { "東京都", "東京", "都", "に", "行っ", "た", "東京都", "東京",
-                "都", "に", "行っ", "た" };
-        int[] answerListPosInc = { 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1 };
-        int[] answerListPosLength = { 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1 };
-        int i = 0;
-        while (tokenizer.incrementToken()) {
-            assertThat(tokenizer.getAttribute(CharTermAttribute.class)
-                    .toString(), is(answerList[i]));
-            assertThat(tokenizer.getAttribute(PositionIncrementAttribute.class)
-                    .getPositionIncrement(), is(answerListPosInc[i]));
-            assertThat(tokenizer.getAttribute(PositionLengthAttribute.class)
-                    .getPositionLength(), is(answerListPosLength[i]));
-            i++;
-        }
+        assertTokenStreamContents(tokenizer,
+                                  new String[] { "東京都", "東京", "都", "に", "行っ", "た", "東京都", "東京", "都", "に", "行っ", "た" },
+                                  new int[] { 0, 0, 2, 3, 4, 6, 8, 8, 10, 11, 12, 14 },
+                                  new int[] { 3, 2, 3, 4, 6, 7, 11, 10, 11, 12, 14, 15 },
+                                  new int[] { 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1 },
+                                  new int[] { 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1 },
+                                  16);
+    }
 
+    @Test
+    public void incrementTokenWithPunctuationsByExtendedMode() throws IOException {
         tokenizerExtended.setReader(new StringReader("東京都に行った。東京都に行った。"));
-        tokenizerExtended.reset();
-        String[] answerListExtended = { "東京都", "東京", "都", "に", "行っ", "た",
-                "東京都", "東京", "都", "に", "行っ", "た" };
-        int[] answerListPosIncExtended = { 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1,
-                1 };
-        int[] answerListPosLengthExtended = { 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1,
-                1, 1 };
-        i = 0;
-        while (tokenizerExtended.incrementToken()) {
-            assertThat(tokenizerExtended.getAttribute(CharTermAttribute.class)
-                    .toString(), is(answerListExtended[i]));
-            assertThat(
-                    tokenizerExtended.getAttribute(
-                            PositionIncrementAttribute.class)
-                            .getPositionIncrement(),
-                    is(answerListPosIncExtended[i]));
-            assertThat(
-                    tokenizerExtended.getAttribute(
-                            PositionLengthAttribute.class).getPositionLength(),
-                    is(answerListPosLengthExtended[i]));
-            i++;
-        }
+        assertTokenStreamContents(tokenizerExtended,
+                                  new String[] { "東京都", "東京", "都", "に", "行っ", "た", "東京都", "東京", "都", "に", "行っ", "た" },
+                                  new int[] { 0, 0, 2, 3, 4, 6, 8, 8, 10, 11, 12, 14 },
+                                  new int[] { 3, 2, 3, 4, 6, 7, 11, 10, 11, 12, 14, 15 },
+                                  new int[] { 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1 },
+                                  new int[] { 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1 },
+                                  16);
+    }
 
+    @Test
+    public void incrementTokenWithPunctuationsByNormalMode() throws IOException {
         tokenizerNormal.setReader(new StringReader("東京都に行った。東京都に行った。"));
-        tokenizerNormal.reset();
-        String[] answerListNormal = { "東京都", "に", "行っ", "た", "東京都", "に", "行っ",
-                "た" };
-        int[] answerListPosIncNormal = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
-        int[] answerListPosLengthNormal = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
-        i = 0;
-        while (tokenizerNormal.incrementToken()) {
-            assertThat(tokenizerNormal.getAttribute(CharTermAttribute.class)
-                    .toString(), is(answerListNormal[i]));
-            assertThat(
-                    tokenizerNormal.getAttribute(
-                            PositionIncrementAttribute.class)
-                            .getPositionIncrement(),
-                    is(answerListPosIncNormal[i]));
-            assertThat(
-                    tokenizerNormal.getAttribute(PositionLengthAttribute.class)
-                            .getPositionLength(),
-                    is(answerListPosLengthNormal[i]));
-            i++;
-        }
+        assertTokenStreamContents(tokenizerNormal,
+                                  new String[] { "東京都", "に", "行っ", "た", "東京都", "に", "行っ", "た" },
+                                  new int[] { 0, 3, 4, 6, 8, 11, 12, 14 },
+                                  new int[] { 3, 4, 6, 7, 11, 12, 14, 15 },
+                                  new int[] { 1, 1, 1, 1, 1, 1, 1, 1 },
+                                  new int[] { 1, 1, 1, 1, 1, 1, 1, 1 },
+                                  16);
+    }
 
+    @Test
+    public void incrementTokenWithPunctuationsByPunctuationMode() throws IOException {
         tokenizerPunctuation.setReader(new StringReader("東京都に行った。東京都に行った。"));
-        tokenizerPunctuation.reset();
-        String[] answerListPunctuation = { "東京都", "東京", "都", "に", "行っ", "た",
-                "。", "東京都", "東京", "都", "に", "行っ", "た", "。" };
-        int[] answerListPosIncPunctuation = { 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1,
-                1, 1, 1, 1 };
-        int[] answerListPosLengthPunctuation = { 2, 1, 1, 1, 1, 1, 1, 2, 1, 1,
-                1, 1, 1, 1, 1 };
-        i = 0;
-        while (tokenizerPunctuation.incrementToken()) {
-            assertThat(
-                    tokenizerPunctuation.getAttribute(CharTermAttribute.class)
-                            .toString(), is(answerListPunctuation[i]));
-            assertThat(
-                    tokenizerPunctuation.getAttribute(
-                            PositionIncrementAttribute.class)
-                            .getPositionIncrement(),
-                    is(answerListPosIncPunctuation[i]));
-            assertThat(
-                    tokenizerPunctuation.getAttribute(
-                            PositionLengthAttribute.class).getPositionLength(),
-                    is(answerListPosLengthPunctuation[i]));
-            i++;
-        }
+        assertTokenStreamContents(tokenizerPunctuation,
+                                  new String[] { "東京都", "東京", "都", "に", "行っ", "た", "。", "東京都", "東京", "都", "に", "行っ", "た", "。" },
+                                  new int[] { 0, 0, 2, 3, 4, 6, 7, 8, 8, 10, 11, 12, 14, 15 },
+                                  new int[] { 3, 2, 3, 4, 6, 7, 8, 11, 10, 11, 12, 14, 15, 16 },
+                                  new int[] { 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1 },
+                                  new int[] { 2, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1 },
+                                  16);
     }
 
     @Test
-    public void incrementTokenAUnit() throws IOException {
-        tokenizer.setReader(new StringReader("東京都に行った。"));
-        tokenizer.reset();
-        String[] answerList = { "東京都", "東京", "都", "に", "行っ", "た" };
-        int[] answerListPosInc = { 1, 0, 1, 1, 1, 1 };
-        int[] answerListPosLength = { 2, 1, 1, 1, 1, 1 };
-        int i = 0;
-        while (tokenizer.incrementToken()) {
-            assertThat(tokenizer.getAttribute(CharTermAttribute.class)
-                    .toString(), is(answerList[i]));
-            assertThat(tokenizer.getAttribute(PositionIncrementAttribute.class)
-                    .getPositionIncrement(), is(answerListPosInc[i]));
-            assertThat(tokenizer.getAttribute(PositionLengthAttribute.class)
-                    .getPositionLength(), is(answerListPosLength[i]));
-            i++;
-        }
-
-        tokenizerExtended.setReader(new StringReader("東京都に行った。"));
-        tokenizerExtended.reset();
-        String[] answerListExtended = { "東京都", "東京", "都", "に", "行っ", "た" };
-        int[] answerListPosIncExtended = { 1, 0, 1, 1, 1, 1 };
-        int[] answerListPosLengthExtended = { 2, 1, 1, 1, 1, 1 };
-        i = 0;
-        while (tokenizerExtended.incrementToken()) {
-            assertThat(tokenizerExtended.getAttribute(CharTermAttribute.class)
-                    .toString(), is(answerListExtended[i]));
-            assertThat(
-                    tokenizerExtended.getAttribute(
-                            PositionIncrementAttribute.class)
-                            .getPositionIncrement(),
-                    is(answerListPosIncExtended[i]));
-            assertThat(
-                    tokenizerExtended.getAttribute(
-                            PositionLengthAttribute.class).getPositionLength(),
-                    is(answerListPosLengthExtended[i]));
-            i++;
-        }
-
-        tokenizerNormal.setReader(new StringReader("東京都に行った。"));
-        tokenizerNormal.reset();
-        String[] answerListNormal = { "東京都", "に", "行っ", "た" };
-        int[] answerListPosIncNormal = { 1, 1, 1, 1 };
-        int[] answerListPosLengthNormal = { 1, 1, 1, 1 };
-        i = 0;
-        while (tokenizerNormal.incrementToken()) {
-            assertThat(tokenizerNormal.getAttribute(CharTermAttribute.class)
-                    .toString(), is(answerListNormal[i]));
-            assertThat(
-                    tokenizerNormal.getAttribute(
-                            PositionIncrementAttribute.class)
-                            .getPositionIncrement(),
-                    is(answerListPosIncNormal[i]));
-            assertThat(
-                    tokenizerNormal.getAttribute(PositionLengthAttribute.class)
-                            .getPositionLength(),
-                    is(answerListPosLengthNormal[i]));
-            i++;
-        }
-
-        tokenizerPunctuation.setReader(new StringReader("東京都に行った。"));
-        tokenizerPunctuation.reset();
-        String[] answerListPunctuation = { "東京都", "東京", "都", "に", "行っ", "た",
-                "。" };
-        int[] answerListPosIncPunctuation = { 1, 0, 1, 1, 1, 1, 1 };
-        int[] answerListPosLengthPunctuation = { 2, 1, 1, 1, 1, 1, 1 };
-        i = 0;
-        while (tokenizerPunctuation.incrementToken()) {
-            assertThat(
-                    tokenizerPunctuation.getAttribute(CharTermAttribute.class)
-                            .toString(), is(answerListPunctuation[i]));
-            assertThat(
-                    tokenizerPunctuation.getAttribute(
-                            PositionIncrementAttribute.class)
-                            .getPositionIncrement(),
-                    is(answerListPosIncPunctuation[i]));
-            assertThat(
-                    tokenizerPunctuation.getAttribute(
-                            PositionLengthAttribute.class).getPositionLength(),
-                    is(answerListPosLengthPunctuation[i]));
-            i++;
-        }
-    }
-
-    @Test
-    public void incrementTokenOOV() throws IOException {
+    public void incrementTokenWithOOVByDefaultMode() throws IOException {
         tokenizer.setReader(new StringReader("アマゾンに行った。"));
-        tokenizer.reset();
-        String[] answerList = { "アマゾン", "に", "行っ", "た" };
-        int[] answerListPosInc = { 1, 1, 1, 1, 1, 1 };
-        int[] answerListPosLength = { 1, 1, 1, 1, 1, 1 };
-        int i = 0;
-        while (tokenizer.incrementToken()) {
-            assertThat(tokenizer.getAttribute(CharTermAttribute.class)
-                    .toString(), is(answerList[i]));
-            assertThat(tokenizer.getAttribute(PositionIncrementAttribute.class)
-                    .getPositionIncrement(), is(answerListPosInc[i]));
-            assertThat(tokenizer.getAttribute(PositionLengthAttribute.class)
-                    .getPositionLength(), is(answerListPosLength[i]));
-            i++;
-        }
+        assertTokenStreamContents(tokenizer,
+                                  new String[] { "アマゾン", "に", "行っ", "た" },
+                                  new int[] { 0, 4, 5, 7 },
+                                  new int[] { 4, 5, 7, 8 },
+                                  new int[] { 1, 1, 1, 1 },
+                                  new int[] { 1, 1, 1, 1 },
+                                  9);
+    }
 
+    @Test
+    public void incrementTokenWithOOVByExtendedMode() throws IOException {
         tokenizerExtended.setReader(new StringReader("アマゾンに行った。"));
-        tokenizerExtended.reset();
-        String[] answerListExtended = { "アマゾン", "ア", "マ", "ゾ", "ン", "に", "行っ",
-                "た" };
-        int[] answerListPosIncExtended = { 1, 0, 1, 1, 1, 1, 1, 1 };
-        int[] answerListPosLengthExtended = { 4, 1, 1, 1, 1, 1, 1, 1 };
-        i = 0;
-        while (tokenizerExtended.incrementToken()) {
-            assertThat(tokenizerExtended.getAttribute(CharTermAttribute.class)
-                    .toString(), is(answerListExtended[i]));
-            assertThat(
-                    tokenizerExtended.getAttribute(
-                            PositionIncrementAttribute.class)
-                            .getPositionIncrement(),
-                    is(answerListPosIncExtended[i]));
-            assertThat(
-                    tokenizerExtended.getAttribute(
-                            PositionLengthAttribute.class).getPositionLength(),
-                    is(answerListPosLengthExtended[i]));
-            i++;
-        }
+        assertTokenStreamContents(tokenizerExtended,
+                                  new String[] { "アマゾン", "ア", "マ", "ゾ", "ン", "に", "行っ", "た" },
+                                  new int[] { 0, 0, 1, 2, 3, 4, 5, 7 },
+                                  new int[] { 4, 1, 2, 3, 4, 5, 7, 8 },
+                                  new int[] { 1, 0, 1, 1, 1, 1, 1, 1 },
+                                  new int[] { 4, 1, 1, 1, 1, 1, 1, 1 },
+                                  9);
+    }
 
+    @Test
+    public void incrementTokenWithOOVByNormalMode() throws IOException {
         tokenizerNormal.setReader(new StringReader("アマゾンに行った。"));
-        tokenizerNormal.reset();
-        String[] answerListNormal = { "アマゾン", "に", "行っ", "た" };
-        int[] answerListPosIncNormal = { 1, 1, 1, 1 };
-        int[] answerListPosLengthNormal = { 1, 1, 1, 1 };
-        i = 0;
-        while (tokenizerNormal.incrementToken()) {
-            assertThat(tokenizerNormal.getAttribute(CharTermAttribute.class)
-                    .toString(), is(answerListNormal[i]));
-            assertThat(
-                    tokenizerNormal.getAttribute(
-                            PositionIncrementAttribute.class)
-                            .getPositionIncrement(),
-                    is(answerListPosIncNormal[i]));
-            assertThat(
-                    tokenizerNormal.getAttribute(PositionLengthAttribute.class)
-                            .getPositionLength(),
-                    is(answerListPosLengthNormal[i]));
-            i++;
-        }
+        assertTokenStreamContents(tokenizerNormal,
+                                  new String[] { "アマゾン", "に", "行っ", "た" },
+                                  new int[] { 0, 4, 5, 7 },
+                                  new int[] { 4, 5, 7, 8 },
+                                  new int[] { 1, 1, 1, 1 },
+                                  new int[] { 1, 1, 1, 1 },
+                                  9);
+    }
 
+    @Test
+    public void incrementTokenWithOOVByPunctuationMode() throws IOException {
         tokenizerPunctuation.setReader(new StringReader("アマゾンに行った。"));
-        tokenizerPunctuation.reset();
-        String[] answerListPunctuation = { "アマゾン", "に", "行っ", "た", "。" };
-        int[] answerListPosIncPunctuation = { 1, 1, 1, 1, 1, 1 };
-        int[] answerListPosLengthPunctuation = { 1, 1, 1, 1, 1, 1, 1 };
-        i = 0;
-        while (tokenizerPunctuation.incrementToken()) {
-            assertThat(
-                    tokenizerPunctuation.getAttribute(CharTermAttribute.class)
-                            .toString(), is(answerListPunctuation[i]));
-            assertThat(
-                    tokenizerPunctuation.getAttribute(
-                            PositionIncrementAttribute.class)
-                            .getPositionIncrement(),
-                    is(answerListPosIncPunctuation[i]));
-            assertThat(
-                    tokenizerPunctuation.getAttribute(
-                            PositionLengthAttribute.class).getPositionLength(),
-                    is(answerListPosLengthPunctuation[i]));
-            i++;
-        }
+        assertTokenStreamContents(tokenizerPunctuation,
+                                  new String[] { "アマゾン", "に", "行っ", "た", "。" },
+                                  new int[] { 0, 4, 5, 7, 8 },
+                                  new int[] { 4, 5, 7, 8, 9 },
+                                  new int[] { 1, 1, 1, 1, 1 },
+                                  new int[] { 1, 1, 1, 1, 1 },
+                                  9);
     }
 
     @Test
@@ -443,14 +234,14 @@ public class TestSudachiTokenizer {
     }
 
     @Test
-    public void testReadSentencesTwoSentences() throws IOException {
+    public void testReadSentencesWithTwoSentences() throws IOException {
         tokenizer.setReader(new StringReader("東京都に行った。東京都に行った。"));
         tokenizer.reset();
         assertThat(tokenizer.readSentences(), is("東京都に行った。東京都に行った。"));
     }
 
     @Test
-    public void testReadSentencesNoLastPunctuation() throws IOException {
+    public void testReadSentencesWithoutLastPunctuation() throws IOException {
         tokenizer.setReader(new StringReader("東京都に行った。東京都に行った"));
         tokenizer.reset();
         String[] answerList = { "東京都に行った。", "東京都に行った" };
@@ -460,7 +251,7 @@ public class TestSudachiTokenizer {
     }
 
     @Test
-    public void testReadSentencesTwoPunctuation() throws IOException {
+    public void testReadSentencesWithTwoPunctuations() throws IOException {
         tokenizer.setReader(new StringReader("東京都に行った。。東京都に行った"));
         tokenizer.reset();
         String[] answerList = { "東京都に行った。。", "東京都に行った" };
@@ -470,7 +261,7 @@ public class TestSudachiTokenizer {
     }
 
     @Test
-    public void testReadSentencesJapaneseComma() throws IOException {
+    public void testReadSentencesWithIdeographicComma() throws IOException {
         tokenizer.setReader(new StringReader("東京都に行った、東京都に行った"));
         tokenizer.reset();
         String[] answerList = { "東京都に行った、", "東京都に行った" };
@@ -480,14 +271,14 @@ public class TestSudachiTokenizer {
     }
 
     @Test
-    public void testReadSentencesPeriod() throws IOException {
+    public void testReadSentencesWithPeriod() throws IOException {
         tokenizer.setReader(new StringReader("東京都に行った。。東京都に行った."));
         tokenizer.reset();
         assertThat(tokenizer.readSentences(), is("東京都に行った。。東京都に行った."));
     }
 
     @Test
-    public void testReadSentencesComma() throws IOException {
+    public void testReadSentencesWithComma() throws IOException {
         tokenizer.setReader(new StringReader("東京都に行った,東京都に行った"));
         tokenizer.reset();
         String[] answerList = { "東京都に行った,", "東京都に行った" };
@@ -497,7 +288,7 @@ public class TestSudachiTokenizer {
     }
 
     @Test
-    public void testReadSentencesLongSentence() throws IOException {
+    public void testReadSentencesWithLongSentence() throws IOException {
         tokenizer.setReader(new StringReader("岩波文庫は平福百穂画伯の装幀をもって昭和二年刊行された。"
                 + "これを発表した時の影響の絶大なりしことは実に驚いた。" + "讃美、激励、希望等の書信が数千通に達した。"
                 + "「私の教養の一切を岩波文庫に托する」などという感激の文字もあった。"

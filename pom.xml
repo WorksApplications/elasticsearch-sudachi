@@ -4,7 +4,7 @@
 
 	<groupId>com.worksap.nlp</groupId>
     <artifactId>analysis-sudachi-elasticsearch6.5</artifactId>
-    <version>1.2.0-SNAPSHOT</version>
+    <version>1.3.0</version>
 	<packaging>jar</packaging>
 
 	<name>analysis-sudachi</name>
@@ -14,7 +14,7 @@
 		<java.version>1.8</java.version>
 		<elasticsearch.version>6.5.4</elasticsearch.version>
 		<lucene.version>7.5.0</lucene.version>
-		<sudachi.version>0.1.2-SNAPSHOT</sudachi.version>
+		<sudachi.version>0.2.0</sudachi.version>
 		<jacoco.skip>true</jacoco.skip>
 		<sonar.skip>true</sonar.skip>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
@@ -106,7 +106,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.20.1</version>
+				<version>2.22.1</version>
 				<configuration>
 					<excludes>
 						<exclude>**/TestAnalysisSudachi.java</exclude>
@@ -117,6 +117,9 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>3.0.0-M1</version>
+				<configuration>
+					<source>${java.version}</source>
+				</configuration>
 				<executions>
 					<execution>
 						<id>attach-javadocs</id>
@@ -152,7 +155,7 @@
 		</plugins>
 	</build>
 	<dependencies>
-		<!-- Sudachi -->
+		<!-- https://mvnrepository.com/artifact/com.worksap.nlp/sudachi -->
 		<dependency>
 			<groupId>com.worksap.nlp</groupId>
 			<artifactId>sudachi</artifactId>
