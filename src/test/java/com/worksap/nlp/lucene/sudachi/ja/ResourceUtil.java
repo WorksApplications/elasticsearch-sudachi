@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
 class ResourceUtil {
@@ -30,8 +31,8 @@ class ResourceUtil {
 
     static String getSudachiSetting(InputStream is) throws IOException{
         String settings;
-        try (BufferedReader br = new BufferedReader(
-                        new InputStreamReader(is));) {
+        try (InputStreamReader ir = new InputStreamReader(is, StandardCharsets.UTF_8);
+            BufferedReader br = new BufferedReader(ir)) {
             String sudachiSettingsLine = "";
             StringBuilder sb = new StringBuilder();
             while ((sudachiSettingsLine = br.readLine()) != null) {
