@@ -14,8 +14,6 @@
         <elasticsearch.version>7.1.0</elasticsearch.version>
         <lucene.version>8.0.0</lucene.version>
         <sudachi.version>0.2.0</sudachi.version>
-        <jacoco.skip>true</jacoco.skip>
-        <sonar.skip>true</sonar.skip>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.language>java</sonar.language>
         <sonar.organization>worksapplications</sonar.organization>
