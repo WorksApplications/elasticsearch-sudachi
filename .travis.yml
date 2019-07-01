@@ -1,27 +1,31 @@
 language: java
 jdk: oraclejdk8
-# To use 7.5GiB memory, specify 'required' for 'sudo'
-# https://docs.travis-ci.com/user/reference/overview/#Virtualization-environments
 sudo: required
 dist: trusty
-env:
-  global:
-    # GITHUB_TOKEN
-    - secure: "WljmhJOo6S6DoLAUqQ8wXG+6soWQDlJVaamuk5UfT3DWfFjUlD6LkT0pTmvI6jdqbk1k7ogtuLq88VuaaY6OsB/Amz6CbJW/1Z5+EgYKdGY6nN4OSBZ253NGMy0RExP5iZicxCGdtcic7PcouKDpi9WjH0dRqpRkgYEdZGcsL7SlK18dnvmW4I6JGbOOmrOfTWE2nWIVt1Fh53eZiV9bffBHBAQn/di8iEk1hHLrUsDE7UyCw9wchlEW7sDL0rB1KlYvZ/G80y9xDMtGoRQo0EF49s4ACLIyg1uhlLniR0Rx/fHFyjUZLzmmFrlmZdM+AVsmgT/WpctgMW0ixzM3a9Wp9PKEm7KEcpgUpoPQBNYMOuxCe3DKZrHHluey9q7elKew4CamvJCyjbMln0dHJXaavaE/obiSu7YjZfymd9FB+DirjvaiL8ulG8qSzDd4FqvsqNzd18lDmzuGHVDlLYNCox3vlm0kuAM9cckn82f6SakqvMM1ZKSeLhWjD0tbpfd+okBvp2y1LaGGZrUhysEk3MXvxOAMa1pCw7Asj+CI9CAmjKjkykMx7csvjTgmCz9sX1aLqXGtEJnThM8R6OYHA05cr+z2eRsnmMWL/wITUXv8y3qKC42AlaA3M42I0lEVwIDLkL/vAa3nG2EjeqvFJ4kDFO34bOCdGgnBRgk="
-    # SONAR_LOGIN
-    - secure: "Iqsmknto7LfqqyimLpAd9iAdHGuQN1tJ99hQ/2yNm31g6SxPxBiWEgifZvdJadjsY2YS/YMD6irEsvtgWhL1Meah2Cl8DdPGQTNxz5OOZIYPRwnTsLcE1JcNJbSqgmcWYv6bcaLSJgXDHgRW+C/FwkkEgvXvvWzdxw924vQlUh5h4StCjjOR5u5gFYvTDn4jMXC2TXv9wfh7Kby5DXHGviJk7idtwpl0YcmG/pgdX2RQR2UlNGRFVoDiUse5TmKkPIcIeUICz5I16SeOEEWbM1YbvAaSTMgnHC8t6lej5e7F0McW4IMXKQKPGABnDwc8gxssu3GP/3vbdZn3/JD3DOOSej7mEJhVAkhDOjCQCnyOIuVlSa+BnRwPtKyE7W9JMxMszNmFktFrzJzHVyXfddKEFWjlFMjeccVLFur4fkE8itgZ2uGVNzxMUG35qRIBPkuW4gCDGVmASYheal1KuPupZO7EmnhYQsvwaG8ZM2Ym5eEBMqTneLOsVLzyJeEDDE7Kyi4mzsrJw0ho/QfbNeCZFG9llaU5uQie+ws1TX7T19WjbvmuRB4OpYJylXkdUroPEFqTMMooq7Y+uz+sbnk9GEiPcel/toLJWb878MQO+iEbaEDCaOV2O7IvAFZgL+fFJfLOjXBVA/i1iFmflH7PIIKoeEuqyxfrQzEjcB4="
-install:
-  # Decrypt settings.xml which is necessary to deploy to Sonatype Maven Repositories
-  - if [ -n "$encrypted_6cebf91f1d36_key" ]; then openssl aes-256-cbc -K $encrypted_6cebf91f1d36_key -iv $encrypted_6cebf91f1d36_iv -in .travis/settings.xml.enc -out .travis/settings.xml -d; fi
+install: true
+addons:
+  sonarcloud:
+    organization: "worksapplications"
+    token:
+      secure: "JIKI52CkXqNLVn9p9JNb+gNEwJtq2k3lajCjf1g868xkh19kkDNF6wCP3Ni+1AILQlXBRGUzWqCYB9BlXTjBtT5A7pRppCM2Q6JOpKHS8V1RKex0mGZ4pp5IcZMtXO8YX6yILL9PuRezUhdo0aJiasWaL6SGdzeUkGumZLIM6UGNm6qI1eab2YIDKxVnQ5I5tJrJ2owd/kUmFckXREOlmMU3VowjvSnB1ezUqLHnhk2qO+ZHaHc9pO5njA4u+XzGDUypzmb1sgphqQf2Urh0yIwrB2cby/OdjJi4s4n5PDmjOSd1jLmOu9ZJ4Omr7iJJ2ZCF0d00ownOax1jCsM81uyaQYhi+5AEWSmNy/4+PfHpRD4w2uhNS+r9TFWRGVMwmyzENyoIvGObx0tECEB+o0h5yn6RBb5KzVzZlQYl8wQfA3nv3AIx7IkHkWtr/t//nyedpe1WgI1AR+ruAp9xP7vg5YrHKMzpDz9DBY5Q9ypkfv7Vne99kb8r3Ompzt2+XNysp47fR9LqB07WtjkJ6ia0wVsd8bWgADeMp6p5xa+4uwkl9/IXilPzAWQuI229OsskZXx2W6ANv22Vi+6CgrSlxUAtg5k0k7QzcCIp9fk4l5jmaTXJWRkWbsUO1thjr4ecylK1SJsMy9b2FGJNAM2YjD6lONzirI7NC0fTqws="
 script:
-  - mvn jacoco:prepare-agent verify -B -V
+  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent test -B
 after_success:
-  - mvn sonar:sonar -Dsonar.login=$SONAR_LOGIN
+  - mvn sonar:sonar -B
+before_deploy:
+  - mvn clean package -B
 deploy:
-  - provider: script
-    script: mvn deploy --settings .travis/settings.xml
-    # Skip cleanup to keep decrepted .travis/settings.xml in workspace
-    # https://docs.travis-ci.com/user/deployment/
-    skip_cleanup: true
-    on:
-      branch: develop
+  provider: releases
+  api_key:
+    secure: "Qst5ZeqRX8wckI5+0mFWBgHFFt2imdczSp4jLjoc/ydi/1aYxDx12Y30x1LWyf5gLuLavDgMxIegIfPATBvrOQysgY0qO5isc0vy6m6BSNXHFJZaWYXdSPBQCA/XCzE2L2s+3B6i4DL5X4e2SI+0DoyDjvXzGf5kH2sOBxkhGTu9C2lkyUiOXWXDkWR4xAnb5UK4KShjP3FtarJrmw82AOs3C5gYfGYI56D97WfQMpHq79hesrgSHW7zFA6IqthSTGEw4qCCnAHQyPE0DDbDAZTcAftjeecsJ5g+hkKy3iwgQDLN6iiM3RB1luqf1Us1ajWvCw88jdiYmGIr9wbivr5yxoi46SEkdZwjw1xSpCze3gRoNGxTnN4BOd/fs7t0BQNphqUHVeLPFu1ib4dnEzB1wNrcMNCJHhupVN4j8mqFIu0QWoDkh0MhRpcRw0tJK6EXnjARjgZ//0hjLqcbZeBgOoglrvkGVyO8G7OncC2ZqxVurxa4h+X5/SN/EicrKcg0gjoJrfVTL6OWzGWJGNQDmeUkcTNnocXn13549bwpEfamKAxCccVRIiZPAOsuDVkEc/Pk2Cfc8uFJ/NG0zVFU4aQCXbSvI9/I4ZAgEJ0WdBcKZNW4DF+jqd+vhpzzWBO0plk3B8huLendZ8whpdrOdJXzgVKsK8exv1nc/HQ="
+  file_glob: true
+  file: target/releases/*.zip
+  overwrite: true
+  skip_cleanup: true
+  on:
+    repo: WorksApplications/elasticsearch-sudachi
+    tags: true
+cache:
+  directories:
+    - "$HOME/.m2/repository"
+    - "$HOME/.sonar/cache"
