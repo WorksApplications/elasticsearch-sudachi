@@ -237,6 +237,9 @@ public final class SudachiTokenizer extends
         n += offset;
 
         int eos = lastIndexOfEos(buffer, n);
+        if (eos == n && Character.isHighSurrogate(buffer[n - 1])) {
+            eos -= 1;
+        }
         String sentences = new String(buffer, 0, eos);
         remainSize = n - eos;
         System.arraycopy(buffer, eos, buffer, 0, remainSize);

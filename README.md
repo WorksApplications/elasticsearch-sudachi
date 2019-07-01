@@ -36,7 +36,7 @@ analysis-sudachi is an Elasticsearch plugin for tokenization of Japanese text us
 
 1. Download analysis-sudachi-elasticsearch zip archive file
 2. Move current dir to $ES_HOME
-3. Execute "bin/elasticsearch-plugin install file:///<plugin-zip-path>"
+3. Execute "bin/elasticsearch-plugin install file:///plugin-zip-path"
 4. Download sudachi dictionary archive from https://github.com/WorksApplications/SudachiDict
 5. Extract dic file and place it to config/sudachi_tokenizer/system_core.dic
 6. Execute "bin/elasticsearch"
