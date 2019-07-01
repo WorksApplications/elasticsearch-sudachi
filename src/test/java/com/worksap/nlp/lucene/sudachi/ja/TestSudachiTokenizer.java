@@ -345,4 +345,21 @@ public class TestSudachiTokenizer extends BaseTokenStreamTestCase {
         }
     }
 
+    @Test
+    public void testReadSentencesWithSurrogatePair() throws IOException {
+        int BUFFER_SIZE = 512;
+        String beforeSurrogatePair = "";
+        for (int i = 0; i < BUFFER_SIZE - 1; i++) {
+            beforeSurrogatePair += "a";
+        }
+        String afterSurrogatePair = "bbb";
+        String inputString = beforeSurrogatePair + "😜" + afterSurrogatePair;
+        tokenizer.setReader(new StringReader(inputString));
+        tokenizer.reset();
+        String[] answerList = { beforeSurrogatePair, "😜" + afterSurrogatePair };
+        for (int i = 0; i < answerList.length; i++) {
+            assertThat(tokenizer.readSentences(), is(answerList[i]));
+        }
+    }
+
 }
