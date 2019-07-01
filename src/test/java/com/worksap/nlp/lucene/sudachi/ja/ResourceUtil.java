@@ -32,7 +32,7 @@ class ResourceUtil {
     static String getSudachiSetting(InputStream is) throws IOException{
         String settings;
         try (InputStreamReader ir = new InputStreamReader(is, StandardCharsets.UTF_8);
-                BufferedReader br = new BufferedReader(ir)) {
+            BufferedReader br = new BufferedReader(ir)) {
             String sudachiSettingsLine = "";
             StringBuilder sb = new StringBuilder();
             while ((sudachiSettingsLine = br.readLine()) != null) {
