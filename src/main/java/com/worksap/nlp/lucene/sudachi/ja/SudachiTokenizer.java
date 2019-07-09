@@ -223,18 +223,20 @@ public final class SudachiTokenizer extends
             offset = remainSize;
             length -= remainSize;
         }
-        int n = input.read(buffer, offset, length);
-        if (n < 0) {
-            if (remainSize != 0) {
-                String lastSentence = new String(buffer, 0, remainSize);
-                baseOffset = nextBaseOffset;
-                nextBaseOffset += remainSize;
-                remainSize = 0;
-                return lastSentence;
+
+        while (length != 0) {
+            int ret = input.read(buffer, offset, length);
+            if (ret < 0) {
+                break;
             }
+            offset += ret;
+            length -= ret;
+        }
+        int n = offset;
+
+        if (n == 0) {
             return null;
         }
-        n += offset;
 
         int eos = lastIndexOfEos(buffer, n);
         if (eos == n && Character.isHighSurrogate(buffer[n - 1])) {
