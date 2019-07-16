@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2018 Works Applications Co., Ltd.
+ *  Copyright (c) 2019 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.util.Collections;
 import java.util.HashMap;
 
 import org.junit.Rule;
@@ -29,9 +30,8 @@ import org.apache.lucene.analysis.BaseTokenStreamTestCase;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
 
-public class TestSudachiPartOfSpeechStopFilterFactory extends BaseTokenStreamTestCase {
-    String path;
-    String settings;
+public class TestSudachiReadingFormFilter extends BaseTokenStreamTestCase {
+    TokenStream tokenStream;
 
     @Rule
     public TemporaryFolder tempFolderForDictionary = new TemporaryFolder();
@@ -42,29 +42,26 @@ public class TestSudachiPartOfSpeechStopFilterFactory extends BaseTokenStreamTes
         File tempFileForDictionary = tempFolderForDictionary
                 .newFolder("sudachiDictionary");
         ResourceUtil.copy(tempFileForDictionary);
-        path = tempFileForDictionary.getPath();
 
+        String settings;
         try (InputStream is = this.getClass().getResourceAsStream("sudachi.json")) {
             settings = ResourceUtil.getSudachiSetting(is);
         }
+
+        tokenStream = new SudachiTokenizer(true, SudachiTokenizer.Mode.SEARCH, tempFileForDictionary.getPath(), settings);
     }
 
-    public void testBasics() throws IOException {
-        String tags = "動詞,非自立可能\n";
-        Tokenizer tokenizer = new SudachiTokenizer(true, SudachiTokenizer.Mode.NORMAL, path, settings);
-        tokenizer.setReader(new StringReader("東京都に行った。"));
-        SudachiPartOfSpeechStopFilterFactory factory
-            = new SudachiPartOfSpeechStopFilterFactory(new HashMap<String, String>() {{ put("tags", "stoptags.txt"); }});
-        factory.inform(new StringResourceLoader(tags));
-        TokenStream ts = factory.create(tokenizer);
-        assertTokenStreamContents(ts,
-                                  new String[] {"東京都", "に", "た"});
+    public void testReadingForm() throws IOException {
+        SudachiReadingFormFilterFactory factory = new SudachiReadingFormFilterFactory(Collections.emptyMap());
+        ((Tokenizer)tokenStream).setReader(new StringReader("東京都に行った。"));
+        tokenStream = factory.create(tokenStream);
+        assertTokenStreamContents(tokenStream, new String[] {"トウキョウト", "トウキョウ", "ト", "ニ", "イッ", "タ"});
     }
 
-    public void testBogusArguments() throws Exception {
-        IllegalArgumentException expected = expectThrows(IllegalArgumentException.class, () -> {
-                new SudachiPartOfSpeechStopFilterFactory(new HashMap<String, String>() {{ put("bogusArg", "bogusValue"); }});
-            });
-        assertTrue(expected.getMessage().contains("Unknown parameters"));
+    public void testRomanizedReadingForm() throws IOException {
+        SudachiReadingFormFilterFactory factory = new SudachiReadingFormFilterFactory(new HashMap<String, String>() {{ put("useRomaji", "true"); }});
+        ((Tokenizer)tokenStream).setReader(new StringReader("東京都に行った。"));
+        tokenStream = factory.create(tokenStream);
+        assertTokenStreamContents(tokenStream, new String[] {"toukyouto", "toukyou", "to", "ni", "iltu", "ta"});
     }
 }
