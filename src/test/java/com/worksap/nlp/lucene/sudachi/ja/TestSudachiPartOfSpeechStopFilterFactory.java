@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
@@ -52,14 +51,12 @@ public class TestSudachiPartOfSpeechStopFilterFactory extends BaseTokenStreamTes
 
     public void testBasics() throws IOException {
         String tags = "動詞,非自立可能\n";
-        TokenStream ts = new SudachiTokenizer(true, SudachiTokenizer.Mode.NORMAL, path, settings);
-        ((Tokenizer)ts).setReader(new StringReader("東京都に行った。"));
-        Map<String, String> args = new HashMap<>();
-        args.put("tags", "stoptags.txt");
+        Tokenizer tokenizer = new SudachiTokenizer(true, SudachiTokenizer.Mode.NORMAL, path, settings);
+        tokenizer.setReader(new StringReader("東京都に行った。"));
         SudachiPartOfSpeechStopFilterFactory factory
-            = new SudachiPartOfSpeechStopFilterFactory(args);
+            = new SudachiPartOfSpeechStopFilterFactory(new HashMap<String, String>() {{ put("tags", "stoptags.txt"); }});
         factory.inform(new StringResourceLoader(tags));
-        ts = factory.create(ts);
+        TokenStream ts = factory.create(tokenizer);
         assertTokenStreamContents(ts,
                                   new String[] {"東京都", "に", "た"});
     }
