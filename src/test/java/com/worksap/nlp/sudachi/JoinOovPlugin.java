@@ -25,7 +25,7 @@ public class JoinOovPlugin extends PathRewritePlugin {
     }
 
     @Override
-    public void rewrite(InputText<?> text, List<LatticeNode> path,
+    public void rewrite(InputText text, List<LatticeNode> path,
             Lattice lattice) {
         boolean isOOVNode = false;
         int begin = 0;

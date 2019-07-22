@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
