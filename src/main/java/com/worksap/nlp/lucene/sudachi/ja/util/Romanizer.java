@@ -68,13 +68,6 @@ public class Romanizer {
                 case 'ト':
                     builder.append('t');
                     break main;
-                case 'ナ':
-                case 'ニ':
-                case 'ヌ':
-                case 'ネ':
-                case 'ノ':
-                    builder.append('n');
-                    break main;
                 case 'ハ':
                 case 'ヒ':
                 case 'フ':
@@ -131,6 +124,9 @@ public class Romanizer {
                 case 'ペ':
                 case 'ポ':
                     builder.append('p');
+                    break main;
+                case 'ヴ':
+                    builder.append('v');
                     break main;
                 default:
                     builder.append("ltu");
@@ -337,10 +333,6 @@ public class Romanizer {
                     builder.append("tsi");
                     i++;
                     break;
-                case 'ゥ':
-                    builder.append("tsu");
-                    i++;
-                    break;
                 case 'ェ':
                     builder.append("tse");
                     i++;
@@ -512,7 +504,7 @@ public class Romanizer {
                     i++;
                     break;
                 default:
-                    builder.append("ho");
+                    builder.append("hu");
                     break;
                 }
                 break;
@@ -679,7 +671,7 @@ public class Romanizer {
                     i++;
                     break;
                 case 'ゥ':
-                    builder.append("qwu");
+                    builder.append("gwu");
                     i++;
                     break;
                 case 'ェ':
@@ -771,7 +763,7 @@ public class Romanizer {
                 }
                 break;
             case 'ヅ':
-                builder.append("zu");
+                builder.append("du");
                 break;
             case 'デ':
                 switch(ch2) {
