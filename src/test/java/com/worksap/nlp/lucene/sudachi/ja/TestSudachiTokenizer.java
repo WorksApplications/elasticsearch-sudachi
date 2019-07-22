@@ -18,11 +18,11 @@
 package com.worksap.nlp.lucene.sudachi.ja;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.io.StringReader;
 
 import org.apache.lucene.analysis.BaseTokenStreamTestCase;
@@ -357,6 +357,48 @@ public class TestSudachiTokenizer extends BaseTokenStreamTestCase {
         tokenizer.setReader(new StringReader(inputString));
         tokenizer.reset();
         String[] answerList = { beforeSurrogatePair, "😜" + afterSurrogatePair };
+        for (int i = 0; i < answerList.length; i++) {
+            assertThat(tokenizer.readSentences(), is(answerList[i]));
+        }
+    }
+
+    private static class ChunkedStringReader extends Reader {
+        private char[] in;
+        private int chunkSize;
+        private int pos;
+        public ChunkedStringReader(String in, int chunkSize) {
+            this.in = in.toCharArray();
+            this.chunkSize = chunkSize;
+            this.pos = 0;
+        }
+
+        @Override
+        public void close() throws IOException {
+            this.pos = this.in.length;
+        }
+
+        @Override
+        public int read(char[] cbuf, int off, int len) throws IOException {
+            int length = len < this.chunkSize ? len : this.chunkSize;
+            if (length > this.in.length - this.pos) {
+                length = this.in.length - this.pos;
+            }
+            if (length == 0) {
+                return -1;
+            }
+            System.arraycopy(this.in, this.pos, cbuf, off, length);
+            this.pos += length;
+            return length;
+        }
+    }
+
+    @Test
+    public void testReadSentencesFromChunkedCharFilter() throws IOException {
+        String inputString = "Elasticsearch";
+        Reader charFilter = new ChunkedStringReader(inputString, 5);
+        tokenizer.setReader(charFilter);
+        tokenizer.reset();
+        String[] answerList = { "Elasticsearch" };
         for (int i = 0; i < answerList.length; i++) {
             assertThat(tokenizer.readSentences(), is(answerList[i]));
         }
