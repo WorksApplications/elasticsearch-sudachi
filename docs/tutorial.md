@@ -1,25 +1,22 @@
-**（このドキュメントは古いです。いまはREADME.mdを参照ください。近日アップデート予定）**
-
-
 # Elasticsearch用Sudachiプラグイン チュートリアル
 
-Elasticsearch プラグインは 5.6 と6系の各マイナーバージョンをサポートしています。
+Elasticsearch プラグインは 5.6, 6.8 の最新バージョンと7系の各マイナーバージョンをサポートしています。
 
-以下では Elasticsearch 6.4.3 で Sudachi をつかう手順をしめします。
+以下では Elasticsearch 7.5.0 で Sudachi をつかう手順をしめします。
  
 まずプラグインをインストールします。 
 
 ```
-$ sudo elasticsearch-plugin install https://github.com/WorksApplications/elasticsearch-sudachi/releases/download/v6.4.3-1.2.0/analysis-sudachi-elasticsearch6.4.3-1.2.0-SNAPSHOT.zip
+$ sudo elasticsearch-plugin install https://github.com/WorksApplications/elasticsearch-sudachi/releases/download/v7.5.0-1.3.2/analysis-sudachi-elasticsearch7.5-1.3.2.zip
 ```
 
-パッケージには辞書が含まれていません。Java版をビルドして `target/system_*.dic` を取得するか、リリース一覧から辞書を取得し、 `$ES_HOME/sudachi` の下に置きます。 
+パッケージには辞書が含まれていません。https://github.com/WorksApplications/SudachiDict から最新の辞書を取得し、 `$ES_HOME/sudachi` の下に置きます。 3つの辞書のうち以下では core 辞書を利用します。
 
 ```
-$ wget https://github.com/WorksApplications/Sudachi/releases/download/v0.1.1/sudachi-0.1.1-dictionary-core.zip
-$ unzip sudachi-0.1.1-dictionary-core.zip
+$ wget https://object-storage.tyo2.conoha.io/v1/nc_2520839e1f9641b08211a5c85243124a/sudachi/sudachi-dictionary-20191030-core.zip
+$ unzip sudachi-dictionary-20191030-core.zip
 $ sudo mkdir /etc/elasticsearch/sudachi
-$ sudo cp system_core.dic /etc/elasticsearch/sudachi
+$ sudo cp sudachi-dictionary-20191030/system_core.dic /etc/elasticsearch/sudachi
 ```
 
 配置後、Elasticsearch を再起動します。
