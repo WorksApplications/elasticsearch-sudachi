@@ -13,7 +13,7 @@
         <java.version>1.8</java.version>
         <elasticsearch.version>7.4.2</elasticsearch.version>
         <lucene.version>8.2.0</lucene.version>
-        <sudachi.version>0.3.0</sudachi.version>
+        <sudachi.version>0.3.1</sudachi.version>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.language>java</sonar.language>
         <sonar.organization>worksapplications</sonar.organization>
