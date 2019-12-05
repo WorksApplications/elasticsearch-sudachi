@@ -7,6 +7,13 @@ analysis-sudachi is an Elasticsearch plugin for tokenization of Japanese text us
 
 # What's new?
 
+- version 1.3.2
+    - Upgrade sudachi morphological analyzer to 0.3.1
+
+- version 1.3.1
+    - Upgrade sudachi morphological analyzer to 0.3.0
+    - Minor bug fix
+
 - version 1.3.0
     - Upgrade sudachi morphological analyzer to 0.2.0
     - Import sudachi from maven central repository
