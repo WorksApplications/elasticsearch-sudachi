@@ -209,7 +209,7 @@ The sudachi\_ja\_stop token filter filters out Japanese stopwords (_japanese_), 
         "filter":{
          "my_stopfilter":{
           "type":"sudachi_ja_stop",
-          "stoptags":[
+          "stopwords":[
             "_japanese_",
             "は",
             "です"
