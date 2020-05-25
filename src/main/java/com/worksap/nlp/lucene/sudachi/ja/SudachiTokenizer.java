@@ -59,17 +59,14 @@ public final class SudachiTokenizer extends
     private final OffsetAttribute offsetAtt;
     private final PositionIncrementAttribute posIncAtt;
     private final PositionLengthAttribute posLengthAtt;
-    private static final char[] EOS_SYMBOL_LIST = { '。', '、', '.', ',' };
 
-    private Iterator<Morpheme> iterator;
+    private Iterator<List<Morpheme>> sentenceIterator;
+    private Iterator<Morpheme> morphemeIterator;
     private ListIterator<Morpheme> aUnitIterator;
     private ListIterator<String> oovIterator;
 
-    private static final int BUFFER_SIZE = 512;
-    private char[] buffer = new char[BUFFER_SIZE];
     private int baseOffset = 0;
-    private int nextBaseOffset = 0;
-    private int remainSize = 0;
+    private int sentenceLength = 0;
     private int oovBegin = 0;
     private int aUnitSize = 0;
     private int oovSize = 0;
@@ -110,17 +107,16 @@ public final class SudachiTokenizer extends
             setAUnitAttribute(aUnitIterator.next());
             return true;
         }
-        if ((iterator == null || !iterator.hasNext()) && !tokenizeSentences()) {
+        Morpheme morpheme = getNextMorpheme();
+        if (morpheme == null) {
             return false;
         }
-
-        Morpheme morpheme = iterator.next();
         if (discardPunctuation) {
-            for (; isPunctuation(morpheme.normalizedForm()); morpheme = iterator
-                    .next()) {
-                if (!iterator.hasNext() && !tokenizeSentences()) {
-                    return false;
-                }
+            for (; morpheme != null && isPunctuation(morpheme.normalizedForm()); morpheme = getNextMorpheme()) {
+                // do nothing
+            }
+            if (morpheme == null) {
+                return false;
             }
         }
 
@@ -141,15 +137,23 @@ public final class SudachiTokenizer extends
         return true;
     }
 
-    private boolean tokenizeSentences() throws IOException {
-        String sentences = readSentences();
-        if (sentences == null) {
-            return false;
+    private Morpheme getNextMorpheme() throws IOException {
+        if (morphemeIterator != null && morphemeIterator.hasNext()) {
+            Morpheme morpheme = morphemeIterator.next();
+            sentenceLength = morpheme.end();
+            return morpheme;
         }
-
-        iterator = tokenizer.tokenize(sentences).iterator();
-
-        return iterator.hasNext();
+        if (sentenceIterator != null && sentenceIterator.hasNext()) {
+            morphemeIterator = sentenceIterator.next().iterator();
+            baseOffset += sentenceLength;
+            sentenceLength = 0;
+            return getNextMorpheme();
+        }
+        sentenceIterator = tokenizer.tokenizeSentences(input).iterator();
+        if (sentenceIterator.hasNext()) {
+            return getNextMorpheme();
+        }
+        return null;
     }
 
     private void setAttribute(Morpheme morpheme) throws IOException {
@@ -215,54 +219,6 @@ public final class SudachiTokenizer extends
             termAtt.setLength(upto);
         }
     }
-
-    String readSentences() throws IOException {
-        int offset = 0;
-        int length = BUFFER_SIZE;
-        if (remainSize > 0) {
-            offset = remainSize;
-            length -= remainSize;
-        }
-
-        while (length != 0) {
-            int ret = input.read(buffer, offset, length);
-            if (ret < 0) {
-                break;
-            }
-            offset += ret;
-            length -= ret;
-        }
-        int n = offset;
-
-        if (n == 0) {
-            return null;
-        }
-
-        int eos = lastIndexOfEos(buffer, n);
-        if (eos == n && Character.isHighSurrogate(buffer[n - 1])) {
-            eos -= 1;
-        }
-        String sentences = new String(buffer, 0, eos);
-        remainSize = n - eos;
-        System.arraycopy(buffer, eos, buffer, 0, remainSize);
-
-        baseOffset = nextBaseOffset;
-        nextBaseOffset += eos;
-
-        return sentences;
-    }
-
-    private int lastIndexOfEos(char[] buffer, int length) {
-        for (int i = length - 1; i > 0; i--) {
-            for (char c : EOS_SYMBOL_LIST) {
-                if (buffer[i] == c) {
-                    return i + 1;
-                }
-            }
-        }
-        return length;
-    }
-
     private boolean isPunctuation(String str) {
         if (str.length() == 0) {
             return false;
@@ -295,17 +251,17 @@ public final class SudachiTokenizer extends
     @Override
     public final void end() throws IOException {
         super.end();
-        offsetAtt.setOffset(nextBaseOffset, nextBaseOffset);
+        int lastOffset = baseOffset + sentenceLength;
+        offsetAtt.setOffset(lastOffset , lastOffset);
     }
 
     @Override
     public void reset() throws IOException {
         super.reset();
-        remainSize = 0;
         baseOffset = 0;
-        nextBaseOffset = 0;
+        sentenceLength = 0;
         oovBegin = 0;
-        iterator = null;
+        morphemeIterator = null;
         aUnitIterator = null;
         oovIterator = null;
         aUnitSize = 0;
