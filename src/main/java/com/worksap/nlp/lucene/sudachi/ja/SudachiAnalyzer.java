@@ -25,7 +25,7 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.core.StopFilter;
 
-import com.worksap.nlp.lucene.sudachi.ja.SudachiTokenizer.Mode;
+import com.worksap.nlp.sudachi.Tokenizer.SplitMode;
 
 /**
  * Analyzer for Sudachi that uses morphological analysis.
@@ -33,7 +33,7 @@ import com.worksap.nlp.lucene.sudachi.ja.SudachiTokenizer.Mode;
  * @see SudachiTokenizer
  */
 public class SudachiAnalyzer extends StopwordAnalyzerBase {
-    private final Mode mode;
+    private final SplitMode mode;
     private final String resourcesPath;
     private final String settings;
     private final PartOfSpeechTrie stoptags;
@@ -44,7 +44,7 @@ public class SudachiAnalyzer extends StopwordAnalyzerBase {
                 DefaultSetHolder.DEFAULT_STOP_TAGS);
     }
 
-    public SudachiAnalyzer(Mode mode, String resourcesPath, String settings,
+    public SudachiAnalyzer(SplitMode mode, String resourcesPath, String settings,
             CharArraySet stopwords, PartOfSpeechTrie stoptags) {
         super(stopwords);
         this.mode = mode;

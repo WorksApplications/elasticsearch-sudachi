@@ -9,6 +9,10 @@
 			<source>src/main/extras/plugin-descriptor.properties</source>
 			<filtered>true</filtered>
 		</file>
+		<file>
+			<source>LICENSE</source>
+			<filtered>false</filtered>
+		</file>
 	</files>
 	<dependencySets>
 		<dependencySet>

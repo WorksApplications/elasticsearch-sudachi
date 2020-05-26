@@ -27,7 +27,7 @@ import org.elasticsearch.index.analysis.AbstractIndexAnalyzerProvider;
 import org.elasticsearch.index.analysis.Analysis;
 
 import com.worksap.nlp.lucene.sudachi.ja.SudachiAnalyzer;
-import com.worksap.nlp.lucene.sudachi.ja.SudachiTokenizer;
+import com.worksap.nlp.sudachi.Tokenizer.SplitMode;
 
 public class SudachiAnalyzerProvider extends
         AbstractIndexAnalyzerProvider<SudachiAnalyzer> {
@@ -39,7 +39,7 @@ public class SudachiAnalyzerProvider extends
         super(indexSettings, name, settings);
         final Set<?> stopWords = Analysis.parseStopWords(env, settings,
                 SudachiAnalyzer.getDefaultStopSet(), false);
-        final SudachiTokenizer.Mode mode = SudachiTokenizerFactory
+        final SplitMode mode = SudachiTokenizerFactory
                 .getMode(settings);
         final String resourcesPath = new SudachiPathResolver(env.configFile()
                 .toString(), settings.get("resources_path", name))

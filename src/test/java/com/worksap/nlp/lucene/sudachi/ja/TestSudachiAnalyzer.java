@@ -26,6 +26,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.worksap.nlp.sudachi.Tokenizer;
+
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.TextField;
@@ -43,8 +45,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-
-import com.worksap.nlp.lucene.sudachi.ja.SudachiAnalyzer;
 
 // Test of character segmentation using analyzer
 public class TestSudachiAnalyzer {
@@ -73,7 +73,7 @@ public class TestSudachiAnalyzer {
             settings = ResourceUtil.getSudachiSetting(is);
         }
 
-        analyzer = new SudachiAnalyzer(SudachiTokenizer.Mode.EXTENDED,
+        analyzer = new SudachiAnalyzer(Tokenizer.SplitMode.C,
                 tempFileForDictionary.getPath(), settings,
                 SudachiAnalyzer.getDefaultStopSet(),
                 SudachiAnalyzer.getDefaultStopTags());
@@ -121,7 +121,7 @@ public class TestSudachiAnalyzer {
             assertThat(fieldName, is(FIELD_NAME));
 
             Terms terms = leafReader.terms(fieldName);
-            assertThat(terms.size(), is(4L));
+            assertThat(terms.size(), is(2L));
 
             List<String> termList = new ArrayList<>();
             TermsEnum termsEnum = terms.iterator();
@@ -130,7 +130,7 @@ public class TestSudachiAnalyzer {
                 String fieldText = bytesRef.utf8ToString();
                 termList.add(fieldText);
             }
-            assertThat(termList, hasItems("東京", "東京都", "都", "行く"));
+            assertThat(termList, hasItems("東京都", "行く"));
         }
     }
 
@@ -140,7 +140,7 @@ public class TestSudachiAnalyzer {
             IndexSearcher searcher = new IndexSearcher(reader);
             QueryParser queryParser = new QueryParser(FIELD_NAME, analyzer);
 
-            Query query = queryParser.parse("東京");
+            Query query = queryParser.parse("東京都");
             TopDocs topDocs = searcher.search(query, 5);
             ScoreDoc[] scoreDocs = topDocs.scoreDocs;
             assertThat(scoreDocs.length, is(1));
