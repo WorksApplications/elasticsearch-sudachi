@@ -29,6 +29,8 @@ import org.apache.lucene.analysis.BaseTokenStreamTestCase;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
 
+import com.worksap.nlp.sudachi.Tokenizer.SplitMode;
+
 public class TestSudachiBaseFormFilter extends BaseTokenStreamTestCase {
     TokenStream tokenStream;
     SudachiBaseFormFilterFactory factory;
@@ -48,20 +50,20 @@ public class TestSudachiBaseFormFilter extends BaseTokenStreamTestCase {
             settings = ResourceUtil.getSudachiSetting(is);
         }
 
-        tokenStream = new SudachiTokenizer(true, SudachiTokenizer.Mode.SEARCH, tempFileForDictionary.getPath(), settings);
+        tokenStream = new SudachiTokenizer(true, SplitMode.C, tempFileForDictionary.getPath(), settings);
         factory = new SudachiBaseFormFilterFactory(Collections.emptyMap());
     }
 
     public void testBaseForm() throws IOException {
         ((Tokenizer)tokenStream).setReader(new StringReader("東京都に行った。"));
         tokenStream = factory.create(tokenStream);
-        assertTokenStreamContents(tokenStream, new String[] {"東京都", "東京", "都", "に", "行く", "た"});
+        assertTokenStreamContents(tokenStream, new String[] {"東京都", "に", "行く", "た"});
     }
 
     public void testBaseFormWithUnnormalizedWord() throws IOException {
         ((Tokenizer)tokenStream).setReader(new StringReader("東京都にいった。"));
         tokenStream = factory.create(tokenStream);
-        assertTokenStreamContents(tokenStream, new String[] {"東京都", "東京", "都", "に", "いく", "た"});
+        assertTokenStreamContents(tokenStream, new String[] {"東京都", "に", "いく", "た"});
     }
 
 }

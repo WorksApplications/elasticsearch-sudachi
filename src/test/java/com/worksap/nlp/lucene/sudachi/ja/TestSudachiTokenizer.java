@@ -24,6 +24,8 @@ import java.io.StringReader;
 
 import org.apache.lucene.analysis.BaseTokenStreamTestCase;
 
+import com.worksap.nlp.sudachi.Tokenizer.SplitMode;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,8 +34,8 @@ import org.junit.rules.TemporaryFolder;
 // Test of character segmentation using incrementToken(tokenizer)
 public class TestSudachiTokenizer extends BaseTokenStreamTestCase {
     private SudachiTokenizer tokenizer;
-    private SudachiTokenizer tokenizerExtended;
-    private SudachiTokenizer tokenizerNormal;
+    private SudachiTokenizer tokenizerA;
+    private SudachiTokenizer tokenizerB;
     private SudachiTokenizer tokenizerPunctuation;
 
     @Rule
@@ -52,14 +54,14 @@ public class TestSudachiTokenizer extends BaseTokenStreamTestCase {
             settings = ResourceUtil.getSudachiSetting(is);
         }
 
-        tokenizer = new SudachiTokenizer(true, SudachiTokenizer.Mode.SEARCH,
+        tokenizer = new SudachiTokenizer(true, SplitMode.C,
                 tempFileForDictionary.getPath(), settings);
-        tokenizerExtended = new SudachiTokenizer(true,
-                SudachiTokenizer.Mode.EXTENDED, tempFileForDictionary.getPath(), settings);
-        tokenizerNormal = new SudachiTokenizer(true,
-                SudachiTokenizer.Mode.NORMAL, tempFileForDictionary.getPath(), settings);
+        tokenizerA = new SudachiTokenizer(true, SplitMode.A,
+                tempFileForDictionary.getPath(), settings);
+        tokenizerB = new SudachiTokenizer(true, SplitMode.B,
+                tempFileForDictionary.getPath(), settings);
         tokenizerPunctuation = new SudachiTokenizer(false,
-                SudachiTokenizer.Mode.SEARCH, tempFileForDictionary.getPath(), settings);
+                SplitMode.C, tempFileForDictionary.getPath(), settings);
     }
 
     @Test
@@ -67,11 +69,11 @@ public class TestSudachiTokenizer extends BaseTokenStreamTestCase {
         String str = new String("東京都に行った。".getBytes("Shift_JIS"), "Shift_JIS");
         tokenizer.setReader(new StringReader(str));
         assertTokenStreamContents(tokenizer,
-                                  new String[] { "東京都", "東京", "都", "に", "行っ", "た" },
-                                  new int[] { 0, 0, 2, 3, 4, 6 },
-                                  new int[] { 3, 2, 3, 4, 6, 7 },
-                                  new int[] { 1, 0, 1, 1, 1, 1 },
-                                  new int[] { 2, 1, 1, 1, 1, 1 },
+                                  new String[] { "東京都", "に", "行っ", "た" },
+                                  new int[] { 0, 3, 4, 6 },
+                                  new int[] { 3, 4, 6, 7 },
+                                  new int[] { 1, 1, 1, 1 },
+                                  new int[] { 1, 1, 1, 1 },
                                   8);
     }
 
@@ -79,30 +81,6 @@ public class TestSudachiTokenizer extends BaseTokenStreamTestCase {
     public void incrementTokenByDefaultMode() throws IOException {
         tokenizer.setReader(new StringReader("東京都に行った。"));
         assertTokenStreamContents(tokenizer,
-                                  new String[] { "東京都", "東京", "都", "に", "行っ", "た" },
-                                  new int[] { 0, 0, 2, 3, 4, 6 },
-                                  new int[] { 3, 2, 3, 4, 6, 7 },
-                                  new int[] { 1, 0, 1, 1, 1, 1 },
-                                  new int[] { 2, 1, 1, 1, 1, 1 },
-                                  8);
-    }
-
-    @Test
-    public void incrementTokenByExtendedMode() throws IOException {
-        tokenizerExtended.setReader(new StringReader("東京都に行った。"));
-        assertTokenStreamContents(tokenizerExtended,
-                                  new String[] { "東京都", "東京", "都", "に", "行っ", "た" },
-                                  new int[] { 0, 0, 2, 3, 4, 6 },
-                                  new int[] { 3, 2, 3, 4, 6, 7 },
-                                  new int[] { 1, 0, 1, 1, 1, 1 },
-                                  new int[] { 2, 1, 1, 1, 1, 1 },
-                                  8);
-    }
-
-    @Test
-    public void incrementTokenByNormalMode() throws IOException {
-        tokenizerNormal.setReader(new StringReader("東京都に行った。"));
-        assertTokenStreamContents(tokenizerNormal,
                                   new String[] { "東京都", "に", "行っ", "た" },
                                   new int[] { 0, 3, 4, 6 },
                                   new int[] { 3, 4, 6, 7 },
@@ -115,11 +93,11 @@ public class TestSudachiTokenizer extends BaseTokenStreamTestCase {
     public void incrementTokenByPunctuationMode() throws IOException {
         tokenizerPunctuation.setReader(new StringReader("東京都に行った。"));
         assertTokenStreamContents(tokenizerPunctuation,
-                                  new String[] { "東京都", "東京", "都", "に", "行っ", "た", "。" },
-                                  new int[] { 0, 0, 2, 3, 4, 6, 7 },
-                                  new int[] { 3, 2, 3, 4, 6, 7, 8 },
-                                  new int[] { 1, 0, 1, 1, 1, 1, 1 },
-                                  new int[] { 2, 1, 1, 1, 1, 1, 1 },
+                                  new String[] { "東京都", "に", "行っ", "た", "。" },
+                                  new int[] { 0, 3, 4, 6, 7 },
+                                  new int[] { 3, 4, 6, 7, 8 },
+                                  new int[] { 1, 1, 1, 1, 1 },
+                                  new int[] { 1, 1, 1, 1, 1 },
                                   8);
     }
 
@@ -127,35 +105,11 @@ public class TestSudachiTokenizer extends BaseTokenStreamTestCase {
     public void incrementTokenWithPunctuationsByDefaultMode() throws IOException {
         tokenizer.setReader(new StringReader("東京都に行った。東京都に行った。"));
         assertTokenStreamContents(tokenizer,
-                                  new String[] { "東京都", "東京", "都", "に", "行っ", "た", "東京都", "東京", "都", "に", "行っ", "た" },
-                                  new int[] { 0, 0, 2, 3, 4, 6, 8, 8, 10, 11, 12, 14 },
-                                  new int[] { 3, 2, 3, 4, 6, 7, 11, 10, 11, 12, 14, 15 },
-                                  new int[] { 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1 },
-                                  new int[] { 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1 },
-                                  16);
-    }
-
-    @Test
-    public void incrementTokenWithPunctuationsByExtendedMode() throws IOException {
-        tokenizerExtended.setReader(new StringReader("東京都に行った。東京都に行った。"));
-        assertTokenStreamContents(tokenizerExtended,
-                                  new String[] { "東京都", "東京", "都", "に", "行っ", "た", "東京都", "東京", "都", "に", "行っ", "た" },
-                                  new int[] { 0, 0, 2, 3, 4, 6, 8, 8, 10, 11, 12, 14 },
-                                  new int[] { 3, 2, 3, 4, 6, 7, 11, 10, 11, 12, 14, 15 },
-                                  new int[] { 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1 },
-                                  new int[] { 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1 },
-                                  16);
-    }
-
-    @Test
-    public void incrementTokenWithPunctuationsByNormalMode() throws IOException {
-        tokenizerNormal.setReader(new StringReader("東京都に行った。東京都に行った。"));
-        assertTokenStreamContents(tokenizerNormal,
                                   new String[] { "東京都", "に", "行っ", "た", "東京都", "に", "行っ", "た" },
                                   new int[] { 0, 3, 4, 6, 8, 11, 12, 14 },
                                   new int[] { 3, 4, 6, 7, 11, 12, 14, 15 },
-                                  new int[] { 1, 1, 1, 1, 1, 1, 1, 1 },
-                                  new int[] { 1, 1, 1, 1, 1, 1, 1, 1 },
+                                  new int[] { 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+                                  new int[] { 1, 1, 1, 1, 1, 1, 1, 1, 1 },
                                   16);
     }
 
@@ -163,11 +117,11 @@ public class TestSudachiTokenizer extends BaseTokenStreamTestCase {
     public void incrementTokenWithPunctuationsByPunctuationMode() throws IOException {
         tokenizerPunctuation.setReader(new StringReader("東京都に行った。東京都に行った。"));
         assertTokenStreamContents(tokenizerPunctuation,
-                                  new String[] { "東京都", "東京", "都", "に", "行っ", "た", "。", "東京都", "東京", "都", "に", "行っ", "た", "。" },
-                                  new int[] { 0, 0, 2, 3, 4, 6, 7, 8, 8, 10, 11, 12, 14, 15 },
-                                  new int[] { 3, 2, 3, 4, 6, 7, 8, 11, 10, 11, 12, 14, 15, 16 },
-                                  new int[] { 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1 },
-                                  new int[] { 2, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1 },
+                                  new String[] { "東京都", "に", "行っ", "た", "。", "東京都", "に", "行っ", "た", "。" },
+                                  new int[] { 0, 3, 4, 6, 7, 8, 11, 12, 14, 15 },
+                                  new int[] { 3, 4, 6, 7, 8, 11, 12, 14, 15, 16 },
+                                  new int[] { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+                                  new int[] { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
                                   16);
     }
 
@@ -175,30 +129,6 @@ public class TestSudachiTokenizer extends BaseTokenStreamTestCase {
     public void incrementTokenWithOOVByDefaultMode() throws IOException {
         tokenizer.setReader(new StringReader("アマゾンに行った。"));
         assertTokenStreamContents(tokenizer,
-                                  new String[] { "アマゾン", "に", "行っ", "た" },
-                                  new int[] { 0, 4, 5, 7 },
-                                  new int[] { 4, 5, 7, 8 },
-                                  new int[] { 1, 1, 1, 1 },
-                                  new int[] { 1, 1, 1, 1 },
-                                  9);
-    }
-
-    @Test
-    public void incrementTokenWithOOVByExtendedMode() throws IOException {
-        tokenizerExtended.setReader(new StringReader("アマゾンに行った。"));
-        assertTokenStreamContents(tokenizerExtended,
-                                  new String[] { "アマゾン", "ア", "マ", "ゾ", "ン", "に", "行っ", "た" },
-                                  new int[] { 0, 0, 1, 2, 3, 4, 5, 7 },
-                                  new int[] { 4, 1, 2, 3, 4, 5, 7, 8 },
-                                  new int[] { 1, 0, 1, 1, 1, 1, 1, 1 },
-                                  new int[] { 4, 1, 1, 1, 1, 1, 1, 1 },
-                                  9);
-    }
-
-    @Test
-    public void incrementTokenWithOOVByNormalMode() throws IOException {
-        tokenizerNormal.setReader(new StringReader("アマゾンに行った。"));
-        assertTokenStreamContents(tokenizerNormal,
                                   new String[] { "アマゾン", "に", "行っ", "た" },
                                   new int[] { 0, 4, 5, 7 },
                                   new int[] { 4, 5, 7, 8 },
@@ -217,6 +147,30 @@ public class TestSudachiTokenizer extends BaseTokenStreamTestCase {
                                   new int[] { 1, 1, 1, 1, 1 },
                                   new int[] { 1, 1, 1, 1, 1 },
                                   9);
+    }
+
+    @Test
+    public void incrementTokenByAMode() throws IOException {
+        tokenizerA.setReader(new StringReader("東京都に行った。"));
+        assertTokenStreamContents(tokenizerA,
+                                  new String[] { "東京", "都", "に", "行っ", "た" },
+                                  new int[] { 0, 2, 3, 4, 6 },
+                                  new int[] { 2, 3, 4, 6, 7 },
+                                  new int[] { 1, 1, 1, 1, 1 },
+                                  new int[] { 1, 1, 1, 1, 1 },
+                                  8);
+    }
+
+    @Test
+    public void incrementTokenByBMode() throws IOException {
+        tokenizerB.setReader(new StringReader("東京都に行った。"));
+        assertTokenStreamContents(tokenizerB,
+                                  new String[] { "東京都", "に", "行っ", "た" },
+                                  new int[] { 0, 3, 4, 6 },
+                                  new int[] { 3, 4, 6, 7 },
+                                  new int[] { 1, 1, 1, 1 },
+                                  new int[] { 1, 1, 1, 1 },
+                                  8);
     }
 
 }

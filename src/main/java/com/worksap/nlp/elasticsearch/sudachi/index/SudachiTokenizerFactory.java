@@ -26,10 +26,10 @@ import org.elasticsearch.index.IndexSettings;
 import org.elasticsearch.index.analysis.AbstractTokenizerFactory;
 
 import com.worksap.nlp.lucene.sudachi.ja.SudachiTokenizer;
-import com.worksap.nlp.lucene.sudachi.ja.SudachiTokenizer.Mode;
+import com.worksap.nlp.sudachi.Tokenizer.SplitMode;
 
 public class SudachiTokenizerFactory extends AbstractTokenizerFactory {
-    private final Mode mode;
+    private final SplitMode mode;
     private final boolean discardPunctuation;
     private final String resourcesPath;
     private final String settingsPath;
@@ -46,16 +46,16 @@ public class SudachiTokenizerFactory extends AbstractTokenizerFactory {
                 settings.get("settings_path")).read();
     }
 
-    public static SudachiTokenizer.Mode getMode(Settings settings) {
-        SudachiTokenizer.Mode mode = SudachiTokenizer.DEFAULT_MODE;
+    public static SplitMode getMode(Settings settings) {
+        SplitMode mode = SudachiTokenizer.DEFAULT_MODE;
         String modeSetting = settings.get("mode", null);
         if (modeSetting != null) {
-            if ("search".equalsIgnoreCase(modeSetting)) {
-                mode = SudachiTokenizer.Mode.SEARCH;
-            } else if ("normal".equalsIgnoreCase(modeSetting)) {
-                mode = SudachiTokenizer.Mode.NORMAL;
-            } else if ("extended".equalsIgnoreCase(modeSetting)) {
-                mode = SudachiTokenizer.Mode.EXTENDED;
+            if ("a".equalsIgnoreCase(modeSetting)) {
+                mode = SplitMode.A;
+            } else if ("b".equalsIgnoreCase(modeSetting)) {
+                mode = SplitMode.B;
+            } else if ("c".equalsIgnoreCase(modeSetting)) {
+                mode = SplitMode.C;
             }
         }
         return mode;
