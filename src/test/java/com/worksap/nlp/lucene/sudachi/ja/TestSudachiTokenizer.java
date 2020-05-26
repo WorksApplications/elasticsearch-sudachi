@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 package com.worksap.nlp.lucene.sudachi.ja;
 
 import java.io.File;
@@ -23,6 +22,8 @@ import java.io.InputStream;
 import java.io.StringReader;
 
 import org.apache.lucene.analysis.BaseTokenStreamTestCase;
+import org.apache.lucene.analysis.charfilter.MappingCharFilter;
+import org.apache.lucene.analysis.charfilter.NormalizeCharMap;
 
 import com.worksap.nlp.sudachi.Tokenizer.SplitMode;
 
@@ -173,4 +174,18 @@ public class TestSudachiTokenizer extends BaseTokenStreamTestCase {
                                   8);
     }
 
+    @Test
+    public void incrementTokenWithCorrectOffset() throws IOException {
+        NormalizeCharMap.Builder builder = new NormalizeCharMap.Builder();
+        builder.add("東京都", "京都");
+        MappingCharFilter filter = new MappingCharFilter(builder.build(), new StringReader("東京都に行った。"));
+        tokenizer.setReader(filter);
+        assertTokenStreamContents(tokenizer,
+                                  new String[] { "京都", "に", "行っ", "た" },
+                                  new int[] { 0, 3, 4, 6 },
+                                  new int[] { 3, 4, 6, 7 },
+                                  new int[] { 1, 1, 1, 1 },
+                                  new int[] { 1, 1, 1, 1 },
+                                  8);
+    }
 }

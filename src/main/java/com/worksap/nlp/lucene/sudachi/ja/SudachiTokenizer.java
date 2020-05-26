@@ -132,8 +132,8 @@ public final class SudachiTokenizer extends
         posAtt.setMorpheme(morpheme);
         readingAtt.setMorpheme(morpheme);
         splitAtt.setMorpheme(morpheme);
-        offsetAtt.setOffset(baseOffset + morpheme.begin(),
-                            baseOffset + morpheme.end());
+        offsetAtt.setOffset(correctOffset(baseOffset + morpheme.begin()),
+                            correctOffset(baseOffset + morpheme.end()));
         termAtt.append(morpheme.surface());
     }
 
@@ -169,7 +169,7 @@ public final class SudachiTokenizer extends
     @Override
     public final void end() throws IOException {
         super.end();
-        int lastOffset = baseOffset + sentenceLength;
+        int lastOffset = correctOffset(baseOffset + sentenceLength);
         offsetAtt.setOffset(lastOffset , lastOffset);
     }
 
