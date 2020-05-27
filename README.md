@@ -7,24 +7,31 @@ analysis-sudachi is an Elasticsearch plugin for tokenization of Japanese text us
 
 # What's new?
 
+- version 2.0.0
+    - New mode `split_mode` was added
+    - New filter `sudachi_split` was added instead of `mode`
+    - `mode` was deperecated
+    - Upgrade Sudachi morphological analyzer to 0.4.1
+    - Words containing periods are no longer split
+    - Fix a bug causing wrong offsets with `icu_normalizer`
+
 - version 1.3.2
-    - Upgrade sudachi morphological analyzer to 0.3.1
+    - Upgrade Sudachi morphological analyzer to 0.3.1
 
 - version 1.3.1
-    - Upgrade sudachi morphological analyzer to 0.3.0
+    - Upgrade Sudachi morphological analyzer to 0.3.0
     - Minor bug fix
 
 - version 1.3.0
-    - Upgrade sudachi morphological analyzer to 0.2.0
-    - Import sudachi from maven central repository
+    - Upgrade Sudachi morphological analyzer to 0.2.0
+    - Import Sudachi from maven central repository
     - Minor bug fix
 
 - version 1.2.0
-    - Upgrading sudachi morphological analyzer to 0.2.0-SNAPSHOT
+    - Upgrading Sudachi morphological analyzer to 0.2.0-SNAPSHOT
     - New filter `sudachi_normalizedform` was added; see [sudachi_normalizedform](#sudachi_normalizedform)
     - Default normalization behavior was changed; neather baseform filter and normalziedform filter not applied
     - `sudachi_readingform` filter was changed with new romaji mappings based on MS-IME
-
 
 - version 1.1.0
     - `part-of-speech forward matching` is available on `stoptags`; see [sudachi_part_of_speech](#sudachi_part_of_speech)
@@ -45,22 +52,22 @@ analysis-sudachi is an Elasticsearch plugin for tokenization of Japanese text us
 2. Move current dir to $ES_HOME
 3. Execute "bin/elasticsearch-plugin install file:///plugin-zip-path"
 4. Download sudachi dictionary archive from https://github.com/WorksApplications/SudachiDict
-5. Extract dic file and place it to config/sudachi_tokenizer/system_core.dic
+5. Extract dic file and place it to config/sudachi/system_core.dic
 6. Execute "bin/elasticsearch"
 
 # Configuration
 
 - tokenizer: Select tokenizer. (sudachi) (string)
-- mode: Select mode. (normal or search or extended) (string, default: search)
-	- normal: Regular segmentataion. (Use C mode of Sudachi)  
-      Ex) 関西国際空港 / アバラカダブラ
-	- search: Additional segmentation useful for search. (Use C and A mode)  
-	  Ex）関西国際空港, 関西, 国際, 空港 / アバラカダブラ
-	- extended: Similar to search mode, but also unigram unknown words.  
-	  Ex）関西国際空港, 関西, 国際, 空港 / アバラカダブラ, ア, バ, ラ, カ, ダ, ブ, ラ
+- mode: Select splitting mode of Sudachi. (A, B, C) (string, default: C)
+  - C: Extracts named entities
+    Ex) 選挙管理委員会
+  - B: Into the middle units
+    Ex) 選挙,管理,委員会
+  - A: The shortest units equivalent to the UniDic short unit
+    Ex) 選挙,管理,委員,会
 - discard\_punctuation: Select to discard punctuation or not. (bool, default: true)
-- settings\_path: Sudachi setting file path. The path may be absolute or relative; relative paths are resolved with respect to ES\_HOME. (string, default: null)
-- resources_path: Sudachi dictionary path. The path may be absolute or relative; relative paths are resolved with respect to ES\_HOME. (string, default: null)
+- settings\_path: Sudachi setting file path. The path may be absolute or relative; relative paths are resolved with respect to es\_config. (string, default: null)
+- resources\_path: Sudachi dictionary path. The path may be absolute or relative; relative paths are resolved with respect to es\_config. (string, default: null)
 
 ## Example
 ```json
@@ -71,8 +78,8 @@ analysis-sudachi is an Elasticsearch plugin for tokenization of Japanese text us
         "tokenizer": {
           "sudachi_tokenizer": {
             "type": "sudachi_tokenizer",
-            "mode": "search",
-	    "discard_punctuation": true,
+            "mode": "C",
+	          "discard_punctuation": true,
             "resources_path": "/etc/elasticsearch/sudachi"
           }
         },
@@ -90,6 +97,90 @@ analysis-sudachi is an Elasticsearch plugin for tokenization of Japanese text us
 ```
 
 # Filters
+
+## sudachi\_split
+
+This filter works like `mode` of kuromoji.
+
+- search: Additional segmentation useful for search. (Use C and A mode)
+  Ex）関西国際空港, 関西, 国際, 空港 / アバラカダブラ
+- extended: Similar to search mode, but also unigram unknown words.
+  Ex）関西国際空港, 関西, 国際, 空港 / アバラカダブラ, ア, バ, ラ, カ, ダ, ブ, ラ
+
+### PUT sudachi_sample
+```json
+{
+  "settings": {
+    "index": {
+      "analysis": {
+        "tokenizer": {
+          "sudachi_tokenizer": {
+            "type": "sudachi_tokenizer"
+          }
+        },
+        "analyzer": {
+          "sudachi_analyzer": {
+            "filter": ["my_searchfilter" ],
+            "tokenizer": "sudachi_tokenizer",
+            "type": "custom"
+          }
+        },
+        "filter":{
+          "my_searchfilter": {
+            "type": "sudachi_split",
+            "mode": "search"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+### POST sudachi_sample
+```json
+{
+    "analyzer": "sudachi_analyzer",
+    "text": "関西国際空港"
+}
+```
+
+### Which responds with:
+```json
+{
+  "tokens" : [
+    {
+      "token" : "関西国際空港",
+      "start_offset" : 0,
+      "end_offset" : 6,
+      "type" : "word",
+      "position" : 0,
+      "positionLength" : 3
+    },
+    {
+      "token" : "関西",
+      "start_offset" : 0,
+      "end_offset" : 2,
+      "type" : "word",
+      "position" : 0
+    },
+    {
+      "token" : "国際",
+      "start_offset" : 2,
+      "end_offset" : 4,
+      "type" : "word",
+      "position" : 1
+    },
+    {
+      "token" : "空港",
+      "start_offset" : 4,
+      "end_offset" : 6,
+      "type" : "word",
+      "position" : 2
+    }
+  ]
+}
+```
 
 ## sudachi\_part\_of\_speech
 
@@ -121,29 +212,26 @@ With the `stoptags`, you can filter out the result in any of these forward match
       "analysis": {
         "tokenizer": {
           "sudachi_tokenizer": {
-            "type": "sudachi_tokenizer",
-            "resources_path": "/etc/elasticsearch/sudachi"
+            "type": "sudachi_tokenizer"
           }
         },
         "analyzer": {
           "sudachi_analyzer": {
-            "filter": [
-              "my_posfilter"
-	    ],
+            "filter": [ "my_posfilter" ],
             "tokenizer": "sudachi_tokenizer",
             "type": "custom"
           }
         },
         "filter":{
-         "my_posfilter":{
-          "type":"sudachi_part_of_speech",
-          "stoptags":[
-           "助詞",
-           "助動詞",
-           "補助記号,句点",
-           "補助記号,読点"
-          ]
-         }
+          "my_posfilter":{
+            "type":"sudachi_part_of_speech",
+            "stoptags":[
+              "助詞",
+              "助動詞",
+              "補助記号,句点",
+              "補助記号,読点"
+            ]
+          }
         }
       }
     }
@@ -154,30 +242,30 @@ With the `stoptags`, you can filter out the result in any of these forward match
 ### POST sudachi_sample
 ```json
 {
-    "analyzer":"sudachi_analyzer",
-    "text":"寿司がおいしいね"
+  "analyzer": "sudachi_analyzer",
+  "text": "寿司がおいしいね"
 }
 ```
 
 ### Which responds with:
 ```json
 {
-    "tokens": [
-        {
-            "token": "寿司",
-            "start_offset": 0,
-            "end_offset": 2,
-            "type": "word",
-            "position": 0
-        },
-        {
-            "token": "美味しい",
-            "start_offset": 3,
-            "end_offset": 7,
-            "type": "word",
-            "position": 2
-        }
-    ]
+  "tokens": [
+    {
+      "token": "寿司",
+      "start_offset": 0,
+      "end_offset": 2,
+      "type": "word",
+      "position": 0
+    },
+    {
+      "token": "美味しい",
+      "start_offset": 3,
+      "end_offset": 7,
+      "type": "word",
+      "position": 2
+    }
+  ]
 }
 ```
 
@@ -193,28 +281,25 @@ The sudachi\_ja\_stop token filter filters out Japanese stopwords (_japanese_), 
       "analysis": {
         "tokenizer": {
           "sudachi_tokenizer": {
-            "type": "sudachi_tokenizer",
-            "resources_path": "/etc/elasticsearch/sudachi"
+            "type": "sudachi_tokenizer"
           }
         },
         "analyzer": {
           "sudachi_analyzer": {
-            "filter": [
-              "my_stopfilter"
-	    ],
+            "filter": [ "my_stopfilter" ],
             "tokenizer": "sudachi_tokenizer",
             "type": "custom"
           }
         },
         "filter":{
-         "my_stopfilter":{
-          "type":"sudachi_ja_stop",
-          "stopwords":[
-            "_japanese_",
-            "は",
-            "です"
-          ]
-         }
+          "my_stopfilter":{
+            "type":"sudachi_ja_stop",
+            "stopwords":[
+              "_japanese_",
+              "は",
+              "です"
+            ]
+          }
         }
       }
     }
@@ -225,37 +310,37 @@ The sudachi\_ja\_stop token filter filters out Japanese stopwords (_japanese_), 
 ### POST sudachi_sample
 ```json
 {
- "analyzer":"sudachi_analyzer",
- "text":"私は宇宙人です。"
+  "analyzer": "sudachi_analyzer",
+  "text": "私は宇宙人です。"
 }
 ```
 
 ### Which responds with:
 ```json
 {
-    "tokens": [
-        {
-            "token": "私",
-            "start_offset": 0,
-            "end_offset": 1,
-            "type": "word",
-            "position": 0
-        },
-        {
-            "token": "宇宙",
-            "start_offset": 2,
-            "end_offset": 4,
-            "type": "word",
-            "position": 2
-        },
-        {
-            "token": "人",
-            "start_offset": 4,
-            "end_offset": 5,
-            "type": "word",
-            "position": 3
-        }
-    ]
+  "tokens": [
+    {
+      "token": "私",
+      "start_offset": 0,
+      "end_offset": 1,
+      "type": "word",
+      "position": 0
+    },
+    {
+      "token": "宇宙",
+      "start_offset": 2,
+      "end_offset": 4,
+      "type": "word",
+      "position": 2
+    },
+    {
+      "token": "人",
+      "start_offset": 4,
+      "end_offset": 5,
+      "type": "word",
+      "position": 3
+    }
+  ]
 }
 ```
 
@@ -271,15 +356,12 @@ The sudachi\_baseform token filter replaces terms with their SudachiBaseFormAttr
       "analysis": {
         "tokenizer": {
           "sudachi_tokenizer": {
-            "type": "sudachi_tokenizer",
-            "resources_path": "/etc/elasticsearch/sudachi"
+            "type": "sudachi_tokenizer"
           }
         },
         "analyzer": {
           "sudachi_analyzer": {
-            "filter": [
-              "sudachi_baseform"
-            ],
+            "filter": [ "sudachi_baseform" ],
             "tokenizer": "sudachi_tokenizer",
             "type": "custom"
           }
@@ -301,15 +383,15 @@ The sudachi\_baseform token filter replaces terms with their SudachiBaseFormAttr
 ### Which responds with:
 ```json
 {
-    "tokens": [
-        {
-            "token": "飲む",
-            "start_offset": 0,
-            "end_offset": 2,
-            "type": "word",
-            "position": 0
-        }
-    ]
+  "tokens": [
+    {
+      "token": "飲む",
+      "start_offset": 0,
+      "end_offset": 2,
+      "type": "word",
+      "position": 0
+    }
+  ]
 }
 ```
 
@@ -327,15 +409,12 @@ This filter lemmatizes verbs and adjectives too. You don't need to use sudachi\_
       "analysis": {
         "tokenizer": {
           "sudachi_tokenizer": {
-            "type": "sudachi_tokenizer",
-            "resources_path": "/etc/elasticsearch/sudachi"
+            "type": "sudachi_tokenizer"
           }
         },
         "analyzer": {
           "sudachi_analyzer": {
-            "filter": [
-              "sudachi_normalizedform"
-            ],
+            "filter": [ "sudachi_normalizedform" ],
             "tokenizer": "sudachi_tokenizer",
             "type": "custom"
           }
@@ -357,15 +436,15 @@ This filter lemmatizes verbs and adjectives too. You don't need to use sudachi\_
 ### Which responds with:
 ```json
 {
-    "tokens": [
-        {
-            "token": "飲む",
-            "start_offset": 0,
-            "end_offset": 2,
-            "type": "word",
-            "position": 0
-        }
-    ]
+  "tokens": [
+    {
+      "token": "飲む",
+      "start_offset": 0,
+      "end_offset": 2,
+      "type": "word",
+      "position": 0
+    }
+  ]
 }
 ```
 
@@ -383,42 +462,37 @@ When using the pre-defined sudachi_readingform filter, use_romaji is set to true
 ### PUT sudachi_sample
 ```json
 {
-    "settings": {
-        "index": {
-            "analysis": {
-                "filter": {
-                    "romaji_readingform": {
-                        "type": "sudachi_readingform",
-                        "use_romaji": true
-                    },
-                    "katakana_readingform": {
-                        "type": "sudachi_readingform",
-                        "use_romaji": false
-                    }
-                },
-                "tokenizer": {
-                    "sudachi_tokenizer": {
-                        "type": "sudachi_tokenizer",
-                        "resources_path": "/etc/elasticsearch/sudachi"
-                    }
-                },
-                "analyzer": {
-                    "romaji_analyzer": {
-                        "tokenizer": "sudachi_tokenizer",
-                        "filter": [
-                            "romaji_readingform"
-                        ]
-                    },
-                    "katakana_analyzer": {
-                        "tokenizer": "sudachi_tokenizer",
-                        "filter": [
-                            "katakana_readingform"
-                        ]
-                    }
-                }
-            }
+  "settings": {
+    "index": {
+      "analysis": {
+        "filter": {
+          "romaji_readingform": {
+            "type": "sudachi_readingform",
+            "use_romaji": true
+          },
+          "katakana_readingform": {
+            "type": "sudachi_readingform",
+            "use_romaji": false
+          }
+        },
+        "tokenizer": {
+          "sudachi_tokenizer": {
+            "type": "sudachi_tokenizer"
+          }
+        },
+        "analyzer": {
+          "romaji_analyzer": {
+            "tokenizer": "sudachi_tokenizer",
+            "filter": [ "romaji_readingform" ]
+          },
+          "katakana_analyzer": {
+            "tokenizer": "sudachi_tokenizer",
+            "filter": [ "katakana_readingform" ]
+          }
         }
+      }
     }
+  }
 }
 ```
 
@@ -442,6 +516,6 @@ Returns `susi`.
 
 # License
 
-Copyright (c) 2017-2019 Works Applications Co., Ltd.
+Copyright (c) 2017-2020 Works Applications Co., Ltd.
 Originally under elasticsearch, https://www.elastic.co/jp/products/elasticsearch
 Originally under lucene, https://lucene.apache.org/
