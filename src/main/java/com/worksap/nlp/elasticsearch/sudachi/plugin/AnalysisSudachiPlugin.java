@@ -35,6 +35,7 @@ import com.worksap.nlp.elasticsearch.sudachi.index.SudachiNormalizedFormFilterFa
 import com.worksap.nlp.elasticsearch.sudachi.index.SudachiPartOfSpeechFilterFactory;
 import com.worksap.nlp.elasticsearch.sudachi.index.SudachiReadingFormFilterFactory;
 import com.worksap.nlp.elasticsearch.sudachi.index.SudachiStopTokenFilterFactory;
+import com.worksap.nlp.elasticsearch.sudachi.index.SudachiSplitFilterFactory;
 import com.worksap.nlp.elasticsearch.sudachi.index.SudachiTokenizerFactory;
 
 public class AnalysisSudachiPlugin extends Plugin implements AnalysisPlugin {
@@ -46,6 +47,7 @@ public class AnalysisSudachiPlugin extends Plugin implements AnalysisPlugin {
         extra.put("sudachi_part_of_speech",
                 SudachiPartOfSpeechFilterFactory::new);
         extra.put("sudachi_readingform", SudachiReadingFormFilterFactory::new);
+        extra.put("sudachi_split", SudachiSplitFilterFactory::new);
         extra.put("sudachi_ja_stop", SudachiStopTokenFilterFactory::new);
         return extra;
     }
