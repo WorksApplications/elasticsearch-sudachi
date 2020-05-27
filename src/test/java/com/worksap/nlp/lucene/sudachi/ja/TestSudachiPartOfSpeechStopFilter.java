@@ -29,6 +29,8 @@ import org.apache.lucene.analysis.BaseTokenStreamTestCase;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
 
+import com.worksap.nlp.sudachi.Tokenizer.SplitMode;
+
 public class TestSudachiPartOfSpeechStopFilter extends BaseTokenStreamTestCase {
     TokenStream tokenStream;
     SudachiPartOfSpeechStopFilterFactory factory;
@@ -48,7 +50,7 @@ public class TestSudachiPartOfSpeechStopFilter extends BaseTokenStreamTestCase {
             settings = ResourceUtil.getSudachiSetting(is);
         }
 
-        tokenStream = new SudachiTokenizer(true, SudachiTokenizer.Mode.SEARCH, tempFileForDictionary.getPath(), settings);
+        tokenStream = new SudachiTokenizer(true, SplitMode.A, tempFileForDictionary.getPath(), settings);
         ((Tokenizer)tokenStream).setReader(new StringReader("東京都に行った。"));
         factory = new SudachiPartOfSpeechStopFilterFactory(new HashMap<String, String>() {{ put("tags", "stoptags.txt"); }});
     }
@@ -72,7 +74,7 @@ public class TestSudachiPartOfSpeechStopFilter extends BaseTokenStreamTestCase {
         factory.inform(new StringResourceLoader(tags));
         tokenStream = factory.create(tokenStream);
         assertTokenStreamContents(tokenStream,
-                                  new String[] { "東京都", "東京", "都", "に", "た"});
+                                  new String[] { "東京", "都", "に", "た"});
     }
 
     public void testConjugationTypeAndForm() throws IOException {
@@ -80,7 +82,7 @@ public class TestSudachiPartOfSpeechStopFilter extends BaseTokenStreamTestCase {
         factory.inform(new StringResourceLoader(tags));
         tokenStream = factory.create(tokenStream);
         assertTokenStreamContents(tokenStream,
-                                  new String[] { "東京都", "東京", "都", "に", "行っ", "た"});
+                                  new String[] { "東京", "都", "に", "行っ", "た"});
     }
 
     public void testConjugationForm() throws IOException {
@@ -88,7 +90,7 @@ public class TestSudachiPartOfSpeechStopFilter extends BaseTokenStreamTestCase {
         factory.inform(new StringResourceLoader(tags));
         tokenStream = factory.create(tokenStream);
         assertTokenStreamContents(tokenStream,
-                                  new String[] {"東京都", "東京", "都", "に", "行っ"});
+                                  new String[] { "東京", "都", "に", "行っ"});
     }
 
     public void testPrefixWithUnmatchedSubcategory() throws IOException {
@@ -96,7 +98,7 @@ public class TestSudachiPartOfSpeechStopFilter extends BaseTokenStreamTestCase {
         factory.inform(new StringResourceLoader(tags));
         tokenStream = factory.create(tokenStream);
         assertTokenStreamContents(tokenStream,
-                                  new String[] {"東京都", "東京", "都", "行っ", "た"});
+                                  new String[] { "東京", "都", "行っ", "た"});
     }
 
     public void testTooLongCategory() throws IOException {
@@ -104,7 +106,7 @@ public class TestSudachiPartOfSpeechStopFilter extends BaseTokenStreamTestCase {
         factory.inform(new StringResourceLoader(tags));
         tokenStream = factory.create(tokenStream);
         assertTokenStreamContents(tokenStream,
-                                  new String[] {"東京都", "東京", "都", "に", "行っ", "た"});
+                                  new String[] { "東京", "都", "に", "行っ", "た"});
     }
 
 }

@@ -30,6 +30,8 @@ import org.apache.lucene.analysis.BaseTokenStreamTestCase;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
 
+import com.worksap.nlp.sudachi.Tokenizer.SplitMode;
+
 public class TestSudachiReadingFormFilter extends BaseTokenStreamTestCase {
     TokenStream tokenStream;
 
@@ -48,20 +50,20 @@ public class TestSudachiReadingFormFilter extends BaseTokenStreamTestCase {
             settings = ResourceUtil.getSudachiSetting(is);
         }
 
-        tokenStream = new SudachiTokenizer(true, SudachiTokenizer.Mode.SEARCH, tempFileForDictionary.getPath(), settings);
+        tokenStream = new SudachiTokenizer(true, SplitMode.C, tempFileForDictionary.getPath(), settings);
     }
 
     public void testReadingForm() throws IOException {
         SudachiReadingFormFilterFactory factory = new SudachiReadingFormFilterFactory(Collections.emptyMap());
         ((Tokenizer)tokenStream).setReader(new StringReader("東京都に行った。"));
         tokenStream = factory.create(tokenStream);
-        assertTokenStreamContents(tokenStream, new String[] {"トウキョウト", "トウキョウ", "ト", "ニ", "イッ", "タ"});
+        assertTokenStreamContents(tokenStream, new String[] {"トウキョウト", "ニ", "イッ", "タ"});
     }
 
     public void testRomanizedReadingForm() throws IOException {
         SudachiReadingFormFilterFactory factory = new SudachiReadingFormFilterFactory(new HashMap<String, String>() {{ put("useRomaji", "true"); }});
         ((Tokenizer)tokenStream).setReader(new StringReader("東京都に行った。"));
         tokenStream = factory.create(tokenStream);
-        assertTokenStreamContents(tokenStream, new String[] {"toukyouto", "toukyou", "to", "ni", "iltu", "ta"});
+        assertTokenStreamContents(tokenStream, new String[] {"toukyouto", "ni", "iltu", "ta"});
     }
 }
