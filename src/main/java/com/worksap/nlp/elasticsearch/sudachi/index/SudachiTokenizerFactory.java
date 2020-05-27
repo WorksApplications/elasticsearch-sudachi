@@ -29,6 +29,9 @@ import com.worksap.nlp.lucene.sudachi.ja.SudachiTokenizer;
 import com.worksap.nlp.sudachi.Tokenizer.SplitMode;
 
 public class SudachiTokenizerFactory extends AbstractTokenizerFactory {
+    private static final String SPLIT_MODE_PARAM = "split_mode";
+    private static final String MODE_PARAM = "mode";
+
     private final SplitMode mode;
     private final boolean discardPunctuation;
     private final String resourcesPath;
@@ -48,7 +51,7 @@ public class SudachiTokenizerFactory extends AbstractTokenizerFactory {
 
     public static SplitMode getMode(Settings settings) {
         SplitMode mode = SudachiTokenizer.DEFAULT_MODE;
-        String modeSetting = settings.get("mode", null);
+        String modeSetting = settings.get(SPLIT_MODE_PARAM, null);
         if (modeSetting != null) {
             if ("a".equalsIgnoreCase(modeSetting)) {
                 mode = SplitMode.A;
@@ -58,6 +61,11 @@ public class SudachiTokenizerFactory extends AbstractTokenizerFactory {
                 mode = SplitMode.C;
             }
         }
+
+        if (settings.hasValue(MODE_PARAM)) {
+            throw new IllegalArgumentException(MODE_PARAM + " is duprecated, use SudachiSplitFilter");
+        }
+
         return mode;
     }
 
