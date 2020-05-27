@@ -26,10 +26,13 @@ import org.elasticsearch.index.IndexSettings;
 import org.elasticsearch.index.analysis.AbstractTokenizerFactory;
 
 import com.worksap.nlp.lucene.sudachi.ja.SudachiTokenizer;
-import com.worksap.nlp.lucene.sudachi.ja.SudachiTokenizer.Mode;
+import com.worksap.nlp.sudachi.Tokenizer.SplitMode;
 
 public class SudachiTokenizerFactory extends AbstractTokenizerFactory {
-    private final Mode mode;
+    private static final String SPLIT_MODE_PARAM = "split_mode";
+    private static final String MODE_PARAM = "mode";
+
+    private final SplitMode mode;
     private final boolean discardPunctuation;
     private final String resourcesPath;
     private final String settingsPath;
@@ -37,27 +40,32 @@ public class SudachiTokenizerFactory extends AbstractTokenizerFactory {
 
     public SudachiTokenizerFactory(IndexSettings indexSettings,
             Environment env, String name, Settings settings) throws IOException {
-        super(indexSettings, name, settings);
+        super(indexSettings, settings, name);
         mode = getMode(settings);
         discardPunctuation = settings.getAsBoolean("discard_punctuation", true);
         resourcesPath = new SudachiPathResolver(env.configFile().toString(), 
-                settings.get("resources_path", name)).resolvePathForDirectory();
+                settings.get("resources_path", "sudachi")).resolvePathForDirectory();
         settingsPath = new SudachiSettingsReader(env.configFile().toString(), 
                 settings.get("settings_path")).read();
     }
 
-    public static SudachiTokenizer.Mode getMode(Settings settings) {
-        SudachiTokenizer.Mode mode = SudachiTokenizer.DEFAULT_MODE;
-        String modeSetting = settings.get("mode", null);
+    public static SplitMode getMode(Settings settings) {
+        SplitMode mode = SudachiTokenizer.DEFAULT_MODE;
+        String modeSetting = settings.get(SPLIT_MODE_PARAM, null);
         if (modeSetting != null) {
-            if ("search".equalsIgnoreCase(modeSetting)) {
-                mode = SudachiTokenizer.Mode.SEARCH;
-            } else if ("normal".equalsIgnoreCase(modeSetting)) {
-                mode = SudachiTokenizer.Mode.NORMAL;
-            } else if ("extended".equalsIgnoreCase(modeSetting)) {
-                mode = SudachiTokenizer.Mode.EXTENDED;
+            if ("a".equalsIgnoreCase(modeSetting)) {
+                mode = SplitMode.A;
+            } else if ("b".equalsIgnoreCase(modeSetting)) {
+                mode = SplitMode.B;
+            } else if ("c".equalsIgnoreCase(modeSetting)) {
+                mode = SplitMode.C;
             }
         }
+
+        if (settings.hasValue(MODE_PARAM)) {
+            throw new IllegalArgumentException(MODE_PARAM + " is duprecated, use SudachiSplitFilter");
+        }
+
         return mode;
     }
 

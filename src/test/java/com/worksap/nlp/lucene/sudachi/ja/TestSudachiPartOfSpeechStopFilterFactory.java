@@ -29,6 +29,8 @@ import org.apache.lucene.analysis.BaseTokenStreamTestCase;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
 
+import com.worksap.nlp.sudachi.Tokenizer.SplitMode;
+
 public class TestSudachiPartOfSpeechStopFilterFactory extends BaseTokenStreamTestCase {
     String path;
     String settings;
@@ -51,7 +53,7 @@ public class TestSudachiPartOfSpeechStopFilterFactory extends BaseTokenStreamTes
 
     public void testBasics() throws IOException {
         String tags = "動詞,非自立可能\n";
-        Tokenizer tokenizer = new SudachiTokenizer(true, SudachiTokenizer.Mode.NORMAL, path, settings);
+        Tokenizer tokenizer = new SudachiTokenizer(true, SplitMode.C, path, settings);
         tokenizer.setReader(new StringReader("東京都に行った。"));
         SudachiPartOfSpeechStopFilterFactory factory
             = new SudachiPartOfSpeechStopFilterFactory(new HashMap<String, String>() {{ put("tags", "stoptags.txt"); }});
