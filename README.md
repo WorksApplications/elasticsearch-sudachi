@@ -60,11 +60,11 @@ analysis-sudachi is an Elasticsearch plugin for tokenization of Japanese text us
 - tokenizer: Select tokenizer. (sudachi) (string)
 - mode: Select splitting mode of Sudachi. (A, B, C) (string, default: C)
   - C: Extracts named entities
-    Ex) 選挙管理委員会
+      - Ex) 選挙管理委員会
   - B: Into the middle units
-    Ex) 選挙,管理,委員会
+      - Ex) 選挙,管理,委員会
   - A: The shortest units equivalent to the UniDic short unit
-    Ex) 選挙,管理,委員,会
+      - Ex) 選挙,管理,委員,会
 - discard\_punctuation: Select to discard punctuation or not. (bool, default: true)
 - settings\_path: Sudachi setting file path. The path may be absolute or relative; relative paths are resolved with respect to es\_config. (string, default: null)
 - resources\_path: Sudachi dictionary path. The path may be absolute or relative; relative paths are resolved with respect to es\_config. (string, default: null)
@@ -103,9 +103,9 @@ analysis-sudachi is an Elasticsearch plugin for tokenization of Japanese text us
 This filter works like `mode` of kuromoji.
 
 - search: Additional segmentation useful for search. (Use C and A mode)
-  Ex）関西国際空港, 関西, 国際, 空港 / アバラカダブラ
+  - Ex）関西国際空港, 関西, 国際, 空港 / アバラカダブラ
 - extended: Similar to search mode, but also unigram unknown words.
-  Ex）関西国際空港, 関西, 国際, 空港 / アバラカダブラ, ア, バ, ラ, カ, ダ, ブ, ラ
+  - Ex）関西国際空港, 関西, 国際, 空港 / アバラカダブラ, ア, バ, ラ, カ, ダ, ブ, ラ
 
 ### PUT sudachi_sample
 ```json
