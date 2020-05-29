@@ -7,6 +7,9 @@ analysis-sudachi is an Elasticsearch plugin for tokenization of Japanese text us
 
 # What's new?
 
+- version 2.0.1
+    - Upgrade Sudachi to 0.4.2
+        - Fix buffer overrun with character normalization
 - version 2.0.0
     - New mode `split_mode` was added
     - New filter `sudachi_split` was added instead of `mode`
