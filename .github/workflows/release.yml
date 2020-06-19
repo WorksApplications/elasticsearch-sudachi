@@ -18,6 +18,15 @@ jobs:
         java-version: 11
     - name: Build with Maven
       run: mvn -B package --file pom.xml
+    - name: Set Package Version
+      id: package-version
+      run: |
+        VERSION=$(grep -oP -m 1 '<version>\K([^<]+)' ./pom.xml)
+        echo "::set-output name=version::${VERSION}"
+        echo ${VERSION}
+        ES_VERSION=$(echo ${VERSION} | sed -E 's/-.*//')
+        echo "::set-output name=es-version::${ES_VERSION}"
+        echo ${ES_VERSION}
     - name: Create release
       id: create_release
       uses: actions/create-release@v1
@@ -26,14 +35,10 @@ jobs:
       with:
         tag_name: ${{ github.ref }}
         release_name: ${{ github.ref }}
+        body: |
+          for Elasticsearch ${{ steps.package-version.outputs.es-version }}
         draft: false
         prerelease: false
-    - name: Set Package Version
-      id: package-version
-      run: |
-        VERSION=$(grep -oP -m 1 '<version>\K([^<]+)' ./pom.xml)
-        echo "::set-output name=version::${VERSION}"
-        echo ${VERSION}
     - name: Upload Release Asset
       id: upload-release-asset 
       uses: actions/upload-release-asset@v1
