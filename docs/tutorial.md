@@ -1,25 +1,37 @@
 # Elasticsearch用Sudachiプラグイン チュートリアル
 
-Elasticsearch プラグインは 5.6, 6.8 の最新バージョンと7系の各マイナーバージョンをサポートしています。
+Elasticsearch プラグインは 5.6, 6.8 の最新バージョンと7系の最新3つのマイナーバージョンをサポートしています。
 
-以下では Elasticsearch 7.5.0 で Sudachi をつかう手順をしめします。
- 
-まずプラグインをインストールします。 
+以下では Elasticsearch 7.7.0 で Sudachi をつかう手順をしめします。
 
-```
-$ sudo elasticsearch-plugin install https://github.com/WorksApplications/elasticsearch-sudachi/releases/download/v7.5.0-1.3.2/analysis-sudachi-elasticsearch7.5-1.3.2.zip
-```
-
-パッケージには辞書が含まれていません。https://github.com/WorksApplications/SudachiDict から最新の辞書を取得し、 `$ES_HOME/sudachi` の下に置きます。 3つの辞書のうち以下では core 辞書を利用します。
+Elasticsearch をインストールします。
 
 ```
-$ wget https://object-storage.tyo2.conoha.io/v1/nc_2520839e1f9641b08211a5c85243124a/sudachi/sudachi-dictionary-20191030-core.zip
-$ unzip sudachi-dictionary-20191030-core.zip
-$ sudo mkdir /etc/elasticsearch/sudachi
-$ sudo cp sudachi-dictionary-20191030/system_core.dic /etc/elasticsearch/sudachi
+$ wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.7.0-linux-x86_64.tar.gz
+$ tar xzf elasticsearch-7.7.0-linux-x86_64.tar.gz
 ```
 
-配置後、Elasticsearch を再起動します。
+プラグインをインストールします。 
+
+```
+$ cd elasticsearch-7.7.0
+$ bin/elasticsearch-plugin install https://github.com/WorksApplications/elasticsearch-sudachi/releases/download/v7.7.0-2.0.2/analysis-sudachi-7.7.0-2.0.2.zip
+```
+
+パッケージには辞書が含まれていません。https://github.com/WorksApplications/SudachiDict から最新の辞書を取得し、 `es_config/sudachi` の下に置きます。 3つの辞書のうち以下では core 辞書を利用します。
+
+```
+$ wget https://object-storage.tyo2.conoha.io/v1/nc_2520839e1f9641b08211a5c85243124a/sudachi/sudachi-dictionary-latest-core.zip
+$ unzip sudachi-dictionary-latest-core.zip
+$ mkdir config/sudachi
+$ cp sudachi-dictionary-*/system_core.dic config/sudachi/
+```
+
+配置後、Elasticsearch を起動します。
+
+```
+$ bin/elasticsearch
+```
 
 設定ファイルを作成します。 
 
@@ -28,6 +40,14 @@ $ sudo cp sudachi-dictionary-20191030/system_core.dic /etc/elasticsearch/sudachi
     "settings" : {
         "analysis" : {
             "filter" : {
+                "search" : {
+                    "type" : "sudachi_split",
+                    "mode" : "search"
+                },
+                "synonym" : {
+                    "type" : "synonym",
+                    "synonyms" : [ "関西国際空港,関空", "関西 => 近畿" ]
+                },
                 "romaji_readingform" : {
                     "type" : "sudachi_readingform",
                     "use_romaji" : true
@@ -58,17 +78,35 @@ $ sudo cp sudachi-dictionary-20191030/system_core.dic /etc/elasticsearch/sudachi
                     "type" : "custom",
                     "tokenizer" : "sudachi_tokenizer"
                 },
-                "sudachi_analyzer": {
-                    "filter": [],
+                "sudachi_search_analyzer" : {
+                    "filter" : [ "search" ],
+                    "type" : "custom",
+                    "tokenizer" : "sudachi_tokenizer"
+                },
+                "sudachi_synonym_analyzer" : {
+                    "filter" : [ "synonym", "search" ],
+                    "type" : "custom",
+                    "tokenizer" : "sudachi_tokenizer"
+                },
+                "sudachi_analyzer" : {
+                    "filter" : [],
+                    "type": "custom",
                     "tokenizer": "sudachi_tokenizer",
-                    "type": "custom"
+                },
+                "sudachi_a_analyzer" : {
+                    "filter" : [],
+                    "type" : "custom",
+                    "tokenizer" : "sudachi_a_tokenizer"
                 }
             },
             "tokenizer" : {
                 "sudachi_tokenizer": {
                     "type": "sudachi_tokenizer",
-                    "mode": "search",
-                    "resources_path": "/etc/elasticsearch/config/sudachi"
+                    "split_mode": "C"
+                },
+                "sudachi_a_tokenizer": {
+                    "type": "sudachi_tokenizer",
+                    "split_mode": "A"
                 }
             }
         }
@@ -94,9 +132,18 @@ $ curl -X GET "localhost:9200/test_sudachi/_analyze?pretty" -H 'Content-Type: ap
       "start_offset" : 0,
       "end_offset" : 6,
       "type" : "word",
-      "position" : 0,
-      "positionLength" : 3
-    },
+      "position" : 0
+    }
+  ]
+}
+```
+C単位で分割されます。
+
+A単位で分割すると以下のようになります。
+```
+$ curl -X GET "localhost:9200/test_sudachi/_analyze?pretty" -H 'Content-Type: application/json' -d'{"analyzer":"sudachi_a_analyzer", "text" : "関西国際空港"}'
+{
+  "tokens" : [
     {
       "token" : "関西",
       "start_offset" : 0,
@@ -121,8 +168,6 @@ $ curl -X GET "localhost:9200/test_sudachi/_analyze?pretty" -H 'Content-Type: ap
   ]
 }
 ```
-
-`search mode` が指定されているでA単位とC単位の両方が出力されます。
 
 動詞、形容詞を終止形で出力してみます。 
 
@@ -193,5 +238,104 @@ $ curl -X GET "localhost:9200/test_sudachi/_analyze?pretty" -H 'Content-Type: ap
 ```
 
 そのほか、品詞によるトークンの除外、ストップワードなどが利用できます。
+
+kuromoji の `search` モードや `extended` モードと同様の動作をさせたいときは `sudachi_split` フィルターをつかいます。
+
+```
+$ curl -X GET "localhost:9200/test_sudachi/_analyze?pretty" -H 'Content-Type: application/json' -d'{"analyzer":"sudachi_search_analyzer", "text" : "関西国際空港"}'
+{
+  "tokens" : [
+    {
+      "token" : "関西国際空港",
+      "start_offset" : 0,
+      "end_offset" : 6,
+      "type" : "word",
+      "position" : 0,
+      "positionLength" : 3
+    },
+    {
+      "token" : "関西",
+      "start_offset" : 0,
+      "end_offset" : 2,
+      "type" : "word",
+      "position" : 0
+    },
+    {
+      "token" : "国際",
+      "start_offset" : 2,
+      "end_offset" : 4,
+      "type" : "word",
+      "position" : 1
+    },
+    {
+      "token" : "空港",
+      "start_offset" : 4,
+      "end_offset" : 6,
+      "type" : "word",
+      "position" : 2
+    }
+  ]
+}
+```
+
+同義語展開と組み合わせることもできます。
+
+```
+$ curl -X GET "localhost:9200/test_sudachi/_analyze?pretty" -H 'Content-Type: application/json' -d'{"analyzer":"sudachi_synonym_analyzer", "text" : "関西国際空港と関西"}'
+{
+  "tokens" : [
+    {
+      "token" : "関西国際空港",
+      "start_offset" : 0,
+      "end_offset" : 6,
+      "type" : "word",
+      "position" : 0,
+      "positionLength" : 3
+    },
+    {
+      "token" : "関西",
+      "start_offset" : 0,
+      "end_offset" : 2,
+      "type" : "word",
+      "position" : 0
+    },
+    {
+      "token" : "国際",
+      "start_offset" : 2,
+      "end_offset" : 4,
+      "type" : "word",
+      "position" : 1
+    },
+    {
+      "token" : "空港",
+      "start_offset" : 4,
+      "end_offset" : 6,
+      "type" : "word",
+      "position" : 2
+    },
+    {
+      "token" : "関空",
+      "start_offset" : 0,
+      "end_offset" : 6,
+      "type" : "SYNONYM",
+      "position" : 2
+    },
+    {
+      "token" : "と",
+      "start_offset" : 6,
+      "end_offset" : 7,
+      "type" : "word",
+      "position" : 3
+    },
+    {
+      "token" : "近畿",
+      "start_offset" : 7,
+      "end_offset" : 9,
+      "type" : "SYNONYM",
+      "position" : 4
+    }
+  ]
+}
+```
 
 こちらもご参照ください: [Elasticsearchのための新しい形態素解析器 「Sudachi」 - Qiita](https://qiita.com/sorami/items/99604ef105f13d2d472b) （Elastic stack Advent Calendar 2017）
