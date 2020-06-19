@@ -7,7 +7,8 @@ Elasticsearch プラグインは 5.6, 6.8 の最新バージョンと7系の各�
 まずプラグインをインストールします。 
 
 ```
-$ sudo elasticsearch-plugin install https://github.com/WorksApplications/elasticsearch-sudachi/releases/download/v7.5.0-1.3.2/analysis-sudachi-elasticsearch7.5-1.3.2.zip
+$ cd elasticsearch-7.7.0
+$ bin/elasticsearch-plugin install https://github.com/WorksApplications/elasticsearch-sudachi/releases/download/v7.7.0-2.0.2/analysis-sudachi-7.7.0-2.0.2.zip
 ```
 
 パッケージには辞書が含まれていません。https://github.com/WorksApplications/SudachiDict から最新の辞書を取得し、 `$ES_HOME/sudachi` の下に置きます。 3つの辞書のうち以下では core 辞書を利用します。
