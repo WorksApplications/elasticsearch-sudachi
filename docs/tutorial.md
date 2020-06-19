@@ -15,7 +15,7 @@ $ tar xzf elasticsearch-7.7.0-linux-x86_64.tar.gz
 
 ```
 $ cd elasticsearch-7.7.0
-$ bin/elasticsearch-plugin install https://github.com/WorksApplications/elasticsearch-sudachi/releases/download/v7.7.0-2.0.1/analysis-sudachi-elasticsearch7.7-2.0.1.zip
+$ bin/elasticsearch-plugin install https://github.com/WorksApplications/elasticsearch-sudachi/releases/download/v7.7.0-2.0.2/analysis-sudachi-7.7.0-2.0.2.zip
 ```
 
 パッケージには辞書が含まれていません。https://github.com/WorksApplications/SudachiDict から最新の辞書を取得し、 `es_config/sudachi` の下に置きます。 3つの辞書のうち以下では core 辞書を利用します。
