@@ -32,8 +32,6 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
-import org.elasticsearch.Version;
-import org.elasticsearch.cluster.metadata.IndexMetaData;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.env.Environment;
 import org.elasticsearch.index.Index;
@@ -185,7 +183,6 @@ public class TestAnalysisSudachi extends ESTestCase {
             settings = Settings.builder()
                     .loadFromStream(RESOURCE_NAME_SUDACHI_ANALYSIS_JSON, input, true)
                 .put("index.analysis.tokenizer.sudachi_tokenizer.resources_path", home)
-                .put(IndexMetaData.SETTING_VERSION_CREATED, Version.CURRENT)
                 .build();
         }
 
