@@ -2,8 +2,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.worksap.nlp</groupId>
-    <artifactId>analysis-sudachi-elasticsearch6.8</artifactId>
-    <version>2.0.1</version>
+    <artifactId>analysis-sudachi</artifactId>
+    <version>6.8.9-2.0.2</version>
     <packaging>jar</packaging>
 
     <name>analysis-sudachi</name>
@@ -13,7 +13,7 @@
         <java.version>1.8</java.version>
         <elasticsearch.version>6.8.9</elasticsearch.version>
         <lucene.version>7.7.3</lucene.version>
-        <sudachi.version>0.4.2</sudachi.version>
+        <sudachi.version>0.4.3</sudachi.version>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.language>java</sonar.language>
         <sonar.organization>worksapplications</sonar.organization>
