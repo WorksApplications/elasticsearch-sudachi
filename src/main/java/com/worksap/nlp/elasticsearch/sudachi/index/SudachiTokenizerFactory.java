@@ -63,7 +63,7 @@ public class SudachiTokenizerFactory extends AbstractTokenizerFactory {
         }
 
         if (settings.hasValue(MODE_PARAM)) {
-            throw new IllegalArgumentException(MODE_PARAM + " is duprecated, use SudachiSplitFilter");
+            throw new IllegalArgumentException(MODE_PARAM + " is deprecated, use SudachiSplitFilter");
         }
 
         return mode;
