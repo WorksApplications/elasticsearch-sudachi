@@ -15,7 +15,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import jdk.internal.agent.resources.agent;
 
 public class TestSudachiSplitFilter extends BaseTokenStreamTestCase {
     TokenStream tokenStream;
