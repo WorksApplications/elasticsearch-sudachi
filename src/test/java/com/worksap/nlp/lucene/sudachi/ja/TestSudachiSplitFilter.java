@@ -107,6 +107,50 @@ public class TestSudachiSplitFilter extends BaseTokenStreamTestCase {
                                   9);
     }
 
+    public void testWithSingleCharOOVBySearchMode() throws IOException {
+        tokenStream = setUpTokenStream("search", "あ");
+        assertTokenStreamContents(tokenStream,
+                                  new String[] { "あ" },
+                                  new int[] { 0 },
+                                  new int[] { 1 },
+                                  new int[] { 1 },
+                                  new int[] { 1 },
+                                  1);
+    }
+
+    public void testWithSingleCharOOVByExtendedMode() throws IOException {
+        tokenStream = setUpTokenStream("extended", "あ");
+        assertTokenStreamContents(tokenStream,
+                                  new String[] { "あ" },
+                                  new int[] { 0 },
+                                  new int[] { 1 },
+                                  new int[] { 1 },
+                                  new int[] { 1 },
+                                  1);
+    }
+
+    public void testWithSingleCharOOVSequenceBySearchMode() throws IOException {
+        tokenStream = setUpTokenStream("search", "アマゾン");
+        assertTokenStreamContents(tokenStream,
+                                  new String[] { "ア", "マ", "ゾ", "ン"  },
+                                  new int[] { 0, 1, 2, 3 },
+                                  new int[] { 1, 2, 3, 4 },
+                                  new int[] { 1, 1, 1, 1 },
+                                  new int[] { 1, 1, 1, 1 },
+                                  4);
+    }
+
+    public void testWithSingleCharOOVSequenceByExtendedMode() throws IOException {
+        tokenStream = setUpTokenStream("extended", "アマゾン");
+        assertTokenStreamContents(tokenStream,
+                                  new String[] { "ア", "マ", "ゾ", "ン"  },
+                                  new int[] { 0, 1, 2, 3 },
+                                  new int[] { 1, 2, 3, 4 },
+                                  new int[] { 1, 1, 1, 1 },
+                                  new int[] { 1, 1, 1, 1 },
+                                  4);
+    }
+
     TokenStream setUpTokenStream(String mode, String input) {
         SudachiSplitFilterFactory factory = new SudachiSplitFilterFactory(new HashMap<String, String>() {{ put("mode", mode); }});
         ((Tokenizer)tokenStream).setReader(new StringReader(input));
