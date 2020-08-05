@@ -132,27 +132,27 @@ public class TestSudachiSplitFilter extends BaseTokenStreamTestCase {
     }
 
     @Test
-    public void testWithSingleCharOOVSequenceBySearchMode() throws IOException {
-        tokenStream = setUpTokenStream("search", "アマゾン");
+    public void testWithOOVSequenceBySearchMode() throws IOException {
+        tokenStream = setUpTokenStream("search", "アマゾンにワニ");
         assertTokenStreamContents(tokenStream,
-                                  new String[] { "ア", "マ", "ゾ", "ン"  },
-                                  new int[] { 0, 1, 2, 3 },
-                                  new int[] { 1, 2, 3, 4 },
-                                  new int[] { 1, 1, 1, 1 },
-                                  new int[] { 1, 1, 1, 1 },
-                                  4);
+                                  new String[] { "アマゾン", "に", "ワニ" },
+                                  new int[] { 0, 4, 5 },
+                                  new int[] { 4, 5, 7 },
+                                  new int[] { 1, 1, 1 },
+                                  new int[] { 1, 1, 1 },
+                                  7);
     }
 
     @Test
-    public void testWithSingleCharOOVSequenceByExtendedMode() throws IOException {
-        tokenStream = setUpTokenStream("extended", "アマゾン");
+    public void testWithOOVSequenceByExtendedMode() throws IOException {
+        tokenStream = setUpTokenStream("extended", "アマゾンにワニ");
         assertTokenStreamContents(tokenStream,
-                                  new String[] { "ア", "マ", "ゾ", "ン"  },
-                                  new int[] { 0, 1, 2, 3 },
-                                  new int[] { 1, 2, 3, 4 },
-                                  new int[] { 1, 1, 1, 1 },
-                                  new int[] { 1, 1, 1, 1 },
-                                  4);
+                                  new String[] { "アマゾン", "ア", "マ", "ゾ", "ン", "に", "ワニ", "ワ", "ニ" },
+                                  new int[] { 0, 0, 1, 2, 3, 4, 5, 5, 6 },
+                                  new int[] { 4, 1, 2, 3, 4, 5, 7, 6, 7 },
+                                  new int[] { 1, 0, 1, 1, 1, 1, 1, 0, 1 },
+                                  new int[] { 4, 1, 1, 1, 1, 1, 2, 1, 1 },
+                                  7);
     }
 
     TokenStream setUpTokenStream(String mode, String input) {

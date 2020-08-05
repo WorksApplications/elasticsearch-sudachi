@@ -2,10 +2,6 @@ package com.worksap.nlp.sudachi;
 
 import java.util.List;
 
-import com.worksap.nlp.sudachi.InputText;
-import com.worksap.nlp.sudachi.Lattice;
-import com.worksap.nlp.sudachi.LatticeNode;
-import com.worksap.nlp.sudachi.PathRewritePlugin;
 import com.worksap.nlp.sudachi.dictionary.Grammar;
 
 public class JoinOovPlugin extends PathRewritePlugin {
@@ -41,8 +37,12 @@ public class JoinOovPlugin extends PathRewritePlugin {
                 if (isOOVNode) {
                     isOOVNode = false;
                     concatenateOov(path, begin, i, oovPosId, lattice);
+                    i = begin + 1;
                 }
             }
+        }
+        if (isOOVNode) {
+            concatenateOov(path, begin, path.size(), oovPosId, lattice);
         }
     }
 }
