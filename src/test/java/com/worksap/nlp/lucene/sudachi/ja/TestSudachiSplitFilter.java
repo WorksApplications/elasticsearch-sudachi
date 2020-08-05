@@ -156,6 +156,7 @@ public class TestSudachiSplitFilter extends BaseTokenStreamTestCase {
     }
 
     TokenStream setUpTokenStream(String mode, String input) {
+        @SuppressWarnings("serial")
         SudachiSplitFilterFactory factory = new SudachiSplitFilterFactory(new HashMap<String, String>() {{ put("mode", mode); }});
         ((Tokenizer)tokenStream).setReader(new StringReader(input));
         return factory.create(tokenStream);
