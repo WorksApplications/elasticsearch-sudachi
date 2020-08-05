@@ -107,6 +107,7 @@ public class TestSudachiSplitFilter extends BaseTokenStreamTestCase {
                                   9);
     }
 
+    @Test
     public void testWithSingleCharOOVBySearchMode() throws IOException {
         tokenStream = setUpTokenStream("search", "あ");
         assertTokenStreamContents(tokenStream,
@@ -118,6 +119,7 @@ public class TestSudachiSplitFilter extends BaseTokenStreamTestCase {
                                   1);
     }
 
+    @Test
     public void testWithSingleCharOOVByExtendedMode() throws IOException {
         tokenStream = setUpTokenStream("extended", "あ");
         assertTokenStreamContents(tokenStream,
@@ -129,6 +131,7 @@ public class TestSudachiSplitFilter extends BaseTokenStreamTestCase {
                                   1);
     }
 
+    @Test
     public void testWithSingleCharOOVSequenceBySearchMode() throws IOException {
         tokenStream = setUpTokenStream("search", "アマゾン");
         assertTokenStreamContents(tokenStream,
@@ -140,6 +143,7 @@ public class TestSudachiSplitFilter extends BaseTokenStreamTestCase {
                                   4);
     }
 
+    @Test
     public void testWithSingleCharOOVSequenceByExtendedMode() throws IOException {
         tokenStream = setUpTokenStream("extended", "アマゾン");
         assertTokenStreamContents(tokenStream,
