@@ -55,6 +55,7 @@ public class TestSudachiPartOfSpeechStopFilterFactory extends BaseTokenStreamTes
         String tags = "動詞,非自立可能\n";
         Tokenizer tokenizer = new SudachiTokenizer(true, SplitMode.C, path, settings);
         tokenizer.setReader(new StringReader("東京都に行った。"));
+        @SuppressWarnings("serial")
         SudachiPartOfSpeechStopFilterFactory factory
             = new SudachiPartOfSpeechStopFilterFactory(new HashMap<String, String>() {{ put("tags", "stoptags.txt"); }});
         factory.inform(new StringResourceLoader(tags));
@@ -64,6 +65,7 @@ public class TestSudachiPartOfSpeechStopFilterFactory extends BaseTokenStreamTes
     }
 
     public void testBogusArguments() throws Exception {
+        @SuppressWarnings("serial")
         IllegalArgumentException expected = expectThrows(IllegalArgumentException.class, () -> {
                 new SudachiPartOfSpeechStopFilterFactory(new HashMap<String, String>() {{ put("bogusArg", "bogusValue"); }});
             });
