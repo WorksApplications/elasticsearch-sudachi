@@ -12,6 +12,7 @@
 		</file>
 		<file>
 			<source>README.md</source>
+			<outputDirectory>elasticsearch</outputDirectory>
 			<filtered>false</filtered>
 		</file>
 		<file>
