@@ -51,9 +51,10 @@ public class SudachiSplitFilter extends TokenFilter {
 
         public void setOov(int offset, char[] src, int length) {
             baseOffset = offset;
+            this.length = length;
             if (reserved < length) {
                 buffer = new char[length];
-                reserved = this.length = length;
+                reserved = length;
             }
             System.arraycopy(src, 0, buffer, 0, length);
             index = 0;
