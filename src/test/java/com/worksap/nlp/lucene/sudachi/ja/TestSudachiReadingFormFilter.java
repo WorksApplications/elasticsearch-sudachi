@@ -61,6 +61,7 @@ public class TestSudachiReadingFormFilter extends BaseTokenStreamTestCase {
     }
 
     public void testRomanizedReadingForm() throws IOException {
+        @SuppressWarnings("serial")
         SudachiReadingFormFilterFactory factory = new SudachiReadingFormFilterFactory(new HashMap<String, String>() {{ put("useRomaji", "true"); }});
         ((Tokenizer)tokenStream).setReader(new StringReader("東京都に行った。"));
         tokenStream = factory.create(tokenStream);
