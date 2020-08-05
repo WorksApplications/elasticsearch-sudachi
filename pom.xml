@@ -3,7 +3,7 @@
 
     <groupId>com.worksap.nlp</groupId>
     <artifactId>analysis-sudachi</artifactId>
-    <version>7.8.1-2.0.3-SNAPSHOT</version>
+    <version>7.8.1-2.0.3</version>
     <packaging>jar</packaging>
 
     <name>analysis-sudachi</name>
