@@ -11,6 +11,10 @@
 			<filtered>true</filtered>
 		</file>
 		<file>
+			<source>README.md</source>
+			<filtered>false</filtered>
+		</file>
+		<file>
 			<source>LICENSE</source>
 			<outputDirectory>elasticsearch</outputDirectory>
 			<filtered>false</filtered>
