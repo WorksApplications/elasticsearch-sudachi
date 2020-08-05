@@ -38,6 +38,7 @@ public class TestSudachiPartOfSpeechStopFilter extends BaseTokenStreamTestCase {
     @Rule
     public TemporaryFolder tempFolderForDictionary = new TemporaryFolder();
 
+    @SuppressWarnings("serial")
     public void setUp() throws Exception {
         super.setUp();
         tempFolderForDictionary.create();

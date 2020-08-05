@@ -7,6 +7,8 @@ analysis-sudachi is an Elasticsearch plugin for tokenization of Japanese text us
 
 # What's new?
 
+- version 2.0.3
+    - Fix duplicated tokens for OOVs with `sudachi_split` filter's `extended mode`
 - version 2.0.2
     - Upgrade Sudachi to 0.4.3
         - Fix overrun with surrogate pairs
@@ -85,8 +87,8 @@ analysis-sudachi is an Elasticsearch plugin for tokenization of Japanese text us
         "tokenizer": {
           "sudachi_tokenizer": {
             "type": "sudachi_tokenizer",
-            "mode": "C",
-	          "discard_punctuation": true,
+            "sudachi_split": "C",
+            "discard_punctuation": true,
             "resources_path": "/etc/elasticsearch/sudachi"
           }
         },
