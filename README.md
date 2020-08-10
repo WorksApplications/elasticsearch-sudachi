@@ -523,6 +523,14 @@ Returns `スシ`.
 ```
 Returns `susi`.
 
+
+# Synonym
+
+There is a temporary way to use Sudachi Dictionary's synonym resource ([Sudachi 同義語辞書](https://github.com/WorksApplications/SudachiDict/blob/develop/docs/synonyms.md)) with Elasticsearch.
+
+Please refer to [this document](docs/synonym.md) for the detail.
+
+
 # License
 
 Copyright (c) 2017-2020 Works Applications Co., Ltd.
