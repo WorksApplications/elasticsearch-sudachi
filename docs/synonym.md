@@ -30,7 +30,7 @@ You can partially make use of the Sudachi synonym resource's detailed informatio
 
 ### Punctuation Symbols
 
-You may need to remove certain synonym words such as `€` and `＆` when you use the analyzer with setting `"discard_punctuation": false` (Otherwise you will be get an error, e.g., `"term: € was completely eliminated by analyzer"`). when creating an index. Alternatively, you can set `"lenient": true` for the synonym filter to ignore the exeptions.
+You may need to remove certain synonym words such as `€` and `＆` when you use the analyzer with setting `"discard_punctuation": false` (Otherwise you will be get an error, e.g., `"term: € was completely eliminated by analyzer"`). Alternatively, you can set `"lenient": true` for the synonym filter to ignore the exeptions.
 
 These symbols are defined as punctuations; See [SudachiTokenizer.java](https://github.com/WorksApplications/elasticsearch-sudachi/blob/develop/src/main/java/com/worksap/nlp/lucene/sudachi/ja/SudachiTokenizer.java#L140) for the detail.
 
