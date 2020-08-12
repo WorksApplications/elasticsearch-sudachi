@@ -9,42 +9,10 @@ You can convert the synonym file to "Solr synonyms" format, and use it via Elast
 
 You can simply convert the Sudachi synonym file into the Solr synonyms format. The Sudachi format is described in detail [here](https://github.com/WorksApplications/SudachiDict/blob/develop/docs/synonyms.md).
 
-Here is an example script for conversion;
+You can use [our example script (ssyn2es.py)](./ssyn2es.py) for the conversion;
 
-```py
-import argparse
-import fileinput
-
-def main():
-    parser = argparse.ArgumentParser(prog="ssyn2es.py", description="convert Sudachi synonyms to ES")
-    parser.add_argument('files', metavar='FILE', nargs='*', help='files to read, if empty, stdin is used')
-    parser.add_argument('-p', '--output-predicate', action='store_true', help='output predicates')
-    args = parser.parse_args()
-
-    synonyms = {}
-    with fileinput.input(files = args.files) as input:
-        for line in input:
-            line = line.strip()
-            if line == "":
-                continue
-            entry = line.split(",")[0:9]
-            if entry[2] == "2" or (not args.output_predicate and entry[1] == "2"):
-                continue
-            group = synonyms.setdefault(entry[0], [[], []])
-            group[1 if entry[2] == "1" else 0].append(entry[8])
-
-    for groupid in sorted(synonyms):
-        group = synonyms[groupid]
-        if not group[1]:
-            if len(group[0]) > 1:
-                print(",".join(group[0]))
-        else:
-            if len(group[0]) > 0 and len(group[1]) > 0:
-                print(",".join(group[0]) + "=>" + ",".join(group[0] + group[1]))
-
-
-if __name__ == "__main__":
-    main()
+```sh
+$ python ssyn2es.py SudachiDict/src/main/text/synonyms.txt > synonym.txt
 ```
 
 ### Expansion Suppresion
@@ -59,6 +27,12 @@ You can partially make use of the Sudachi synonym resource's detailed informatio
 # `アイスクリーム` => `アイスクリーム`, `ice cream`, `ice`, `アイス`
 # `アイス` => `アイス` (**no expansion**)
 ```
+
+### Punctuation Symbols
+
+You may need to remove certain synonym words such as `€` and `＆` when you use the analyzer with setting `"discard_punctuation": false` (Otherwise you will be get an error, e.g., `"term: € was completely eliminated by analyzer"`). when creating an index. Alternatively, you can set `"lenient": true` for the synonym filter to ignore the exeptions.
+
+These symbols are defined as punctuations; See [SudachiTokenizer.java](https://github.com/WorksApplications/elasticsearch-sudachi/blob/develop/src/main/java/com/worksap/nlp/lucene/sudachi/ja/SudachiTokenizer.java#L140) for the detail.
 
 
 ## Synonym Filter
@@ -98,6 +72,8 @@ You can use the converted Solr format file with Elasticsearch's default synonym 
 ```
 
 Here we assume that the converted synonym file is placed as `$ES_PATH_CONF/sudachi/synonym.txt`.
+
+If you would like to use `sudachi_split` filter, set it *after* the synonym filter (otherwise you will get an error, e.g., `term: 不明確 analyzed to a token (不) with position increment != 1 (got: 0)`).
 
 
 ### Example: Analysis
