@@ -66,8 +66,7 @@ analysis-sudachi is an Elasticsearch plugin for tokenization of Japanese text us
 
 # Configuration
 
-- tokenizer: Select tokenizer. (sudachi) (string)
-- mode: Select splitting mode of Sudachi. (A, B, C) (string, default: C)
+- split_mode: Select splitting mode of Sudachi. (A, B, C) (string, default: C)
   - C: Extracts named entities
       - Ex) 選挙管理委員会
   - B: Into the middle units
