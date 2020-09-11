@@ -87,7 +87,7 @@ analysis-sudachi is an Elasticsearch plugin for tokenization of Japanese text us
         "tokenizer": {
           "sudachi_tokenizer": {
             "type": "sudachi_tokenizer",
-            "sudachi_split": "C",
+            "split_mode": "C",
             "discard_punctuation": true,
             "resources_path": "/etc/elasticsearch/sudachi"
           }
