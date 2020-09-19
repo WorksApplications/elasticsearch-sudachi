@@ -155,6 +155,30 @@ public class TestSudachiSplitFilter extends BaseTokenStreamTestCase {
                                   7);
     }
 
+    @Test
+    public void testWithSurrogateCharOOVByExtendedMode() throws IOException {
+        tokenStream = setUpTokenStream("extended", "𠮟");
+        assertTokenStreamContents(tokenStream,
+                                  new String[] { "𠮟" },
+                                  new int[] { 0 },
+                                  new int[] { 2 },
+                                  new int[] { 1 },
+                                  new int[] { 1 },
+                                  2);
+    }
+
+    @Test
+    public void testWithSurrogateStringOOVByExtendedMode() throws IOException {
+        tokenStream = setUpTokenStream("extended", "𠮟る");
+        assertTokenStreamContents(tokenStream,
+                                  new String[] { "𠮟る", "𠮟", "る" },
+                                  new int[] { 0, 0, 2 },
+                                  new int[] { 3, 2, 3 },
+                                  new int[] { 1, 0, 1 },
+                                  new int[] { 2, 1, 1 },
+                                  3);
+    }
+
     TokenStream setUpTokenStream(String mode, String input) {
         @SuppressWarnings("serial")
         SudachiSplitFilterFactory factory = new SudachiSplitFilterFactory(new HashMap<String, String>() {{ put("mode", mode); }});

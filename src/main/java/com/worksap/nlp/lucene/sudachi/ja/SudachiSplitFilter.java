@@ -127,9 +127,10 @@ public class SudachiSplitFilter extends TokenFilter {
         }
 
         if (input.incrementToken()) {
-            if (mode == Mode.EXTENDED && splitAtt.isOOV() && (termAtt.length() > 1)) {
+            int length = codePointCount(termAtt);
+            if (mode == Mode.EXTENDED && splitAtt.isOOV() && length > 1) {
                 oovChars.setOov(offsetAtt.startOffset(), termAtt.buffer(), termAtt.length());
-                posLengthAtt.setPositionLength(termAtt.length());
+                posLengthAtt.setPositionLength(length);
             } else {
                 List<Morpheme> aUnits = splitAtt.getAUnits();
                 if (aUnits.size() > 1) {
@@ -172,6 +173,23 @@ public class SudachiSplitFilter extends TokenFilter {
         } else {
             posIncAtt.setPositionIncrement(1);
         }
-        termAtt.append(oovChars.next());
+        char c = oovChars.next();
+        termAtt.append(c);
+        if (Character.isSurrogate(c) && oovChars.hasNext()) {
+            termAtt.append(oovChars.next());
+            offsetAtt.setOffset(offset, offset + 2);
+        }
+    }
+
+    private int codePointCount(CharTermAttribute attr) {
+        int count = attr.length();
+        for (int i = 0; i < attr.length(); ) {
+            if (Character.isHighSurrogate(attr.charAt(i++)) &&
+                Character.isLowSurrogate(attr.charAt(i))) {
+                    count--;
+                    i++;
+                }
+        }
+        return count;
     }
 }
