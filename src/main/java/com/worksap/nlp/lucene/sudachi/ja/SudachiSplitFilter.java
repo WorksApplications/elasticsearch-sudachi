@@ -127,8 +127,8 @@ public class SudachiSplitFilter extends TokenFilter {
         }
 
         if (input.incrementToken()) {
-            int length = codePointCount(termAtt);
-            if (mode == Mode.EXTENDED && splitAtt.isOOV() && length > 1) {
+            int length = 0;
+            if (mode == Mode.EXTENDED && splitAtt.isOOV() && (length = codePointCount(termAtt)) > 1) {
                 oovChars.setOov(offsetAtt.startOffset(), termAtt.buffer(), termAtt.length());
                 posLengthAtt.setPositionLength(length);
             } else {
