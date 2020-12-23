@@ -51,7 +51,7 @@ analysis-sudachi is an Elasticsearch plugin for tokenization of Japanese text us
 
 1. Build analysis-sudachi.
 ```
-   $ mvn package
+   $ ./gradlew -PelasticsearchVersion=7.10.1 build
 ```
 
 # Installation
