@@ -22,7 +22,9 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.util.HashMap;
 
+import org.junit.Before;
 import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import org.apache.lucene.analysis.BaseTokenStreamTestCase;
@@ -39,6 +41,7 @@ public class TestSudachiPartOfSpeechStopFilter extends BaseTokenStreamTestCase {
     public TemporaryFolder tempFolderForDictionary = new TemporaryFolder();
 
     @SuppressWarnings("serial")
+    @Before
     public void setUp() throws Exception {
         super.setUp();
         tempFolderForDictionary.create();
@@ -56,6 +59,7 @@ public class TestSudachiPartOfSpeechStopFilter extends BaseTokenStreamTestCase {
         factory = new SudachiPartOfSpeechStopFilterFactory(new HashMap<String, String>() {{ put("tags", "stoptags.txt"); }});
     }
 
+    @Test
     public void testAllPOS() throws IOException {
         String tags = "動詞,非自立可能\n名詞,固有名詞,地名,一般\n";
         factory.inform(new StringResourceLoader(tags));
@@ -63,6 +67,7 @@ public class TestSudachiPartOfSpeechStopFilter extends BaseTokenStreamTestCase {
         assertTokenStreamContents(tokenStream, new String[] {"都", "に", "た"});
     }
 
+    @Test
     public void testPrefix() throws IOException {
         String tags = "動詞\n名詞,固有名詞\n";
         factory.inform(new StringResourceLoader(tags));
@@ -70,6 +75,7 @@ public class TestSudachiPartOfSpeechStopFilter extends BaseTokenStreamTestCase {
         assertTokenStreamContents(tokenStream, new String[] {"都", "に", "た"});
     }
 
+    @Test
     public void testConjugationType() throws IOException {
         String tags = "五段-カ行\n";
         factory.inform(new StringResourceLoader(tags));
@@ -78,6 +84,7 @@ public class TestSudachiPartOfSpeechStopFilter extends BaseTokenStreamTestCase {
                                   new String[] { "東京", "都", "に", "た"});
     }
 
+    @Test
     public void testConjugationTypeAndForm() throws IOException {
         String tags = "五段-カ行,終止形-一般\n";
         factory.inform(new StringResourceLoader(tags));
@@ -86,6 +93,7 @@ public class TestSudachiPartOfSpeechStopFilter extends BaseTokenStreamTestCase {
                                   new String[] { "東京", "都", "に", "行っ", "た"});
     }
 
+    @Test
     public void testConjugationForm() throws IOException {
         String tags = "終止形-一般\n";
         factory.inform(new StringResourceLoader(tags));
@@ -94,6 +102,7 @@ public class TestSudachiPartOfSpeechStopFilter extends BaseTokenStreamTestCase {
                                   new String[] { "東京", "都", "に", "行っ"});
     }
 
+    @Test
     public void testPrefixWithUnmatchedSubcategory() throws IOException {
         String tags = "助詞,格助詞\n助詞,格助詞,引用\n";
         factory.inform(new StringResourceLoader(tags));
@@ -102,6 +111,7 @@ public class TestSudachiPartOfSpeechStopFilter extends BaseTokenStreamTestCase {
                                   new String[] { "東京", "都", "行っ", "た"});
     }
 
+    @Test
     public void testTooLongCategory() throws IOException {
         String tags = "名詞,固有名詞,地名,一般,一般\n";
         factory.inform(new StringResourceLoader(tags));

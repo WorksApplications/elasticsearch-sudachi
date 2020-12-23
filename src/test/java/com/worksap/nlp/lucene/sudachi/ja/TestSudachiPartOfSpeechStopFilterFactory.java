@@ -22,7 +22,9 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.util.HashMap;
 
+import org.junit.Before;
 import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import org.apache.lucene.analysis.BaseTokenStreamTestCase;
@@ -38,6 +40,7 @@ public class TestSudachiPartOfSpeechStopFilterFactory extends BaseTokenStreamTes
     @Rule
     public TemporaryFolder tempFolderForDictionary = new TemporaryFolder();
 
+    @Before
     public void setUp() throws Exception {
         super.setUp();
         tempFolderForDictionary.create();
@@ -51,6 +54,7 @@ public class TestSudachiPartOfSpeechStopFilterFactory extends BaseTokenStreamTes
         }
     }
 
+    @Test
     public void testBasics() throws IOException {
         String tags = "動詞,非自立可能\n";
         Tokenizer tokenizer = new SudachiTokenizer(true, SplitMode.C, path, settings);
@@ -64,6 +68,7 @@ public class TestSudachiPartOfSpeechStopFilterFactory extends BaseTokenStreamTes
                                   new String[] {"東京都", "に", "た"});
     }
 
+    @Test
     public void testBogusArguments() throws Exception {
         @SuppressWarnings("serial")
         IllegalArgumentException expected = expectThrows(IllegalArgumentException.class, () -> {

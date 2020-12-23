@@ -23,7 +23,9 @@ import java.io.StringReader;
 import java.util.Collections;
 import java.util.HashMap;
 
+import org.junit.Before;
 import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import org.apache.lucene.analysis.BaseTokenStreamTestCase;
@@ -38,6 +40,7 @@ public class TestSudachiReadingFormFilter extends BaseTokenStreamTestCase {
     @Rule
     public TemporaryFolder tempFolderForDictionary = new TemporaryFolder();
 
+    @Before
     public void setUp() throws Exception {
         super.setUp();
         tempFolderForDictionary.create();
@@ -53,6 +56,7 @@ public class TestSudachiReadingFormFilter extends BaseTokenStreamTestCase {
         tokenStream = new SudachiTokenizer(true, SplitMode.C, tempFileForDictionary.getPath(), settings);
     }
 
+    @Test
     public void testReadingForm() throws IOException {
         SudachiReadingFormFilterFactory factory = new SudachiReadingFormFilterFactory(Collections.emptyMap());
         ((Tokenizer)tokenStream).setReader(new StringReader("東京都に行った。"));
@@ -60,6 +64,7 @@ public class TestSudachiReadingFormFilter extends BaseTokenStreamTestCase {
         assertTokenStreamContents(tokenStream, new String[] {"トウキョウト", "ニ", "イッ", "タ"});
     }
 
+    @Test
     public void testRomanizedReadingForm() throws IOException {
         @SuppressWarnings("serial")
         SudachiReadingFormFilterFactory factory = new SudachiReadingFormFilterFactory(new HashMap<String, String>() {{ put("useRomaji", "true"); }});

@@ -11,6 +11,7 @@ import com.worksap.nlp.sudachi.Tokenizer.SplitMode;
 import org.apache.lucene.analysis.BaseTokenStreamTestCase;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -21,6 +22,7 @@ public class TestSudachiSplitFilter extends BaseTokenStreamTestCase {
     @Rule
     public TemporaryFolder tempFolderForDictionary = new TemporaryFolder();
 
+    @Before
     public void setUp() throws Exception {
         super.setUp();
         tempFolderForDictionary.create();

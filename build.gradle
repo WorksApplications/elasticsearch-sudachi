@@ -1,0 +1,65 @@
+plugins {
+    id 'java-library'
+    id 'org.sonarqube' version '3.0'
+    id 'jacoco'
+}
+
+group = 'com.worksap.nlp'
+archivesBaseName = 'analysis-sudachi'
+version = '2.0.4-SNAPSHOT'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'com.worksap.nlp:sudachi:0.5.1', "org.elasticsearch.client:transport:${elasticsearchVersion}"
+    testImplementation "org.elasticsearch.test:framework:${elasticsearchVersion}"
+}
+
+task buildTestDict(dependsOn: 'processTestResources', type: JavaExec) {
+    main = 'com.worksap.nlp.sudachi.dictionary.DictionaryBuilder'
+    classpath = sourceSets.main.runtimeClasspath
+    args('-o', 'build/resources/test/com/worksap/nlp/lucene/sudachi/ja/system_core.dic', '-m', 'src/test/dict/matrix.def', 'src/test/dict/lex.csv')
+}
+test.dependsOn buildTestDict
+
+task embedVersion(type: Copy) {
+    from 'src/main/extras/plugin-descriptor.properties'
+    into 'build/descriptor'
+    expand([version: version, elasticsearchVersion: elasticsearchVersion])
+}
+
+task copyDependencies(type: Copy) {
+    def libs = ['sudachi', 'javax.json', 'jdartsclone']
+    from configurations.runtimeClasspath.collect { f -> (libs.any { f.name.startsWith(it) }) ? f : null }
+    into 'build/libs'
+}
+
+task distZip(dependsOn: ['jar', 'embedVersion', 'copyDependencies'], type: Zip) {
+    archiveBaseName = archivesBaseName
+    appendix = elasticsearchVersion
+    from 'build/libs/', 'build/descriptor', 'LICENSE', 'README.md'
+}
+
+artifacts {
+    archives distZip
+}
+
+sonarqube {
+  properties {
+    property "sonar.projectKey", "WorksApplications_elasticsearch-sudachi"
+    property "sonar.organization", "worksapplications"
+    property "sonar.host.url", "https://sonarcloud.io"
+  }
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+    }
+    dependsOn test
+}
