@@ -25,7 +25,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
 class ResourceUtil {
-    static final String RESOURCE_NAME_SYSTEM_DIC = "system.dic";
+    static final String RESOURCE_NAME_SYSTEM_DIC = "system_core.dic";
 
     private ResourceUtil() {}
 

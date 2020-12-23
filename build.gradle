@@ -18,6 +18,13 @@ dependencies {
     testImplementation 'junit:junit:4.13.1', 'org.hamcrest:hamcrest:2.1', "org.elasticsearch.test:framework:${elasticsearchVersion}"
 }
 
+task buildTestDict(dependsOn: 'processTestResources', type: JavaExec) {
+    main = 'com.worksap.nlp.sudachi.dictionary.DictionaryBuilder'
+    classpath = sourceSets.main.runtimeClasspath
+    args('-o', 'build/resources/test/com/worksap/nlp/lucene/sudachi/ja/system_core.dic', '-m', 'src/test/dict/matrix.def', 'src/test/dict/lex.csv')
+}
+test.dependsOn buildTestDict
+
 task embedVersion(type: Copy) {
     from 'src/main/extras/plugin-descriptor.properties'
     into 'build/descriptor'
