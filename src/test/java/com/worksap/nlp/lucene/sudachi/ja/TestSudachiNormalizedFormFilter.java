@@ -22,7 +22,9 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.util.Collections;
 
+import org.junit.Before;
 import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import org.apache.lucene.analysis.BaseTokenStreamTestCase;
@@ -38,6 +40,7 @@ public class TestSudachiNormalizedFormFilter extends BaseTokenStreamTestCase {
     @Rule
     public TemporaryFolder tempFolderForDictionary = new TemporaryFolder();
 
+    @Before
     public void setUp() throws Exception {
         super.setUp();
         tempFolderForDictionary.create();
@@ -54,12 +57,14 @@ public class TestSudachiNormalizedFormFilter extends BaseTokenStreamTestCase {
         factory = new SudachiNormalizedFormFilterFactory(Collections.emptyMap());
     }
 
+    @Test
     public void testNormalizedForm() throws IOException {
         ((Tokenizer)tokenStream).setReader(new StringReader("東京都に行った。"));
         tokenStream = factory.create(tokenStream);
         assertTokenStreamContents(tokenStream, new String[] {"東京都", "に", "行く", "た"});
     }
 
+    @Test
     public void testNormalizedFormWithUnnormalizedWord() throws IOException {
         ((Tokenizer)tokenStream).setReader(new StringReader("東京都にいった。"));
         tokenStream = factory.create(tokenStream);
