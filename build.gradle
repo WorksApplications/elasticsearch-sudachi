@@ -1,0 +1,41 @@
+plugins {
+    id 'java-library'
+}
+
+group = 'com.worksap.nlp'
+archivesBaseName = 'analysis-sudachi'
+version = '2.0.4-SNAPSHOT'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'com.worksap.nlp:sudachi:0.5.1', "org.elasticsearch.client:transport:${elasticsearchVersion}"
+    testImplementation 'junit:junit:4.13.1', 'org.hamcrest:hamcrest:2.1', "org.elasticsearch.test:framework:${elasticsearchVersion}"
+}
+
+task embedVersion(type: Copy) {
+    from 'src/main/extras/plugin-descriptor.properties'
+    into 'build/descriptor'
+    expand([version: version, elasticsearchVersion: elasticsearchVersion])
+}
+
+task copyDependencies(type: Copy) {
+    def libs = ['sudachi', 'javax.json', 'jdartsclone']
+    from configurations.runtimeClasspath.collect { f -> (libs.any { f.name.startsWith(it) }) ? f : null }
+    into 'build/libs'
+}
+
+task distZip(dependsOn: ['jar', 'embedVersion', 'copyDependencies'], type: Zip) {
+    archiveBaseName = archivesBaseName
+    appendix = elasticsearchVersion
+    from 'build/libs/', 'build/descriptor', 'LICENSE', 'README.md'
+}
+
+artifacts {
+    archives distZip
+}
