@@ -1,5 +1,7 @@
 plugins {
     id 'java-library'
+    id 'org.sonarqube' version '3.0'
+    id 'jacoco'
 }
 
 group = 'com.worksap.nlp'
@@ -15,7 +17,7 @@ repositories {
 
 dependencies {
     implementation 'com.worksap.nlp:sudachi:0.5.1', "org.elasticsearch.client:transport:${elasticsearchVersion}"
-    testImplementation 'junit:junit:4.13.1', 'org.hamcrest:hamcrest:2.1', "org.elasticsearch.test:framework:${elasticsearchVersion}"
+    testImplementation "org.elasticsearch.test:framework:${elasticsearchVersion}"
 }
 
 task buildTestDict(dependsOn: 'processTestResources', type: JavaExec) {
@@ -45,4 +47,19 @@ task distZip(dependsOn: ['jar', 'embedVersion', 'copyDependencies'], type: Zip) 
 
 artifacts {
     archives distZip
+}
+
+sonarqube {
+  properties {
+    property "sonar.projectKey", "WorksApplications_elasticsearch-sudachi"
+    property "sonar.organization", "worksapplications"
+    property "sonar.host.url", "https://sonarcloud.io"
+  }
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+    }
+    dependsOn test
 }
