@@ -2,8 +2,8 @@
 
 analysis-sudachi is an Elasticsearch plugin for tokenization of Japanese text using Sudachi the Japanese morphological analyzer.
 
-[![Build Status](https://travis-ci.org/WorksApplications/elasticsearch-sudachi.svg?branch=develop)](https://travis-ci.org/WorksApplications/elasticsearch-sudachi)
-[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=com.worksap.nlp%3Aanalysis-sudachi&metric=alert_status)](https://sonarcloud.io/dashboard/index/com.worksap.nlp%3Aanalysis-sudachi)
+![build](https://github.com/WorksApplications/elasticsearch-sudachi/workflows/build/badge.svg)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=WorksApplications_elasticsearch-sudachi&metric=alert_status)](https://sonarcloud.io/dashboard?id=WorksApplications_elasticsearch-sudachi)
 
 # What's new?
 
