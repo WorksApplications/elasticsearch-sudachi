@@ -57,7 +57,7 @@ public class TestSudachiPartOfSpeechStopFilterFactory extends BaseTokenStreamTes
     @Test
     public void testBasics() throws IOException {
         String tags = "動詞,非自立可能\n";
-        Tokenizer tokenizer = new SudachiTokenizer(true, SplitMode.C, path, settings);
+        Tokenizer tokenizer = new SudachiTokenizer(true, SplitMode.C, path, settings, false);
         tokenizer.setReader(new StringReader("東京都に行った。"));
         @SuppressWarnings("serial")
         SudachiPartOfSpeechStopFilterFactory factory

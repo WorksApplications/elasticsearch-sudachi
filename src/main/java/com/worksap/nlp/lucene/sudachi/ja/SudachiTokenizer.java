@@ -61,18 +61,18 @@ public final class SudachiTokenizer extends
     private int sentenceLength = 0;
 
     public SudachiTokenizer(boolean discardPunctuation, Tokenizer.SplitMode mode,
-            String resourcesPath, String settings) throws IOException {
+            String resourcesPath, String settings, boolean mergeSettings) throws IOException {
         this(DEFAULT_TOKEN_ATTRIBUTE_FACTORY, discardPunctuation, mode,
-                resourcesPath, settings);
+                resourcesPath, settings, mergeSettings);
     }
 
     public SudachiTokenizer(AttributeFactory factory,
-            boolean discardPunctuation, Tokenizer.SplitMode mode, String path, String settings)
+            boolean discardPunctuation, Tokenizer.SplitMode mode, String path, String settings, boolean mergeSettings)
             throws IOException {
         super(factory);
         this.discardPunctuation = discardPunctuation;
         this.mode = mode;
-        dictionary = new DictionaryFactory().create(path, settings);
+        dictionary = new DictionaryFactory().create(path, settings, mergeSettings);
         tokenizer = dictionary.create();
 
         termAtt = addAttribute(CharTermAttribute.class);
