@@ -48,6 +48,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import static org.apache.lucene.analysis.BaseTokenStreamTestCase.assertTokenStreamContents;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -71,7 +72,7 @@ public class TestSudachiAnalysis {
         settings.put("index.analysis.tokenizer.sudachi_tokenizer.type", "sudachi_tokenizer");
         settings.put("index.analysis.tokenizer.sudachi_tokenizer.settings_path", "sudachi/sudachi.json");
 
-        Tokenizer tokenizer = createTestAnalyzer(settings).get("sudachi_tokenizer").create();
+        Tokenizer tokenizer = createTestTokenizers(settings).get("sudachi_tokenizer").create();
         tokenizer.setReader(new StringReader("東京へ行く。"));
         assertTerms(tokenizer, "東京", "へ", "行く");
     }
@@ -87,12 +88,24 @@ public class TestSudachiAnalysis {
         settings.put("index.analysis.tokenizer.sudachi_tokenizer.type", "sudachi_tokenizer");
         settings.put("index.analysis.tokenizer.sudachi_tokenizer.additional_settings", additional);
 
-        Tokenizer tokenizer = createTestAnalyzer(settings).get("sudachi_tokenizer").create();
+        Tokenizer tokenizer = createTestTokenizers(settings).get("sudachi_tokenizer").create();
         tokenizer.setReader(new StringReader("自然言語"));
         assertTerms(tokenizer, "自然", "言語");
     }
 
-    Map<String, TokenizerFactory> createTestAnalyzer(Map<String, String> settings) throws IOException {
+    @Test
+    public void analyzerProvider() throws IOException {
+        Settings indexSettings = Settings.builder().put(IndexMetadata.SETTING_VERSION_CREATED, Version.CURRENT).build();
+        Settings nodeSettings = Settings.builder().put(Environment.PATH_HOME_SETTING.getKey(), testFolder.getRoot().getPath()).build();
+        Environment env = TestEnvironment.newEnvironment(nodeSettings);
+        Settings settings = Settings.builder().put("settings_path", "sudachi/sudachi.json").build();
+        SudachiAnalyzerProvider provider = new SudachiAnalyzerProvider(IndexSettingsModule.newIndexSettings(new Index("test", "_na_"), indexSettings), env, "sudachi", settings);
+        try (TokenStream stream = provider.get().tokenStream("_na_", "東京へ行く。")) {
+            assertTokenStreamContents(stream, new String[] { "東京", "行く" });
+        }
+    }
+
+    Map<String, TokenizerFactory> createTestTokenizers(Map<String, String> settings) throws IOException {
         Settings.Builder builder = Settings.builder();
         settings.forEach((k, v) -> builder.put(k, v));
         builder.put(IndexMetadata.SETTING_VERSION_CREATED, Version.CURRENT);
