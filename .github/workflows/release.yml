@@ -51,7 +51,7 @@ jobs:
         name: upload_url
     - name: Extract upload URL
       id: extract_url
-      run: echo "::set-output name=upload_url::$(cat upload_url)"
+      run: echo "::set-output name=upload_url::$(cat upload_url.txt)"
     - name: Upload release asset
       id: upload_release_asset
       uses: actions/upload-release-asset@v1
