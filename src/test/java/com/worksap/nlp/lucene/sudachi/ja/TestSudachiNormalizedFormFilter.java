@@ -53,7 +53,7 @@ public class TestSudachiNormalizedFormFilter extends BaseTokenStreamTestCase {
             settings = ResourceUtil.getSudachiSetting(is);
         }
 
-        tokenStream = new SudachiTokenizer(true, SplitMode.C, tempFileForDictionary.getPath(), settings);
+        tokenStream = new SudachiTokenizer(true, SplitMode.C, tempFileForDictionary.getPath(), settings, false);
         factory = new SudachiNormalizedFormFilterFactory(Collections.emptyMap());
     }
 

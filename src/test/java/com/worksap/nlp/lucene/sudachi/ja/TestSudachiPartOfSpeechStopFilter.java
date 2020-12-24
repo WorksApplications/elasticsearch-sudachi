@@ -54,7 +54,7 @@ public class TestSudachiPartOfSpeechStopFilter extends BaseTokenStreamTestCase {
             settings = ResourceUtil.getSudachiSetting(is);
         }
 
-        tokenStream = new SudachiTokenizer(true, SplitMode.A, tempFileForDictionary.getPath(), settings);
+        tokenStream = new SudachiTokenizer(true, SplitMode.A, tempFileForDictionary.getPath(), settings, false);
         ((Tokenizer)tokenStream).setReader(new StringReader("東京都に行った。"));
         factory = new SudachiPartOfSpeechStopFilterFactory(new HashMap<String, String>() {{ put("tags", "stoptags.txt"); }});
     }

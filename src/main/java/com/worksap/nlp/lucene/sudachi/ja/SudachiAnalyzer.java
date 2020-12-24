@@ -36,20 +36,22 @@ public class SudachiAnalyzer extends StopwordAnalyzerBase {
     private final SplitMode mode;
     private final String resourcesPath;
     private final String settings;
+    private final boolean mergeSettings;
     private final PartOfSpeechTrie stoptags;
 
     public SudachiAnalyzer() {
-        this(SudachiTokenizer.DEFAULT_MODE, "", null,
+        this(SudachiTokenizer.DEFAULT_MODE, "", null, false,
                 DefaultSetHolder.DEFAULT_STOP_SET,
                 DefaultSetHolder.DEFAULT_STOP_TAGS);
     }
 
-    public SudachiAnalyzer(SplitMode mode, String resourcesPath, String settings,
+    public SudachiAnalyzer(SplitMode mode, String resourcesPath, String settings, boolean mergeSettings,
             CharArraySet stopwords, PartOfSpeechTrie stoptags) {
         super(stopwords);
         this.mode = mode;
         this.resourcesPath = resourcesPath;
         this.settings = settings;
+        this.mergeSettings = mergeSettings;
         this.stoptags = stoptags;
     }
 
@@ -88,7 +90,7 @@ public class SudachiAnalyzer extends StopwordAnalyzerBase {
     protected TokenStreamComponents createComponents(String fieldName) {
         Tokenizer tokenizer = null;
         try {
-            tokenizer = new SudachiTokenizer(true, mode, resourcesPath, settings);
+            tokenizer = new SudachiTokenizer(true, mode, resourcesPath, settings, mergeSettings);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

@@ -34,21 +34,15 @@ public class SudachiAnalyzerProvider extends
 
     private final SudachiAnalyzer analyzer;
 
-    public SudachiAnalyzerProvider(IndexSettings indexSettings,
-            Environment env, String name, Settings settings) throws IOException {
+    public SudachiAnalyzerProvider(IndexSettings indexSettings, Environment env, String name, Settings settings) throws IOException {
         super(indexSettings, name, settings);
-        final Set<?> stopWords = Analysis.parseStopWords(env, settings,
-                SudachiAnalyzer.getDefaultStopSet(), false);
-        final SplitMode mode = SudachiTokenizerFactory
-                .getMode(settings);
-        final String resourcesPath = new SudachiPathResolver(env.configFile()
-                .toString(), settings.get("resources_path", "sudachi"))
-                .resolvePathForDirectory();
-        final String settingsPath = new SudachiSettingsReader(env.configFile()
-                .toString(), settings.get("settings_path")).read();
-        analyzer = new SudachiAnalyzer(mode, resourcesPath, settingsPath,
-                CharArraySet.copy(stopWords),
-                SudachiAnalyzer.getDefaultStopTags());
+        final Set<?> stopWords = Analysis.parseStopWords(env, settings, SudachiAnalyzer.getDefaultStopSet(), false);
+        final SplitMode mode = SudachiTokenizerFactory.getMode(settings);
+        final String resourcesPath = SudachiTokenizerFactory.getResourcesPath(env, settings);
+        final String[] settingsStrings = SudachiTokenizerFactory.getSettingsJSON(env, settings);
+        final String settingsJSON = settingsStrings[0];
+        final boolean mergeSettings = settingsStrings[1].equals("true");
+        analyzer = new SudachiAnalyzer(mode, resourcesPath, settingsJSON, mergeSettings, CharArraySet.copy(stopWords), SudachiAnalyzer.getDefaultStopTags());
     }
 
     @Override

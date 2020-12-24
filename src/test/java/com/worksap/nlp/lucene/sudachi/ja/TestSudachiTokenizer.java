@@ -38,31 +38,30 @@ public class TestSudachiTokenizer extends BaseTokenStreamTestCase {
     private SudachiTokenizer tokenizerA;
     private SudachiTokenizer tokenizerB;
     private SudachiTokenizer tokenizerPunctuation;
+    private File tempFolderForDictionary;
 
     @Rule
-    public TemporaryFolder tempFolderForDictionary = new TemporaryFolder();
+    public TemporaryFolder tempFolder = new TemporaryFolder();
 
     @Before
     public void setup() throws IOException {
-        tempFolderForDictionary.create();
-        File tempFileForDictionary = tempFolderForDictionary
-                .newFolder("sudachiDictionary");
-        ResourceUtil.copy(tempFileForDictionary);
+        tempFolder.create();
+        tempFolderForDictionary = tempFolder.newFolder("sudachiDictionary");
+        ResourceUtil.copy(tempFolderForDictionary);
 
         String settings;
-        try(InputStream is = this.getClass()
-                .getResourceAsStream("sudachi.json");){
+        try(InputStream is = this.getClass().getResourceAsStream("sudachi.json")){
             settings = ResourceUtil.getSudachiSetting(is);
         }
 
         tokenizer = new SudachiTokenizer(true, SplitMode.C,
-                tempFileForDictionary.getPath(), settings);
+                tempFolderForDictionary.getPath(), settings, false);
         tokenizerA = new SudachiTokenizer(true, SplitMode.A,
-                tempFileForDictionary.getPath(), settings);
+                tempFolderForDictionary.getPath(), settings, false);
         tokenizerB = new SudachiTokenizer(true, SplitMode.B,
-                tempFileForDictionary.getPath(), settings);
+                tempFolderForDictionary.getPath(), settings, false);
         tokenizerPunctuation = new SudachiTokenizer(false,
-                SplitMode.C, tempFileForDictionary.getPath(), settings);
+                SplitMode.C, tempFolderForDictionary.getPath(), settings, false);
     }
 
     @Test
@@ -187,5 +186,33 @@ public class TestSudachiTokenizer extends BaseTokenStreamTestCase {
                                   new int[] { 1, 1, 1, 1 },
                                   new int[] { 1, 1, 1, 1 },
                                   8);
+    }
+
+    @Test
+    public void additionalSettings() throws IOException {
+        tokenizer.setReader(new StringReader("自然言語"));
+        assertTokenStreamContents(tokenizer,
+                                  new String[] { "自然言語" },
+                                  new int[] { 0 },
+                                  new int[] { 4 },
+                                  new int[] { 1 },
+                                  new int[] { 1 },
+                                  4);
+
+        // use MeCabOovProviderPlugin
+        String additional;
+        try (InputStream is = this.getClass().getResourceAsStream("additional.json")) {
+            additional = ResourceUtil.getSudachiSetting(is);
+        }
+        ResourceUtil.copyResource("unk.def", tempFolderForDictionary, false);
+        tokenizer = new SudachiTokenizer(true, SplitMode.C, tempFolderForDictionary.getPath(), additional, true);
+        tokenizer.setReader(new StringReader("自然言語"));
+        assertTokenStreamContents(tokenizer,
+                                  new String[] { "自然", "言語" },
+                                  new int[] { 0, 2 },
+                                  new int[] { 2, 4 },
+                                  new int[] { 1, 1 },
+                                  new int[] { 1, 1 },
+                                  4);
     }
 }

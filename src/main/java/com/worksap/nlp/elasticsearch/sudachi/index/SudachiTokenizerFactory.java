@@ -31,22 +31,24 @@ import com.worksap.nlp.sudachi.Tokenizer.SplitMode;
 public class SudachiTokenizerFactory extends AbstractTokenizerFactory {
     private static final String SPLIT_MODE_PARAM = "split_mode";
     private static final String MODE_PARAM = "mode";
+    private static final String ADDITIONAL_SETTINGS_PARAM = "additional_settings";
 
     private final SplitMode mode;
     private final boolean discardPunctuation;
     private final String resourcesPath;
-    private final String settingsPath;
-    
+    private final String settingsJSON;
+    private final boolean mergeSettings;
 
     public SudachiTokenizerFactory(IndexSettings indexSettings,
             Environment env, String name, Settings settings) throws IOException {
         super(indexSettings, settings, name);
         mode = getMode(settings);
         discardPunctuation = settings.getAsBoolean("discard_punctuation", true);
-        resourcesPath = new SudachiPathResolver(env.configFile().toString(), 
-                settings.get("resources_path", "sudachi")).resolvePathForDirectory();
-        settingsPath = new SudachiSettingsReader(env.configFile().toString(), 
-                settings.get("settings_path")).read();
+        resourcesPath = getResourcesPath(env, settings);
+
+        String[] settingsStrings = getSettingsJSON(env, settings);
+        settingsJSON = settingsStrings[0];
+        mergeSettings = settingsStrings[1].equals("true");
     }
 
     public static SplitMode getMode(Settings settings) {
@@ -69,11 +71,27 @@ public class SudachiTokenizerFactory extends AbstractTokenizerFactory {
         return mode;
     }
 
+    public static String getResourcesPath(Environment env, Settings settings) {
+        return new SudachiPathResolver(env.configFile().toString(), settings.get("resources_path", "sudachi")).resolvePathForDirectory();
+    }
+
+    public static String[] getSettingsJSON(Environment env, Settings settings) {
+        String[] ret = new String[2];
+        if (settings.hasValue(ADDITIONAL_SETTINGS_PARAM)) {
+            ret[0] = settings.get(ADDITIONAL_SETTINGS_PARAM);
+            ret[1] = "true";
+        } else {
+            ret[0] = new SudachiSettingsReader(env.configFile().toString(), settings.get("settings_path")).read();
+            ret[1] = "false";
+        }
+        return ret;
+    }
+
     @Override
     public Tokenizer create() {
         SudachiTokenizer t = null;
         try {
-            t = new SudachiTokenizer(discardPunctuation, mode, resourcesPath, settingsPath);
+            t = new SudachiTokenizer(discardPunctuation, mode, resourcesPath, settingsJSON, mergeSettings);
         } catch (IOException e) {
             throw new ElasticsearchException("fail to make SudachiTokenizer", e);
         }
