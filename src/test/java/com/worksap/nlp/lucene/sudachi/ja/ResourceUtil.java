@@ -24,12 +24,12 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
-class ResourceUtil {
+public class ResourceUtil {
     static final String RESOURCE_NAME_SYSTEM_DIC = "system_core.dic";
 
     private ResourceUtil() {}
 
-    static String getSudachiSetting(InputStream is) throws IOException{
+    public static String getSudachiSetting(InputStream is) throws IOException{
         String settings;
         try (InputStreamReader ir = new InputStreamReader(is, StandardCharsets.UTF_8);
             BufferedReader br = new BufferedReader(ir)) {
@@ -43,11 +43,11 @@ class ResourceUtil {
         return settings;
     }
 
-    static void copy(File destDir) throws IOException {
+    public static void copy(File destDir) throws IOException {
         copyResource(RESOURCE_NAME_SYSTEM_DIC, destDir, false);
     }
 
-    static void copyResource(String filename, File destDir, boolean fromRoot)
+    public static void copyResource(String filename, File destDir, boolean fromRoot)
         throws IOException {
         String src = (fromRoot) ? "/" + filename : filename;
         try (InputStream stream = ResourceUtil.class.getResourceAsStream(src)) {
