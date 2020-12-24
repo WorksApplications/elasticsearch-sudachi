@@ -7,6 +7,9 @@ analysis-sudachi is an Elasticsearch plugin for tokenization of Japanese text us
 
 # What's new?
 
+- version 2.1.0
+    - Added a new property `additional_settings` to write Sudachi settings directly in config
+    - Added support for specifying Elasticsearch version at build time
 - version 2.0.3
     - Fix duplicated tokens for OOVs with `sudachi_split` filter's `extended mode`
 - version 2.0.2
@@ -76,6 +79,7 @@ analysis-sudachi is an Elasticsearch plugin for tokenization of Japanese text us
 - discard\_punctuation: Select to discard punctuation or not. (bool, default: true)
 - settings\_path: Sudachi setting file path. The path may be absolute or relative; relative paths are resolved with respect to es\_config. (string, default: null)
 - resources\_path: Sudachi dictionary path. The path may be absolute or relative; relative paths are resolved with respect to es\_config. (string, default: null)
+- additional_settings: Describes a configuration JSON string for Sudachi. This JSON string will be merged into the default configuration. If this property is set, `settings_path` will be ignored.
 
 ## Example
 ```json
@@ -89,6 +93,36 @@ analysis-sudachi is an Elasticsearch plugin for tokenization of Japanese text us
             "split_mode": "C",
             "discard_punctuation": true,
             "resources_path": "/etc/elasticsearch/sudachi"
+          }
+        },
+        "analyzer": {
+          "sudachi_analyzer": {
+            "filter": [],
+            "tokenizer": "sudachi_tokenizer",
+            "type": "custom"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+# Dictionary
+
+You can specify the dictionary either in the file specified by `settings_path` or by `additional_settings`.
+
+# Example
+
+```json
+{
+  "settings": {
+    "index": {
+      "analysis": {
+        "tokenizer": {
+          "sudachi_tokenizer": {
+            "type": "sudachi_tokenizer",
+            "additional_settings": "{\"systemDict\":\"system_full.dic\",\"userDict\":[\"user.dic\"]}"
           }
         },
         "analyzer": {
