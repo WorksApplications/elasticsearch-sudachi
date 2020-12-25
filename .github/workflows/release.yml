@@ -1,33 +1,11 @@
 name: Create release draft
 
 on:
-  push:
-    tags:
-      - 'v*'
+  release:
+    types: [create]
 
 jobs:
-  create_page:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Create release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        draft: true
-        prerelease: false
-    - run: echo ${{ steps.create_release.outputs.upload_url }} > upload_url.txt
-    - name: Upload URL
-      uses: actions/upload-artifact@v2
-      with:
-        name: upload_url
-        path: upload_url.txt
-
   deploy:
-    needs: create_page
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -46,19 +24,18 @@ jobs:
       run: chmod +x gradlew
     - name: Build ${{ matrix.es-version }}
       run: ./gradlew -PelasticsearchVersion=${{ matrix.es-version }} clean build
-    - uses: actions/download-artifact@v2
-      with:
-        name: upload_url
-    - name: Extract upload URL
-      id: extract_url
-      run: echo "::set-output name=upload_url::$(cat upload_url.txt)"
+    - name: Get release
+      id: get_release
+      uses: bruceadams/get-release@v1.2.2
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
     - name: Upload release asset
       id: upload_release_asset
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ steps.extract_url.outputs.upload_url }}
+        upload_url: ${{ steps.get_release.outputs.upload_url }}
         asset_path: build/distributions/analysis-sudachi-${{ matrix.es-version }}-${{ steps.tag.outputs.version }}.zip
         asset_name: analysis-sudachi-${{ matrix.es-version }}-${{ steps.tag.outputs.version }}.zip
         asset_content_type: application/zip
