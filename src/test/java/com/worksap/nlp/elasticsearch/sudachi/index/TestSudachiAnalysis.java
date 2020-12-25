@@ -34,7 +34,7 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.elasticsearch.Version;
-import org.elasticsearch.cluster.metadata.IndexMetadata;
+import org.elasticsearch.cluster.metadata.IndexMetaData;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.env.Environment;
 import org.elasticsearch.env.TestEnvironment;
@@ -95,7 +95,7 @@ public class TestSudachiAnalysis {
 
     @Test
     public void analyzerProvider() throws IOException {
-        Settings indexSettings = Settings.builder().put(IndexMetadata.SETTING_VERSION_CREATED, Version.CURRENT).build();
+        Settings indexSettings = Settings.builder().put(IndexMetaData.SETTING_VERSION_CREATED, Version.CURRENT).build();
         Settings nodeSettings = Settings.builder().put(Environment.PATH_HOME_SETTING.getKey(), testFolder.getRoot().getPath()).build();
         Environment env = TestEnvironment.newEnvironment(nodeSettings);
         Settings settings = Settings.builder().put("settings_path", "sudachi/sudachi.json").build();
@@ -108,7 +108,7 @@ public class TestSudachiAnalysis {
     Map<String, TokenizerFactory> createTestTokenizers(Map<String, String> settings) throws IOException {
         Settings.Builder builder = Settings.builder();
         settings.forEach((k, v) -> builder.put(k, v));
-        builder.put(IndexMetadata.SETTING_VERSION_CREATED, Version.CURRENT);
+        builder.put(IndexMetaData.SETTING_VERSION_CREATED, Version.CURRENT);
         Settings indexSettings = builder.build();
         Settings nodeSettings = Settings.builder().put(Environment.PATH_HOME_SETTING.getKey(), testFolder.getRoot().getPath()).build();
         Environment env = TestEnvironment.newEnvironment(nodeSettings);
