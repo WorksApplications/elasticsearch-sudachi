@@ -41,7 +41,7 @@ public class SudachiTokenizerFactory extends AbstractTokenizerFactory {
 
     public SudachiTokenizerFactory(IndexSettings indexSettings,
             Environment env, String name, Settings settings) throws IOException {
-        super(indexSettings, settings, name);
+        super(indexSettings, settings);
         mode = getMode(settings);
         discardPunctuation = settings.getAsBoolean("discard_punctuation", true);
         resourcesPath = getResourcesPath(env, settings);
