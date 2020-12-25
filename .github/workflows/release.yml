@@ -2,7 +2,7 @@ name: Create release draft
 
 on:
   release:
-    types: [create]
+    types: [created]
 
 jobs:
   deploy:
