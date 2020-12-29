@@ -44,6 +44,7 @@ task distZip(dependsOn: ['jar', 'embedVersion', 'copyDependencies'], type: Zip) 
     archiveBaseName = archivesBaseName
     appendix = elasticsearchVersion
     from 'build/libs/', 'build/descriptor', 'LICENSE', 'README.md'
+    into 'elasticsearch'
 }
 
 artifacts {

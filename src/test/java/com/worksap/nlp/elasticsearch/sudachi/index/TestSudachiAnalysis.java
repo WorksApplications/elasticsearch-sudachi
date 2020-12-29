@@ -37,7 +37,6 @@ import org.elasticsearch.Version;
 import org.elasticsearch.cluster.metadata.IndexMetaData;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.env.Environment;
-import org.elasticsearch.env.TestEnvironment;
 import org.elasticsearch.index.Index;
 import org.elasticsearch.index.analysis.AnalysisRegistry;
 import org.elasticsearch.index.analysis.TokenizerFactory;
@@ -97,7 +96,7 @@ public class TestSudachiAnalysis {
     public void analyzerProvider() throws IOException {
         Settings indexSettings = Settings.builder().put(IndexMetaData.SETTING_VERSION_CREATED, Version.CURRENT).build();
         Settings nodeSettings = Settings.builder().put(Environment.PATH_HOME_SETTING.getKey(), testFolder.getRoot().getPath()).build();
-        Environment env = TestEnvironment.newEnvironment(nodeSettings);
+        Environment env = new Environment(nodeSettings);
         Settings settings = Settings.builder().put("settings_path", "sudachi/sudachi.json").build();
         SudachiAnalyzerProvider provider = new SudachiAnalyzerProvider(IndexSettingsModule.newIndexSettings(new Index("test", "_na_"), indexSettings), env, "sudachi", settings);
         try (TokenStream stream = provider.get().tokenStream("_na_", "東京へ行く。")) {
@@ -111,7 +110,7 @@ public class TestSudachiAnalysis {
         builder.put(IndexMetaData.SETTING_VERSION_CREATED, Version.CURRENT);
         Settings indexSettings = builder.build();
         Settings nodeSettings = Settings.builder().put(Environment.PATH_HOME_SETTING.getKey(), testFolder.getRoot().getPath()).build();
-        Environment env = TestEnvironment.newEnvironment(nodeSettings);
+        Environment env = new Environment(nodeSettings);
         AnalysisModule analysisModule = new AnalysisModule(env, Collections.singletonList(new AnalysisSudachiPlugin()));
         AnalysisRegistry analysisRegistry = analysisModule.getAnalysisRegistry();
         return analysisRegistry.buildTokenizerFactories(IndexSettingsModule.newIndexSettings(new Index("test", "_na_"), indexSettings));
