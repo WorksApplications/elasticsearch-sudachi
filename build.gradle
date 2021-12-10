@@ -19,7 +19,7 @@ repositories {
 dependencies {
     implementation 'com.worksap.nlp:sudachi:0.5.3', "org.elasticsearch.client:transport:${elasticsearchVersion}"
     testImplementation "org.elasticsearch.test:framework:${elasticsearchVersion}"
-    testRuntimeOnly "org.apache.logging.log4j:log4j-core:2.11.1"
+    testRuntimeOnly "org.apache.logging.log4j:log4j-core:2.15.0"
 }
 
 def buildTestDict = tasks.register('buildTestDict', JavaExec) {
