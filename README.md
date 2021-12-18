@@ -57,11 +57,14 @@ analysis-sudachi is an Elasticsearch plugin for tokenization of Japanese text us
    $ ./gradlew -PelasticsearchVersion=7.10.1 build
 ```
 
-- `develop` branch: for Elasticsearch 7.8 or later
-- `es7.4-7.7` branch: for Elasticsearch 7.4, 7.5, 7.6, 7.7
-- `es7.0-7.3` branch: for Elasticsearch 7.0, 7.1, 7.2, 7.3
-- `es6.8` branch: for Elasticsearch 6.8
-- `es5.6` branch: for Elasticsearch 5.6
+2. You will run "bin/elasticsearch-plugin install build/distributions/analysis-sudachi-7.10.1-2.1.1-SNAPSHOT.zip" to install the generated plugin, for example.
+
+- ES versions and branches
+  - `develop` branch: for Elasticsearch 7.8 or later
+  - `es7.4-7.7` branch: for Elasticsearch 7.4, 7.5, 7.6, 7.7
+  - `es7.0-7.3` branch: for Elasticsearch 7.0, 7.1, 7.2, 7.3
+  - `es6.8` branch: for Elasticsearch 6.8
+  - `es5.6` branch: for Elasticsearch 5.6
 
 # Installation
 
