@@ -50,7 +50,7 @@ analysis-sudachi is an Elasticsearch plugin for tokenization of Japanese text us
 - version 1.0.0
     - first release
 
-# Build
+# Build (if necessary)
 
 1. Build analysis-sudachi.
 ```
@@ -65,13 +65,22 @@ analysis-sudachi is an Elasticsearch plugin for tokenization of Japanese text us
 
 # Installation
 
-1. Download analysis-sudachi-elasticsearch zip archive file
-2. Move current dir to $ES_HOME
-3. Execute "bin/elasticsearch-plugin install file:///plugin-zip-path"
-4. Download sudachi dictionary archive from https://github.com/WorksApplications/SudachiDict
-5. Extract dic file and place it to config/sudachi/system_core.dic
+1. Move current dir to $ES_HOME
+2. Install the Plugin
+
+   a. Using the release package
+   ```
+   $ bin/elasticsearch-plugin install https://github.com/WorksApplications/elasticsearch-sudachi/releases/download/v2.1.0/analysis-sudachi-7.10.1-2.1.0.zip
+   ```
+   b. Using self-build package
+   ```
+   $ bin/elasticsearch-plugin install file:///path/to/analysis-sudachi-7.10.1-2.1.1-SNAPSHOT.zip
+   ```
+   (Specify the absolute path in URI format)
+3. Download sudachi dictionary archive from https://github.com/WorksApplications/SudachiDict
+4. Extract dic file and place it to config/sudachi/system_core.dic
    (You must install system_core.dic in this place if you use Elasticsearch 7.6 or later)
-6. Execute "bin/elasticsearch"
+5. Execute "bin/elasticsearch"
 
 # Configuration
 
