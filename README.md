@@ -82,6 +82,14 @@ analysis-sudachi is an Elasticsearch plugin for tokenization of Japanese text us
    (You must install system_core.dic in this place if you use Elasticsearch 7.6 or later)
 5. Execute "bin/elasticsearch"
 
+## Update Sudachi
+
+If you want to update Sudachi that is included in a plugin you have installed, do the following
+
+1. Download the latest version of Sudachi from [the release page](https://github.com/WorksApplications/Sudachi/releases).
+2. Extract the Sudachi JAR file from the zip.
+3. Delete the sudachi JAR file in $ES_HOME/plugins/analysis-sudachi and replace it with the JAR file you extracted in step 2.
+
 # Configuration
 
 - split_mode: Select splitting mode of Sudachi. (A, B, C) (string, default: C)
