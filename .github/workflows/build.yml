@@ -29,10 +29,13 @@ jobs:
     - name: Build and analyze # This stage sets up gradle caching
       uses: eskatos/gradle-command-action@v2
       with:
-        arguments: clean build jacocoTestReport sonarqube
+        arguments: --info clean build jacocoTestReport sonarqube
+        cache-read-only: false # ${{ github.ref != 'refs/heads/develop' }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-    - name: Check code formatting
-      run: ./gradlew spotlessCheck
-
+    - uses: actions/upload-artifact@v3
+      if: failure()
+      with:
+        name: failure reports
+        path: build/reports
