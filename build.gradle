@@ -10,14 +10,17 @@ version = '2.1.1-SNAPSHOT'
 
 tasks.withType(JavaCompile) {
     options.release = 8
+    options.encoding = 'UTF-8'
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 
 dependencies {
-    implementation 'com.worksap.nlp:sudachi:0.5.3', "org.elasticsearch.client:transport:${elasticsearchVersion}"
+    implementation 'com.worksap.nlp:sudachi:0.6.1'
+    implementation "org.elasticsearch.client:transport:${elasticsearchVersion}"
     testImplementation "org.elasticsearch.test:framework:${elasticsearchVersion}"
     testRuntimeOnly "org.apache.logging.log4j:log4j-core:2.17.1"
 }
