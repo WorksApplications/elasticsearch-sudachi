@@ -22,7 +22,7 @@ dependencies {
     implementation 'com.worksap.nlp:sudachi:0.6.1'
     implementation "org.elasticsearch.client:transport:${elasticsearchVersion}"
     testImplementation "org.elasticsearch.test:framework:${elasticsearchVersion}"
-    testRuntimeOnly "org.apache.logging.log4j:log4j-core:2.17.1"
+    testRuntimeOnly 'org.apache.logging.log4j:log4j-core:2.17.2'
 }
 
 def buildTestDict = tasks.register('buildTestDict', JavaExec) {
@@ -46,7 +46,7 @@ def copyDependencies = tasks.register('copyDependencies', Copy) {
 }
 
 def distZip = tasks.register('distZip', Zip) {
-    dependsOn 'jar', embedVersion, copyDependencies
+    dependsOn tasks.jar, embedVersion, copyDependencies
     archiveBaseName = archivesBaseName
     archiveAppendix = elasticsearchVersion
     from 'build/libs/', 'build/descriptor', 'LICENSE', 'README.md'
