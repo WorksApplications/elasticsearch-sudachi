@@ -36,6 +36,7 @@ import com.worksap.nlp.sudachi.DictionaryFactory;
 import com.worksap.nlp.sudachi.Morpheme;
 import com.worksap.nlp.sudachi.Tokenizer;
 
+@SuppressWarnings("jol")
 public final class SudachiTokenizer extends
         org.apache.lucene.analysis.Tokenizer {
     public static final Tokenizer.SplitMode DEFAULT_MODE = Tokenizer.SplitMode.C;
