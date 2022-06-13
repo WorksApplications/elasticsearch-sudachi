@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2017 Works Applications Co., Ltd.
+ * Copyright (c) 2017-2022 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,8 +37,7 @@ import com.worksap.nlp.sudachi.Morpheme;
 import com.worksap.nlp.sudachi.Tokenizer;
 
 @SuppressWarnings("jol")
-public final class SudachiTokenizer extends
-        org.apache.lucene.analysis.Tokenizer {
+public final class SudachiTokenizer extends org.apache.lucene.analysis.Tokenizer {
     public static final Tokenizer.SplitMode DEFAULT_MODE = Tokenizer.SplitMode.C;
 
     private final boolean discardPunctuation;
@@ -61,15 +60,13 @@ public final class SudachiTokenizer extends
     private int baseOffset = 0;
     private int sentenceLength = 0;
 
-    public SudachiTokenizer(boolean discardPunctuation, Tokenizer.SplitMode mode,
-            String resourcesPath, String settings, boolean mergeSettings) throws IOException {
-        this(DEFAULT_TOKEN_ATTRIBUTE_FACTORY, discardPunctuation, mode,
-                resourcesPath, settings, mergeSettings);
+    public SudachiTokenizer(boolean discardPunctuation, Tokenizer.SplitMode mode, String resourcesPath, String settings,
+            boolean mergeSettings) throws IOException {
+        this(DEFAULT_TOKEN_ATTRIBUTE_FACTORY, discardPunctuation, mode, resourcesPath, settings, mergeSettings);
     }
 
-    public SudachiTokenizer(AttributeFactory factory,
-            boolean discardPunctuation, Tokenizer.SplitMode mode, String path, String settings, boolean mergeSettings)
-            throws IOException {
+    public SudachiTokenizer(AttributeFactory factory, boolean discardPunctuation, Tokenizer.SplitMode mode, String path,
+            String settings, boolean mergeSettings) throws IOException {
         super(factory);
         this.discardPunctuation = discardPunctuation;
         this.mode = mode;
@@ -133,8 +130,7 @@ public final class SudachiTokenizer extends
         posAtt.setMorpheme(morpheme);
         readingAtt.setMorpheme(morpheme);
         splitAtt.setMorpheme(morpheme);
-        offsetAtt.setOffset(correctOffset(baseOffset + morpheme.begin()),
-                            correctOffset(baseOffset + morpheme.end()));
+        offsetAtt.setOffset(correctOffset(baseOffset + morpheme.begin()), correctOffset(baseOffset + morpheme.end()));
         termAtt.append(morpheme.surface());
     }
 
@@ -143,35 +139,35 @@ public final class SudachiTokenizer extends
             return false;
         }
         return str.codePoints().allMatch(c -> {
-                switch (Character.getType(c)) {
-                case Character.SPACE_SEPARATOR:
-                case Character.LINE_SEPARATOR:
-                case Character.PARAGRAPH_SEPARATOR:
-                case Character.CONTROL:
-                case Character.FORMAT:
-                case Character.DASH_PUNCTUATION:
-                case Character.START_PUNCTUATION:
-                case Character.END_PUNCTUATION:
-                case Character.CONNECTOR_PUNCTUATION:
-                case Character.OTHER_PUNCTUATION:
-                case Character.MATH_SYMBOL:
-                case Character.CURRENCY_SYMBOL:
-                case Character.MODIFIER_SYMBOL:
-                case Character.OTHER_SYMBOL:
-                case Character.INITIAL_QUOTE_PUNCTUATION:
-                case Character.FINAL_QUOTE_PUNCTUATION:
-                    return true;
-                default:
-                    return false;
-                }
-            });
+            switch (Character.getType(c)) {
+            case Character.SPACE_SEPARATOR:
+            case Character.LINE_SEPARATOR:
+            case Character.PARAGRAPH_SEPARATOR:
+            case Character.CONTROL:
+            case Character.FORMAT:
+            case Character.DASH_PUNCTUATION:
+            case Character.START_PUNCTUATION:
+            case Character.END_PUNCTUATION:
+            case Character.CONNECTOR_PUNCTUATION:
+            case Character.OTHER_PUNCTUATION:
+            case Character.MATH_SYMBOL:
+            case Character.CURRENCY_SYMBOL:
+            case Character.MODIFIER_SYMBOL:
+            case Character.OTHER_SYMBOL:
+            case Character.INITIAL_QUOTE_PUNCTUATION:
+            case Character.FINAL_QUOTE_PUNCTUATION:
+                return true;
+            default:
+                return false;
+            }
+        });
     }
 
     @Override
     public final void end() throws IOException {
         super.end();
         int lastOffset = correctOffset(baseOffset + sentenceLength);
-        offsetAtt.setOffset(lastOffset , lastOffset);
+        offsetAtt.setOffset(lastOffset, lastOffset);
     }
 
     @Override
