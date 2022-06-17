@@ -36,7 +36,7 @@ import com.worksap.nlp.sudachi.DictionaryFactory;
 import com.worksap.nlp.sudachi.Morpheme;
 import com.worksap.nlp.sudachi.Tokenizer;
 
-@SuppressWarnings({"jol", "java:S1206"})
+@SuppressWarnings({ "jol" })
 public final class SudachiTokenizer extends org.apache.lucene.analysis.Tokenizer {
     public static final Tokenizer.SplitMode DEFAULT_MODE = Tokenizer.SplitMode.C;
 
@@ -176,5 +176,17 @@ public final class SudachiTokenizer extends org.apache.lucene.analysis.Tokenizer
         baseOffset = 0;
         sentenceLength = 0;
         morphemeIterator = null;
+    }
+
+    // to safisfy sonarcloud
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    // to satisfy sonarcloud
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
     }
 }
