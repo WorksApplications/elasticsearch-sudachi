@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2020 Works Applications Co., Ltd.
+ * Copyright (c) 2020-2022 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,15 +19,15 @@ package com.worksap.nlp.lucene.sudachi.ja;
 import java.util.Locale;
 import java.util.Map;
 
+import com.worksap.nlp.lucene.sudachi.aliases.TokenFilterFactory;
 import com.worksap.nlp.lucene.sudachi.ja.SudachiSplitFilter.Mode;
 
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.util.TokenFilterFactory;
 
 public class SudachiSplitFilterFactory extends TokenFilterFactory {
     private static final String MODE_PARAM = "mode";
     private final Mode mode;
-    
+
     public SudachiSplitFilterFactory(Map<String, String> args) {
         super(args);
         mode = Mode.valueOf(get(args, MODE_PARAM, SudachiSplitFilter.DEFAULT_MODE.toString()).toUpperCase(Locale.ROOT));

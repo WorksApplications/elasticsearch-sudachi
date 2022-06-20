@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2019 Works Applications Co., Ltd.
+ * Copyright (c) 2019-2022 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,12 +23,12 @@ import java.io.StringReader;
 import java.util.Collections;
 import java.util.HashMap;
 
+import com.worksap.nlp.lucene.sudachi.aliases.BaseTokenStreamTestCase;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import org.apache.lucene.analysis.BaseTokenStreamTestCase;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
 
@@ -44,8 +44,7 @@ public class TestSudachiReadingFormFilter extends BaseTokenStreamTestCase {
     public void setUp() throws Exception {
         super.setUp();
         tempFolderForDictionary.create();
-        File tempFileForDictionary = tempFolderForDictionary
-                .newFolder("sudachiDictionary");
+        File tempFileForDictionary = tempFolderForDictionary.newFolder("sudachiDictionary");
         ResourceUtil.copy(tempFileForDictionary);
 
         String settings;
@@ -59,17 +58,21 @@ public class TestSudachiReadingFormFilter extends BaseTokenStreamTestCase {
     @Test
     public void testReadingForm() throws IOException {
         SudachiReadingFormFilterFactory factory = new SudachiReadingFormFilterFactory(Collections.emptyMap());
-        ((Tokenizer)tokenStream).setReader(new StringReader("東京都に行った。"));
+        ((Tokenizer) tokenStream).setReader(new StringReader("東京都に行った。"));
         tokenStream = factory.create(tokenStream);
-        assertTokenStreamContents(tokenStream, new String[] {"トウキョウト", "ニ", "イッ", "タ"});
+        assertTokenStreamContents(tokenStream, new String[] { "トウキョウト", "ニ", "イッ", "タ" });
     }
 
     @Test
     public void testRomanizedReadingForm() throws IOException {
         @SuppressWarnings("serial")
-        SudachiReadingFormFilterFactory factory = new SudachiReadingFormFilterFactory(new HashMap<String, String>() {{ put("useRomaji", "true"); }});
-        ((Tokenizer)tokenStream).setReader(new StringReader("東京都に行った。"));
+        SudachiReadingFormFilterFactory factory = new SudachiReadingFormFilterFactory(new HashMap<String, String>() {
+            {
+                put("useRomaji", "true");
+            }
+        });
+        ((Tokenizer) tokenStream).setReader(new StringReader("東京都に行った。"));
         tokenStream = factory.create(tokenStream);
-        assertTokenStreamContents(tokenStream, new String[] {"toukyouto", "ni", "iltu", "ta"});
+        assertTokenStreamContents(tokenStream, new String[] { "toukyouto", "ni", "iltu", "ta" });
     }
 }

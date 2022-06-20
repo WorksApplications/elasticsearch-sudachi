@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2020 Works Applications Co., Ltd.
+ * Copyright (c) 2020-2022 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.worksap.nlp.elasticsearch.sudachi.plugin.AnalysisSudachiPlugin;
+import com.worksap.nlp.lucene.sudachi.aliases.BaseTokenStreamTestCase;
 import com.worksap.nlp.lucene.sudachi.ja.ResourceUtil;
 
 import org.apache.lucene.analysis.TokenStream;
@@ -48,22 +49,21 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import static org.apache.lucene.analysis.BaseTokenStreamTestCase.assertTokenStreamContents;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 
-public class TestSudachiAnalysis {
+public class TestSudachiAnalysis extends BaseTokenStreamTestCase {
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
 
     @Before
-    public void setUp() throws IOException {
+    public void setUp() throws Exception {
         testFolder.create();
         File sudachiFolder = testFolder.newFolder("config", "sudachi");
         ResourceUtil.copy(sudachiFolder);
         ResourceUtil.copyResource("sudachi.json", sudachiFolder, false);
         ResourceUtil.copyResource("unk.def", sudachiFolder, false);
+        super.setUp();
     }
 
     @Test
@@ -96,10 +96,13 @@ public class TestSudachiAnalysis {
     @Test
     public void analyzerProvider() throws IOException {
         Settings indexSettings = Settings.builder().put(IndexMetadata.SETTING_VERSION_CREATED, Version.CURRENT).build();
-        Settings nodeSettings = Settings.builder().put(Environment.PATH_HOME_SETTING.getKey(), testFolder.getRoot().getPath()).build();
+        Settings nodeSettings = Settings.builder()
+                .put(Environment.PATH_HOME_SETTING.getKey(), testFolder.getRoot().getPath()).build();
         Environment env = TestEnvironment.newEnvironment(nodeSettings);
         Settings settings = Settings.builder().put("settings_path", "sudachi/sudachi.json").build();
-        SudachiAnalyzerProvider provider = new SudachiAnalyzerProvider(IndexSettingsModule.newIndexSettings(new Index("test", "_na_"), indexSettings), env, "sudachi", settings);
+        SudachiAnalyzerProvider provider = new SudachiAnalyzerProvider(
+                IndexSettingsModule.newIndexSettings(new Index("test", "_na_"), indexSettings), env, "sudachi",
+                settings);
         try (TokenStream stream = provider.get().tokenStream("_na_", "東京へ行く。")) {
             assertTokenStreamContents(stream, new String[] { "東京", "行く" });
         }
@@ -107,14 +110,16 @@ public class TestSudachiAnalysis {
 
     Map<String, TokenizerFactory> createTestTokenizers(Map<String, String> settings) throws IOException {
         Settings.Builder builder = Settings.builder();
-        settings.forEach((k, v) -> builder.put(k, v));
+        settings.forEach(builder::put);
         builder.put(IndexMetadata.SETTING_VERSION_CREATED, Version.CURRENT);
         Settings indexSettings = builder.build();
-        Settings nodeSettings = Settings.builder().put(Environment.PATH_HOME_SETTING.getKey(), testFolder.getRoot().getPath()).build();
+        Settings nodeSettings = Settings.builder()
+                .put(Environment.PATH_HOME_SETTING.getKey(), testFolder.getRoot().getPath()).build();
         Environment env = TestEnvironment.newEnvironment(nodeSettings);
         AnalysisModule analysisModule = new AnalysisModule(env, Collections.singletonList(new AnalysisSudachiPlugin()));
         AnalysisRegistry analysisRegistry = analysisModule.getAnalysisRegistry();
-        return analysisRegistry.buildTokenizerFactories(IndexSettingsModule.newIndexSettings(new Index("test", "_na_"), indexSettings));
+        return analysisRegistry.buildTokenizerFactories(
+                IndexSettingsModule.newIndexSettings(new Index("test", "_na_"), indexSettings));
     }
 
     static void assertTerms(TokenStream stream, String... expected) throws IOException {

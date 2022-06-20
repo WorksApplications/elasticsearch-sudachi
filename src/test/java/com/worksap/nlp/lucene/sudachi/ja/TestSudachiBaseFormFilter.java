@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2018 Works Applications Co., Ltd.
+ * Copyright (c) 2018-2022 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,12 +22,12 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.util.Collections;
 
+import com.worksap.nlp.lucene.sudachi.aliases.BaseTokenStreamTestCase;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import org.apache.lucene.analysis.BaseTokenStreamTestCase;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
 
@@ -44,8 +44,7 @@ public class TestSudachiBaseFormFilter extends BaseTokenStreamTestCase {
     public void setUp() throws Exception {
         super.setUp();
         tempFolderForDictionary.create();
-        File tempFileForDictionary = tempFolderForDictionary
-                .newFolder("sudachiDictionary");
+        File tempFileForDictionary = tempFolderForDictionary.newFolder("sudachiDictionary");
         ResourceUtil.copy(tempFileForDictionary);
 
         String settings;
@@ -59,16 +58,16 @@ public class TestSudachiBaseFormFilter extends BaseTokenStreamTestCase {
 
     @Test
     public void testBaseForm() throws IOException {
-        ((Tokenizer)tokenStream).setReader(new StringReader("東京都に行った。"));
+        ((Tokenizer) tokenStream).setReader(new StringReader("東京都に行った。"));
         tokenStream = factory.create(tokenStream);
-        assertTokenStreamContents(tokenStream, new String[] {"東京都", "に", "行く", "た"});
+        assertTokenStreamContents(tokenStream, new String[] { "東京都", "に", "行く", "た" });
     }
 
     @Test
     public void testBaseFormWithUnnormalizedWord() throws IOException {
-        ((Tokenizer)tokenStream).setReader(new StringReader("東京都にいった。"));
+        ((Tokenizer) tokenStream).setReader(new StringReader("東京都にいった。"));
         tokenStream = factory.create(tokenStream);
-        assertTokenStreamContents(tokenStream, new String[] {"東京都", "に", "いく", "た"});
+        assertTokenStreamContents(tokenStream, new String[] { "東京都", "に", "いく", "た" });
     }
 
 }

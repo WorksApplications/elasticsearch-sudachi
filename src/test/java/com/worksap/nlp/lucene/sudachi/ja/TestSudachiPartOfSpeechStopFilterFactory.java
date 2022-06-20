@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2018 Works Applications Co., Ltd.
+ * Copyright (c) 2018-2022 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,12 +22,12 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.util.HashMap;
 
+import com.worksap.nlp.lucene.sudachi.aliases.BaseTokenStreamTestCase;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import org.apache.lucene.analysis.BaseTokenStreamTestCase;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
 
@@ -44,8 +44,7 @@ public class TestSudachiPartOfSpeechStopFilterFactory extends BaseTokenStreamTes
     public void setUp() throws Exception {
         super.setUp();
         tempFolderForDictionary.create();
-        File tempFileForDictionary = tempFolderForDictionary
-                .newFolder("sudachiDictionary");
+        File tempFileForDictionary = tempFolderForDictionary.newFolder("sudachiDictionary");
         ResourceUtil.copy(tempFileForDictionary);
         path = tempFileForDictionary.getPath();
 
@@ -60,20 +59,27 @@ public class TestSudachiPartOfSpeechStopFilterFactory extends BaseTokenStreamTes
         Tokenizer tokenizer = new SudachiTokenizer(true, SplitMode.C, path, settings, false);
         tokenizer.setReader(new StringReader("東京都に行った。"));
         @SuppressWarnings("serial")
-        SudachiPartOfSpeechStopFilterFactory factory
-            = new SudachiPartOfSpeechStopFilterFactory(new HashMap<String, String>() {{ put("tags", "stoptags.txt"); }});
+        SudachiPartOfSpeechStopFilterFactory factory = new SudachiPartOfSpeechStopFilterFactory(
+                new HashMap<String, String>() {
+                    {
+                        put("tags", "stoptags.txt");
+                    }
+                });
         factory.inform(new StringResourceLoader(tags));
         TokenStream ts = factory.create(tokenizer);
-        assertTokenStreamContents(ts,
-                                  new String[] {"東京都", "に", "た"});
+        assertTokenStreamContents(ts, new String[] { "東京都", "に", "た" });
     }
 
     @Test
     public void testBogusArguments() throws Exception {
         @SuppressWarnings("serial")
         IllegalArgumentException expected = expectThrows(IllegalArgumentException.class, () -> {
-                new SudachiPartOfSpeechStopFilterFactory(new HashMap<String, String>() {{ put("bogusArg", "bogusValue"); }});
+            new SudachiPartOfSpeechStopFilterFactory(new HashMap<String, String>() {
+                {
+                    put("bogusArg", "bogusValue");
+                }
             });
+        });
         assertTrue(expected.getMessage().contains("Unknown parameters"));
     }
 }
