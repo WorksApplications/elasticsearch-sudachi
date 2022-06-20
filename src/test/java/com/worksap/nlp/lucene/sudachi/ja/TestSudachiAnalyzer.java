@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2017 Works Applications Co., Ltd.
+ * Copyright (c) 2017-2022 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.worksap.nlp.lucene.test.Top_docsKt;
 import com.worksap.nlp.sudachi.Tokenizer;
 
 import org.apache.lucene.document.Field;
@@ -68,15 +69,12 @@ public class TestSudachiAnalyzer {
         ResourceUtil.copy(tempFileForDictionary);
 
         String settings;
-        try (InputStream is = this.getClass().getResourceAsStream(
-                "sudachi.json");) {
+        try (InputStream is = this.getClass().getResourceAsStream("sudachi.json");) {
             settings = ResourceUtil.getSudachiSetting(is);
         }
 
-        analyzer = new SudachiAnalyzer(Tokenizer.SplitMode.C,
-                tempFileForDictionary.getPath(), settings, false,
-                SudachiAnalyzer.getDefaultStopSet(),
-                SudachiAnalyzer.getDefaultStopTags());
+        analyzer = new SudachiAnalyzer(Tokenizer.SplitMode.C, tempFileForDictionary.getPath(), settings, false,
+                SudachiAnalyzer.getDefaultStopSet(), SudachiAnalyzer.getDefaultStopTags());
         IndexWriterConfig config = new IndexWriterConfig(analyzer);
 
         tempFolder.create();
@@ -153,10 +151,10 @@ public class TestSudachiAnalyzer {
             assertThat(values[0], is(INPUT_TEXT));
 
             query = queryParser.parse("京都");
-            assertThat(searcher.search(query, 5).totalHits.value, is(0L));
+            assertThat(Top_docsKt.hits(searcher.search(query, 5)), is(0L));
 
             query = queryParser.parse("岩波");
-            assertThat(searcher.search(query, 5).totalHits.value, is(0L));
+            assertThat(Top_docsKt.hits(searcher.search(query, 5)), is(0L));
         }
     }
 }

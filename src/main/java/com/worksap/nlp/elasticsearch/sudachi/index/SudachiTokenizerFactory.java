@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2017 Works Applications Co., Ltd.
+ * Copyright (c) 2017-2022 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,12 @@ package com.worksap.nlp.elasticsearch.sudachi.index;
 
 import java.io.IOException;
 
+import com.worksap.nlp.elasticsearch.sudachi.aliases.AbstractTokenizerFactory;
 import org.apache.lucene.analysis.Tokenizer;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.env.Environment;
 import org.elasticsearch.index.IndexSettings;
-import org.elasticsearch.index.analysis.AbstractTokenizerFactory;
 
 import com.worksap.nlp.lucene.sudachi.ja.SudachiTokenizer;
 import com.worksap.nlp.sudachi.Tokenizer.SplitMode;
@@ -39,8 +39,8 @@ public class SudachiTokenizerFactory extends AbstractTokenizerFactory {
     private final String settingsJSON;
     private final boolean mergeSettings;
 
-    public SudachiTokenizerFactory(IndexSettings indexSettings,
-            Environment env, String name, Settings settings) throws IOException {
+    public SudachiTokenizerFactory(IndexSettings indexSettings, Environment env, String name, Settings settings)
+            throws IOException {
         super(indexSettings, settings, name);
         mode = getMode(settings);
         discardPunctuation = settings.getAsBoolean("discard_punctuation", true);
@@ -72,7 +72,8 @@ public class SudachiTokenizerFactory extends AbstractTokenizerFactory {
     }
 
     public static String getResourcesPath(Environment env, Settings settings) {
-        return new SudachiPathResolver(env.configFile().toString(), settings.get("resources_path", "sudachi")).resolvePathForDirectory();
+        return new SudachiPathResolver(env.configFile().toString(), settings.get("resources_path", "sudachi"))
+                .resolvePathForDirectory();
     }
 
     public static String[] getSettingsJSON(Environment env, Settings settings) {
