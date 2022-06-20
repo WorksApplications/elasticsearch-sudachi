@@ -22,11 +22,12 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.util.HashMap;
 
+import com.worksap.nlp.lucene.sudachi.aliases.BaseTokenStreamTestCase;
 import com.worksap.nlp.sudachi.Tokenizer.SplitMode;
 
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
-import org.apache.lucene.tests.analysis.BaseTokenStreamTestCase;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

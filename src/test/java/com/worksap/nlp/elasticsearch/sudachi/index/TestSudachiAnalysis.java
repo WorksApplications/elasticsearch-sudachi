@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.worksap.nlp.elasticsearch.sudachi.aliases.MetadataConstants;
 import com.worksap.nlp.elasticsearch.sudachi.plugin.AnalysisSudachiPlugin;
 import com.worksap.nlp.lucene.sudachi.aliases.BaseTokenStreamTestCase;
 import com.worksap.nlp.lucene.sudachi.ja.ResourceUtil;
@@ -35,7 +36,6 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.elasticsearch.Version;
-import org.elasticsearch.cluster.metadata.IndexMetadata;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.env.Environment;
 import org.elasticsearch.env.TestEnvironment;
@@ -95,7 +95,8 @@ public class TestSudachiAnalysis extends BaseTokenStreamTestCase {
 
     @Test
     public void analyzerProvider() throws IOException {
-        Settings indexSettings = Settings.builder().put(IndexMetadata.SETTING_VERSION_CREATED, Version.CURRENT).build();
+        Settings indexSettings = Settings.builder().put(MetadataConstants.SETTING_VERSION_CREATED, Version.CURRENT)
+                .build();
         Settings nodeSettings = Settings.builder()
                 .put(Environment.PATH_HOME_SETTING.getKey(), testFolder.getRoot().getPath()).build();
         Environment env = TestEnvironment.newEnvironment(nodeSettings);
@@ -111,7 +112,7 @@ public class TestSudachiAnalysis extends BaseTokenStreamTestCase {
     Map<String, TokenizerFactory> createTestTokenizers(Map<String, String> settings) throws IOException {
         Settings.Builder builder = Settings.builder();
         settings.forEach(builder::put);
-        builder.put(IndexMetadata.SETTING_VERSION_CREATED, Version.CURRENT);
+        builder.put(MetadataConstants.SETTING_VERSION_CREATED, Version.CURRENT);
         Settings indexSettings = builder.build();
         Settings nodeSettings = Settings.builder()
                 .put(Environment.PATH_HOME_SETTING.getKey(), testFolder.getRoot().getPath()).build();
