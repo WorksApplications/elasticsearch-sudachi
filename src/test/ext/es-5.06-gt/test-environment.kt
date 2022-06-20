@@ -14,8 +14,14 @@
  * limitations under the License.
  */
 
-package com.worksap.nlp.lucene.test
+package com.worksap.nlp.elasticsearch.test
 
-import org.apache.lucene.search.TopDocs
+import org.elasticsearch.common.settings.Settings
+import org.elasticsearch.env.Environment
 
-fun TopDocs.hits(): Long = this.totalHits.toLong()
+object TestEnvironment {
+  @JvmStatic
+  fun newEnvironment(nodeSettings: Settings): Environment {
+    return org.elasticsearch.env.TestEnvironment.newEnvironment(nodeSettings)
+  }
+}

@@ -29,6 +29,7 @@ import java.util.Map;
 
 import com.worksap.nlp.elasticsearch.sudachi.aliases.MetadataConstants;
 import com.worksap.nlp.elasticsearch.sudachi.plugin.AnalysisSudachiPlugin;
+import com.worksap.nlp.elasticsearch.test.TestEnvironment;
 import com.worksap.nlp.lucene.sudachi.aliases.BaseTokenStreamTestCase;
 import com.worksap.nlp.lucene.sudachi.ja.ResourceUtil;
 
@@ -38,7 +39,6 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.elasticsearch.Version;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.env.Environment;
-import org.elasticsearch.env.TestEnvironment;
 import org.elasticsearch.index.Index;
 import org.elasticsearch.index.analysis.AnalysisRegistry;
 import org.elasticsearch.index.analysis.TokenizerFactory;

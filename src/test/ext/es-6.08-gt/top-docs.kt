@@ -18,4 +18,4 @@ package com.worksap.nlp.lucene.test
 
 import org.apache.lucene.search.TopDocs
 
-fun TopDocs.hits(): Long = this.totalHits.toLong()
+fun TopDocs.hits(): Long = this.totalHits.value
