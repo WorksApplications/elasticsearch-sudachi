@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2017 Works Applications Co., Ltd.
+ * Copyright (c) 2017-2022 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,127 +50,84 @@ public class TestSudachiTokenizer extends BaseTokenStreamTestCase {
         ResourceUtil.copy(tempFolderForDictionary);
 
         String settings;
-        try(InputStream is = this.getClass().getResourceAsStream("sudachi.json")){
+        try (InputStream is = this.getClass().getResourceAsStream("sudachi.json")) {
             settings = ResourceUtil.getSudachiSetting(is);
         }
 
-        tokenizer = new SudachiTokenizer(true, SplitMode.C,
-                tempFolderForDictionary.getPath(), settings, false);
-        tokenizerA = new SudachiTokenizer(true, SplitMode.A,
-                tempFolderForDictionary.getPath(), settings, false);
-        tokenizerB = new SudachiTokenizer(true, SplitMode.B,
-                tempFolderForDictionary.getPath(), settings, false);
-        tokenizerPunctuation = new SudachiTokenizer(false,
-                SplitMode.C, tempFolderForDictionary.getPath(), settings, false);
+        tokenizer = new SudachiTokenizer(true, SplitMode.C, tempFolderForDictionary.getPath(), settings, false);
+        tokenizerA = new SudachiTokenizer(true, SplitMode.A, tempFolderForDictionary.getPath(), settings, false);
+        tokenizerB = new SudachiTokenizer(true, SplitMode.B, tempFolderForDictionary.getPath(), settings, false);
+        tokenizerPunctuation = new SudachiTokenizer(false, SplitMode.C, tempFolderForDictionary.getPath(), settings,
+                false);
     }
 
     @Test
     public void incrementTokenWithShiftJis() throws IOException {
         String str = new String("東京都に行った。".getBytes("Shift_JIS"), "Shift_JIS");
         tokenizer.setReader(new StringReader(str));
-        assertTokenStreamContents(tokenizer,
-                                  new String[] { "東京都", "に", "行っ", "た" },
-                                  new int[] { 0, 3, 4, 6 },
-                                  new int[] { 3, 4, 6, 7 },
-                                  new int[] { 1, 1, 1, 1 },
-                                  new int[] { 1, 1, 1, 1 },
-                                  8);
+        assertTokenStreamContents(tokenizer, new String[] { "東京都", "に", "行っ", "た" }, new int[] { 0, 3, 4, 6 },
+                new int[] { 3, 4, 6, 7 }, new int[] { 1, 1, 1, 1 }, new int[] { 1, 1, 1, 1 }, 8);
     }
 
     @Test
     public void incrementTokenByDefaultMode() throws IOException {
         tokenizer.setReader(new StringReader("東京都に行った。"));
-        assertTokenStreamContents(tokenizer,
-                                  new String[] { "東京都", "に", "行っ", "た" },
-                                  new int[] { 0, 3, 4, 6 },
-                                  new int[] { 3, 4, 6, 7 },
-                                  new int[] { 1, 1, 1, 1 },
-                                  new int[] { 1, 1, 1, 1 },
-                                  8);
+        assertTokenStreamContents(tokenizer, new String[] { "東京都", "に", "行っ", "た" }, new int[] { 0, 3, 4, 6 },
+                new int[] { 3, 4, 6, 7 }, new int[] { 1, 1, 1, 1 }, new int[] { 1, 1, 1, 1 }, 8);
     }
 
     @Test
     public void incrementTokenByPunctuationMode() throws IOException {
         tokenizerPunctuation.setReader(new StringReader("東京都に行った。"));
-        assertTokenStreamContents(tokenizerPunctuation,
-                                  new String[] { "東京都", "に", "行っ", "た", "。" },
-                                  new int[] { 0, 3, 4, 6, 7 },
-                                  new int[] { 3, 4, 6, 7, 8 },
-                                  new int[] { 1, 1, 1, 1, 1 },
-                                  new int[] { 1, 1, 1, 1, 1 },
-                                  8);
+        assertTokenStreamContents(tokenizerPunctuation, new String[] { "東京都", "に", "行っ", "た", "。" },
+                new int[] { 0, 3, 4, 6, 7 }, new int[] { 3, 4, 6, 7, 8 }, new int[] { 1, 1, 1, 1, 1 },
+                new int[] { 1, 1, 1, 1, 1 }, 8);
     }
 
     @Test
     public void incrementTokenWithPunctuationsByDefaultMode() throws IOException {
         tokenizer.setReader(new StringReader("東京都に行った。東京都に行った。"));
-        assertTokenStreamContents(tokenizer,
-                                  new String[] { "東京都", "に", "行っ", "た", "東京都", "に", "行っ", "た" },
-                                  new int[] { 0, 3, 4, 6, 8, 11, 12, 14 },
-                                  new int[] { 3, 4, 6, 7, 11, 12, 14, 15 },
-                                  new int[] { 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-                                  new int[] { 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-                                  16);
+        assertTokenStreamContents(tokenizer, new String[] { "東京都", "に", "行っ", "た", "東京都", "に", "行っ", "た" },
+                new int[] { 0, 3, 4, 6, 8, 11, 12, 14 }, new int[] { 3, 4, 6, 7, 11, 12, 14, 15 },
+                new int[] { 1, 1, 1, 1, 1, 1, 1, 1, 1 }, new int[] { 1, 1, 1, 1, 1, 1, 1, 1, 1 }, 16);
     }
 
     @Test
     public void incrementTokenWithPunctuationsByPunctuationMode() throws IOException {
         tokenizerPunctuation.setReader(new StringReader("東京都に行った。東京都に行った。"));
         assertTokenStreamContents(tokenizerPunctuation,
-                                  new String[] { "東京都", "に", "行っ", "た", "。", "東京都", "に", "行っ", "た", "。" },
-                                  new int[] { 0, 3, 4, 6, 7, 8, 11, 12, 14, 15 },
-                                  new int[] { 3, 4, 6, 7, 8, 11, 12, 14, 15, 16 },
-                                  new int[] { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-                                  new int[] { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-                                  16);
+                new String[] { "東京都", "に", "行っ", "た", "。", "東京都", "に", "行っ", "た", "。" },
+                new int[] { 0, 3, 4, 6, 7, 8, 11, 12, 14, 15 }, new int[] { 3, 4, 6, 7, 8, 11, 12, 14, 15, 16 },
+                new int[] { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, new int[] { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, 16);
     }
 
     @Test
     public void incrementTokenWithOOVByDefaultMode() throws IOException {
         tokenizer.setReader(new StringReader("アマゾンに行った。"));
-        assertTokenStreamContents(tokenizer,
-                                  new String[] { "アマゾン", "に", "行っ", "た" },
-                                  new int[] { 0, 4, 5, 7 },
-                                  new int[] { 4, 5, 7, 8 },
-                                  new int[] { 1, 1, 1, 1 },
-                                  new int[] { 1, 1, 1, 1 },
-                                  9);
+        assertTokenStreamContents(tokenizer, new String[] { "アマゾン", "に", "行っ", "た" }, new int[] { 0, 4, 5, 7 },
+                new int[] { 4, 5, 7, 8 }, new int[] { 1, 1, 1, 1 }, new int[] { 1, 1, 1, 1 }, 9);
     }
 
     @Test
     public void incrementTokenWithOOVByPunctuationMode() throws IOException {
         tokenizerPunctuation.setReader(new StringReader("アマゾンに行った。"));
-        assertTokenStreamContents(tokenizerPunctuation,
-                                  new String[] { "アマゾン", "に", "行っ", "た", "。" },
-                                  new int[] { 0, 4, 5, 7, 8 },
-                                  new int[] { 4, 5, 7, 8, 9 },
-                                  new int[] { 1, 1, 1, 1, 1 },
-                                  new int[] { 1, 1, 1, 1, 1 },
-                                  9);
+        assertTokenStreamContents(tokenizerPunctuation, new String[] { "アマゾン", "に", "行っ", "た", "。" },
+                new int[] { 0, 4, 5, 7, 8 }, new int[] { 4, 5, 7, 8, 9 }, new int[] { 1, 1, 1, 1, 1 },
+                new int[] { 1, 1, 1, 1, 1 }, 9);
     }
 
     @Test
     public void incrementTokenByAMode() throws IOException {
         tokenizerA.setReader(new StringReader("東京都に行った。"));
-        assertTokenStreamContents(tokenizerA,
-                                  new String[] { "東京", "都", "に", "行っ", "た" },
-                                  new int[] { 0, 2, 3, 4, 6 },
-                                  new int[] { 2, 3, 4, 6, 7 },
-                                  new int[] { 1, 1, 1, 1, 1 },
-                                  new int[] { 1, 1, 1, 1, 1 },
-                                  8);
+        assertTokenStreamContents(tokenizerA, new String[] { "東京", "都", "に", "行っ", "た" }, new int[] { 0, 2, 3, 4, 6 },
+                new int[] { 2, 3, 4, 6, 7 }, new int[] { 1, 1, 1, 1, 1 }, new int[] { 1, 1, 1, 1, 1 }, 8);
     }
 
     @Test
     public void incrementTokenByBMode() throws IOException {
         tokenizerB.setReader(new StringReader("東京都に行った。"));
-        assertTokenStreamContents(tokenizerB,
-                                  new String[] { "東京都", "に", "行っ", "た" },
-                                  new int[] { 0, 3, 4, 6 },
-                                  new int[] { 3, 4, 6, 7 },
-                                  new int[] { 1, 1, 1, 1 },
-                                  new int[] { 1, 1, 1, 1 },
-                                  8);
+        assertTokenStreamContents(tokenizerB, new String[] { "東京都", "に", "行っ", "た" }, new int[] { 0, 3, 4, 6 },
+                new int[] { 3, 4, 6, 7 }, new int[] { 1, 1, 1, 1 }, new int[] { 1, 1, 1, 1 }, 8);
     }
 
     @Test
@@ -179,25 +136,15 @@ public class TestSudachiTokenizer extends BaseTokenStreamTestCase {
         builder.add("東京都", "京都");
         MappingCharFilter filter = new MappingCharFilter(builder.build(), new StringReader("東京都に行った。"));
         tokenizer.setReader(filter);
-        assertTokenStreamContents(tokenizer,
-                                  new String[] { "京都", "に", "行っ", "た" },
-                                  new int[] { 0, 3, 4, 6 },
-                                  new int[] { 3, 4, 6, 7 },
-                                  new int[] { 1, 1, 1, 1 },
-                                  new int[] { 1, 1, 1, 1 },
-                                  8);
+        assertTokenStreamContents(tokenizer, new String[] { "京都", "に", "行っ", "た" }, new int[] { 0, 3, 4, 6 },
+                new int[] { 3, 4, 6, 7 }, new int[] { 1, 1, 1, 1 }, new int[] { 1, 1, 1, 1 }, 8);
     }
 
     @Test
     public void additionalSettings() throws IOException {
         tokenizer.setReader(new StringReader("自然言語"));
-        assertTokenStreamContents(tokenizer,
-                                  new String[] { "自然言語" },
-                                  new int[] { 0 },
-                                  new int[] { 4 },
-                                  new int[] { 1 },
-                                  new int[] { 1 },
-                                  4);
+        assertTokenStreamContents(tokenizer, new String[] { "自然言語" }, new int[] { 0 }, new int[] { 4 }, new int[] { 1 },
+                new int[] { 1 }, 4);
 
         // use MeCabOovProviderPlugin
         String additional;
@@ -207,12 +154,13 @@ public class TestSudachiTokenizer extends BaseTokenStreamTestCase {
         ResourceUtil.copyResource("unk.def", tempFolderForDictionary, false);
         tokenizer = new SudachiTokenizer(true, SplitMode.C, tempFolderForDictionary.getPath(), additional, true);
         tokenizer.setReader(new StringReader("自然言語"));
-        assertTokenStreamContents(tokenizer,
-                                  new String[] { "自然", "言語" },
-                                  new int[] { 0, 2 },
-                                  new int[] { 2, 4 },
-                                  new int[] { 1, 1 },
-                                  new int[] { 1, 1 },
-                                  4);
+        assertTokenStreamContents(tokenizer, new String[] { "自然", "言語" }, new int[] { 0, 2 }, new int[] { 2, 4 },
+                new int[] { 1, 1 }, new int[] { 1, 1 }, 4);
+    }
+
+    @Test
+    public void equalsHashCodeCoverage() {
+        assertNotEquals(tokenizerA, tokenizerB);
+        assertNotEquals(tokenizerA.hashCode(), tokenizerB.hashCode());
     }
 }

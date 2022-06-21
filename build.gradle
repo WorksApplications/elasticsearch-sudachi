@@ -1,5 +1,6 @@
 plugins {
     id 'java-library'
+    id 'com.diffplug.spotless' version '6.6.1'
     id 'org.sonarqube' version '3.3'
     id 'jacoco'
 }
@@ -22,7 +23,7 @@ dependencies {
     implementation 'com.worksap.nlp:sudachi:0.6.2'
     implementation "org.elasticsearch.client:transport:${elasticsearchVersion}"
     testImplementation "org.elasticsearch.test:framework:${elasticsearchVersion}"
-    testRuntimeOnly "org.apache.logging.log4j:log4j-core:2.17.1"
+    testRuntimeOnly 'org.apache.logging.log4j:log4j-core:2.17.2'
 }
 
 def buildTestDict = tasks.register('buildTestDict', JavaExec) {
@@ -46,7 +47,7 @@ def copyDependencies = tasks.register('copyDependencies', Copy) {
 }
 
 def distZip = tasks.register('distZip', Zip) {
-    dependsOn 'jar', embedVersion, copyDependencies
+    dependsOn tasks.jar, embedVersion, copyDependencies
     archiveBaseName = archivesBaseName
     archiveAppendix = elasticsearchVersion
     from 'build/libs/', 'build/descriptor', 'LICENSE', 'README.md'
@@ -54,6 +55,32 @@ def distZip = tasks.register('distZip', Zip) {
 
 artifacts {
     archives distZip
+}
+
+// See https://github.com/diffplug/spotless/tree/main/plugin-gradle
+spotless {
+    // watch for https://github.com/diffplug/spotless/issues/911 to be closed
+    ratchetFrom 'origin/develop'
+    encoding 'UTF-8' // all formats will be interpreted as UTF-8
+
+    format 'misc', {
+        target '*.gradle', '*.md', '.gitignore', '*.txt', '*.csv'
+
+        trimTrailingWhitespace()
+        indentWithSpaces(2)
+        endWithNewline()
+    }
+    java {
+        // don't need to set target, it is inferred from java
+        // version list: https://github.com/diffplug/spotless/tree/main/lib-extra/src/main/resources/com/diffplug/spotless/extra/eclipse_jdt_formatter
+        eclipse('4.21.0').configFile('.formatter/eclipse-formatter.xml')
+        licenseHeaderFile('.formatter/license-header')
+    }
+    kotlin {
+        // by default the target is every '.kt' and '.kts` file in the java sourcesets
+        ktfmt('0.36')
+        licenseHeaderFile('.formatter/license-header')
+    }
 }
 
 sonarqube {
