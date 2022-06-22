@@ -80,7 +80,7 @@ class EsSudachiPlugin implements Plugin<Project> {
         var version = Version.supportVersion(verString)
 
         var tags = EsSupport.values().collectMany { v ->
-            var comparison = v.compareTo(version)
+            var comparison = v <=> version
             if (comparison < 0) {
                 return List.of("${v.tag}-gt", "${v.tag}-ge")
             } else if (comparison > 0) {

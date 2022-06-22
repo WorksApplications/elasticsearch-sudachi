@@ -51,8 +51,7 @@ def embedVersion = tasks.register('embedVersion', Copy) {
 }
 
 def copyDependencies = tasks.register('copyDependencies', Copy) {
-    def libs = ['sudachi', 'javax.json', 'jdartsclone']
-    from configurations.runtimeClasspath.collect { f -> (libs.any { f.name.startsWith(it) }) ? f : null }
+    from configurations.runtimeClasspath
     into 'build/libs'
 }
 
