@@ -18,7 +18,9 @@ package com.worksap.nlp.elasticsearch.sudachi
 
 import com.worksap.nlp.sudachi.Config
 import com.worksap.nlp.sudachi.PathAnchor
+import com.worksap.nlp.sudachi.Tokenizer
 import com.worksap.nlp.sudachi.Tokenizer.SplitMode
+import com.worksap.nlp.tools.EnumFlag
 import java.nio.file.Path
 import java.util.*
 import kotlin.io.path.exists
@@ -28,7 +30,6 @@ import org.elasticsearch.index.IndexSettings
 
 @Suppress("UNUSED_PARAMETER")
 class ConfigAdapter(index: IndexSettings, name: String, settings: Settings, env: Environment) {
-
   private val basePath = resourcesPath(env, settings)
 
   val compiled: Config = run {
@@ -37,16 +38,17 @@ class ConfigAdapter(index: IndexSettings, name: String, settings: Settings, env:
     additional.withFallback(base)
   }
 
-  val discardPunctuation = settings.getAsBoolean(PARAM_DISCARD_PUNCTUATION, true)
+  val discardPunctuation: Boolean = settings.getAsBoolean(PARAM_DISCARD_PUNCTUATION, true)
 
   val mode = splitMode(settings)
 
   companion object {
-    const val PARAM_SPLIT_MODE = "split_mode"
     const val PARAM_SPLIT_MODE_DEPRECATED = "mode"
     const val PARAM_SETTINGS_PATH = "settings_path"
     const val PARAM_ADDITIONAL_SETTINGS = "additional_settings"
     const val PARAM_DISCARD_PUNCTUATION = "discard_punctuation"
+
+    private object SplitModeFlag: EnumFlag<SplitMode>("split_mode", SplitMode.C)
 
     @JvmStatic
     fun splitMode(settings: Settings): SplitMode {
@@ -54,12 +56,7 @@ class ConfigAdapter(index: IndexSettings, name: String, settings: Settings, env:
         throw IllegalArgumentException(
             "Setting $PARAM_SPLIT_MODE_DEPRECATED is deprecated, use SudachiSplitFilter instead")
       }
-      return when (val modeStr = settings.get(PARAM_SPLIT_MODE)?.lowercase(Locale.ROOT) ?: "c") {
-        "a" -> SplitMode.A
-        "b" -> SplitMode.B
-        "c" -> SplitMode.C
-        else -> throw IllegalArgumentException("invalid SplitMode $modeStr")
-      }
+      return SplitModeFlag.get(settings)
     }
 
     @JvmStatic
