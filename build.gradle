@@ -104,4 +104,5 @@ sonarqube {
 
 tasks.koverXmlReport {
     enabled = true
+    xmlReportFile.set(layout.buildDirectory.file("reports/jacoco/test/jacocoTestReport.xml"))
 }
