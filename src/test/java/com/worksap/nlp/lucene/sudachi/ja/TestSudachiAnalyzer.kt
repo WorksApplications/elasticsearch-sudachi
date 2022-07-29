@@ -14,129 +14,117 @@
  * limitations under the License.
  */
 
-package com.worksap.nlp.lucene.sudachi.ja;
+package com.worksap.nlp.lucene.sudachi.ja
 
-import static org.hamcrest.CoreMatchers.hasItems;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import com.worksap.nlp.lucene.sudachi.ja.input.NoopInputExtractor;
-import com.worksap.nlp.lucene.sudachi.ja.util.AnalysisCache;
-import com.worksap.nlp.lucene.test.Top_docsKt;
-import com.worksap.nlp.sudachi.Tokenizer;
-
-import com.worksap.nlp.test.InMemoryDictionary;
-import org.apache.lucene.document.Field;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.TextField;
-import org.apache.lucene.index.*;
-import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.RAMDirectory;
-import org.apache.lucene.util.BytesRef;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import com.worksap.nlp.lucene.sudachi.aliases.DirectoryForTests
+import com.worksap.nlp.lucene.sudachi.ja.input.NoopInputExtractor
+import com.worksap.nlp.lucene.sudachi.ja.util.AnalysisCache
+import com.worksap.nlp.lucene.test.hits
+import com.worksap.nlp.sudachi.Tokenizer
+import com.worksap.nlp.test.InMemoryDictionary
+import java.io.IOException
+import org.apache.lucene.document.Document
+import org.apache.lucene.document.Field
+import org.apache.lucene.document.TextField
+import org.apache.lucene.index.DirectoryReader
+import org.apache.lucene.index.IndexWriter
+import org.apache.lucene.index.IndexWriterConfig
+import org.apache.lucene.queryparser.classic.QueryParser
+import org.apache.lucene.search.IndexSearcher
+import org.apache.lucene.store.Directory
+import org.apache.lucene.util.BytesRef
+import org.hamcrest.CoreMatchers
+import org.hamcrest.MatcherAssert
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
 
 // Test of character segmentation using analyzer
-public class TestSudachiAnalyzer {
-    private static final String INPUT_TEXT = "東京都へ行った。";
-    private static final String FIELD_NAME = "txt";
+class TestSudachiAnalyzer {
+  private var analyzer: SudachiAnalyzer? = null
+  private val dir: Directory = DirectoryForTests()
+  private val dic = InMemoryDictionary()
 
-    private SudachiAnalyzer analyzer;
-    private Directory dir;
-    private final InMemoryDictionary dic = new InMemoryDictionary();
+  @Before
+  fun setUp() {
+    analyzer =
+        SudachiAnalyzer(
+            dic.dic,
+            AnalysisCache(0, NoopInputExtractor.INSTANCE),
+            true,
+            Tokenizer.SplitMode.C,
+            SudachiAnalyzer.getDefaultStopSet(),
+            SudachiAnalyzer.getDefaultStopTags())
+    val config = IndexWriterConfig(analyzer)
+    IndexWriter(dir, config).use { writer -> createIndex(writer) }
+  }
 
-    @Before
-    public void setUp() throws IOException {
-        analyzer = new SudachiAnalyzer(dic.getDic(), new AnalysisCache(0, NoopInputExtractor.INSTANCE), true,
-                Tokenizer.SplitMode.C, SudachiAnalyzer.getDefaultStopSet(), SudachiAnalyzer.getDefaultStopTags());
-        IndexWriterConfig config = new IndexWriterConfig(analyzer);
-
-        dir = new RAMDirectory();
-
-        try (IndexWriter writer = new IndexWriter(dir, config)) {
-            createIndex(writer);
-        }
+  @After
+  @Throws(IOException::class)
+  fun tearDown() {
+    dir.close()
+    if (analyzer != null) {
+      analyzer!!.close()
     }
+  }
 
-    @After
-    public void tearDown() throws IOException {
-        if (dir != null) {
-            dir.close();
-        }
-        if (analyzer != null) {
-            analyzer.close();
-        }
+  @Test
+  @Throws(IOException::class)
+  fun testTerms() {
+    DirectoryReader.open(dir).use { reader ->
+      val atomicReaderContextList = reader.leaves()
+      MatcherAssert.assertThat(atomicReaderContextList.size, CoreMatchers.`is`(1))
+      val leafReaderContext = atomicReaderContextList[0]
+      val leafReader = leafReaderContext.reader()
+      val fields = leafReader.fieldInfos
+      MatcherAssert.assertThat(fields.size(), CoreMatchers.`is`(1))
+      val fieldName = fields.iterator().next().name
+      MatcherAssert.assertThat(fieldName, CoreMatchers.`is`(FIELD_NAME))
+      val terms = leafReader.terms(fieldName)
+      MatcherAssert.assertThat(terms.size(), CoreMatchers.`is`(2L))
+      val termList: MutableList<String> = ArrayList()
+      val termsEnum = terms.iterator()
+      var bytesRef: BytesRef?
+      while (termsEnum.next().also { bytesRef = it } != null) {
+        val fieldText = bytesRef!!.utf8ToString()
+        termList.add(fieldText)
+      }
+      MatcherAssert.assertThat<List<String>>(termList, CoreMatchers.hasItems("東京都", "行く"))
     }
+  }
 
-    private static void createIndex(IndexWriter writer) throws IOException {
-        Document doc = new Document();
-        doc.add(new TextField(FIELD_NAME, INPUT_TEXT, Field.Store.YES));
-        writer.addDocument(doc);
-        writer.commit();
-        writer.isOpen();
+  @Test
+  fun testQuery() {
+    DirectoryReader.open(dir).use { reader ->
+      val searcher = IndexSearcher(reader)
+      val queryParser = QueryParser(FIELD_NAME, analyzer)
+      var query = queryParser.parse("東京都")
+      val topDocs = searcher.search(query, 5)
+      val scoreDocs = topDocs.scoreDocs
+      MatcherAssert.assertThat(scoreDocs.size, CoreMatchers.`is`(1))
+      val scoreDoc = scoreDocs[0]
+      val docId = scoreDoc.doc
+      MatcherAssert.assertThat(docId, CoreMatchers.`is`(0))
+      val doc = searcher.doc(docId)
+      val values = doc.getValues(FIELD_NAME)
+      MatcherAssert.assertThat(values.size, CoreMatchers.`is`(1))
+      MatcherAssert.assertThat(values[0], CoreMatchers.`is`(INPUT_TEXT))
+      query = queryParser.parse("京都")
+      MatcherAssert.assertThat(searcher.search(query, 5).hits(), CoreMatchers.`is`(0L))
+      query = queryParser.parse("岩波")
+      MatcherAssert.assertThat(searcher.search(query, 5).hits(), CoreMatchers.`is`(0L))
     }
+  }
 
-    @Test
-    public void testTerms() throws IOException {
-        try (IndexReader reader = DirectoryReader.open(dir)) {
-            List<LeafReaderContext> atomicReaderContextList = reader.leaves();
-            assertThat(atomicReaderContextList.size(), is(1));
-            LeafReaderContext leafReaderContext = atomicReaderContextList.get(0);
-
-            LeafReader leafReader = leafReaderContext.reader();
-            FieldInfos fields = leafReader.getFieldInfos();
-            assertThat(fields.size(), is(1));
-
-            String fieldName = fields.iterator().next().name;
-            assertThat(fieldName, is(FIELD_NAME));
-
-            Terms terms = leafReader.terms(fieldName);
-            assertThat(terms.size(), is(2L));
-
-            List<String> termList = new ArrayList<>();
-            TermsEnum termsEnum = terms.iterator();
-            BytesRef bytesRef = null;
-            while ((bytesRef = termsEnum.next()) != null) {
-                String fieldText = bytesRef.utf8ToString();
-                termList.add(fieldText);
-            }
-            assertThat(termList, hasItems("東京都", "行く"));
-        }
+  companion object {
+    private const val INPUT_TEXT = "東京都へ行った。"
+    private const val FIELD_NAME = "txt"
+    private fun createIndex(writer: IndexWriter) {
+      val doc = Document()
+      doc.add(TextField(FIELD_NAME, INPUT_TEXT, Field.Store.YES))
+      writer.addDocument(doc)
+      writer.commit()
+      writer.isOpen
     }
-
-    @Test
-    public void testQuery() throws Exception {
-        try (IndexReader reader = DirectoryReader.open(dir)) {
-            IndexSearcher searcher = new IndexSearcher(reader);
-            QueryParser queryParser = new QueryParser(FIELD_NAME, analyzer);
-
-            Query query = queryParser.parse("東京都");
-            TopDocs topDocs = searcher.search(query, 5);
-            ScoreDoc[] scoreDocs = topDocs.scoreDocs;
-            assertThat(scoreDocs.length, is(1));
-            ScoreDoc scoreDoc = scoreDocs[0];
-            int docId = scoreDoc.doc;
-            assertThat(docId, is(0));
-            Document doc = searcher.doc(docId);
-            String[] values = doc.getValues(FIELD_NAME);
-            assertThat(values.length, is(1));
-            assertThat(values[0], is(INPUT_TEXT));
-
-            query = queryParser.parse("京都");
-            assertThat(Top_docsKt.hits(searcher.search(query, 5)), is(0L));
-
-            query = queryParser.parse("岩波");
-            assertThat(Top_docsKt.hits(searcher.search(query, 5)), is(0L));
-        }
-    }
+  }
 }

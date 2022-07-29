@@ -17,6 +17,7 @@
 package com.worksap.nlp.lucene.sudachi.ja;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,10 +29,7 @@ import com.worksap.nlp.lucene.sudachi.ja.util.AnalysisCache;
 import com.worksap.nlp.lucene.sudachi.ja.util.Stoptags;
 import com.worksap.nlp.sudachi.PartialPOS;
 import com.worksap.nlp.sudachi.PosMatcher;
-import org.apache.lucene.analysis.CharArraySet;
-import org.apache.lucene.analysis.StopwordAnalyzerBase;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.Tokenizer;
+import org.apache.lucene.analysis.*;
 import org.apache.lucene.analysis.core.StopFilter;
 
 import com.worksap.nlp.sudachi.Tokenizer.SplitMode;

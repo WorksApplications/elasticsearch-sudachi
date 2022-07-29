@@ -16,6 +16,7 @@
 
 package com.worksap.nlp.lucene.sudachi.ja.input
 
+import com.worksap.nlp.lucene.sudachi.aliases.DirectoryForTests
 import org.apache.lucene.analysis.Analyzer
 import org.apache.lucene.analysis.Tokenizer
 import org.apache.lucene.document.Document
@@ -23,12 +24,11 @@ import org.apache.lucene.document.Field
 import org.apache.lucene.document.TextField
 import org.apache.lucene.index.IndexWriter
 import org.apache.lucene.index.IndexWriterConfig
-import org.apache.lucene.store.RAMDirectory
 import org.junit.Assert.*
 import org.junit.Test
 
 class InputExtractorTest {
-  private val dir = RAMDirectory()
+  private val dir = DirectoryForTests()
 
   private class ExtractorTextStream(
       val extractor: InputExtractor,
