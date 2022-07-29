@@ -39,7 +39,7 @@ jobs:
     - name: Build # This stage sets up gradle caching
       uses: eskatos/gradle-command-action@v2
       with:
-        arguments: -PelasticsearchVersion=${{ matrix.es-version }} --info clean build jacocoTestReport
+        arguments: -PelasticsearchVersion=${{ matrix.es-version }} --info clean build koverXmlReport
         cache-read-only: false # ${{ github.ref != 'refs/heads/develop' }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
