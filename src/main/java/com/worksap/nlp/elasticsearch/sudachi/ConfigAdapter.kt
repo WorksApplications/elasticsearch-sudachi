@@ -18,11 +18,9 @@ package com.worksap.nlp.elasticsearch.sudachi
 
 import com.worksap.nlp.sudachi.Config
 import com.worksap.nlp.sudachi.PathAnchor
-import com.worksap.nlp.sudachi.Tokenizer
 import com.worksap.nlp.sudachi.Tokenizer.SplitMode
 import com.worksap.nlp.tools.EnumFlag
 import java.nio.file.Path
-import java.util.*
 import kotlin.io.path.exists
 import org.elasticsearch.common.settings.Settings
 import org.elasticsearch.env.Environment
@@ -48,7 +46,7 @@ class ConfigAdapter(index: IndexSettings, name: String, settings: Settings, env:
     const val PARAM_ADDITIONAL_SETTINGS = "additional_settings"
     const val PARAM_DISCARD_PUNCTUATION = "discard_punctuation"
 
-    private object SplitModeFlag: EnumFlag<SplitMode>("split_mode", SplitMode.C)
+    private object SplitModeFlag : EnumFlag<SplitMode>("split_mode", SplitMode.C)
 
     @JvmStatic
     fun splitMode(settings: Settings): SplitMode {
