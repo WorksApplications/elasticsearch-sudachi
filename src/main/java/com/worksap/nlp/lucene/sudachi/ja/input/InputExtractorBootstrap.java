@@ -16,14 +16,14 @@
 
 package com.worksap.nlp.lucene.sudachi.ja.input;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.elasticsearch.common.logging.ESLoggerFactory;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
 public class InputExtractorBootstrap {
-    private final static Logger logger = ESLoggerFactory.getLogger(InputExtractorBootstrap.class);
+    private final static Logger logger = LogManager.getLogger(InputExtractorBootstrap.class);
 
     @NotNull
     public static final InputExtractor ZERO_COPY;
