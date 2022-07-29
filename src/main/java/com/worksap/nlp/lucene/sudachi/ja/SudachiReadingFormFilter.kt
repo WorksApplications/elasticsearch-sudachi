@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2017 Works Applications Co., Ltd.
+ * Copyright (c) 2017-2022 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,56 +14,43 @@
  * limitations under the License.
  */
 
-package com.worksap.nlp.lucene.sudachi.ja;
+package com.worksap.nlp.lucene.sudachi.ja
 
-import java.io.IOException;
+import com.worksap.nlp.lucene.sudachi.aliases.TokenFilterFactory
+import com.worksap.nlp.lucene.sudachi.ja.util.Romanizer
+import com.worksap.nlp.sudachi.Morpheme
+import org.apache.lucene.analysis.TokenStream
 
-import org.apache.lucene.analysis.TokenFilter;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
-
-import com.worksap.nlp.lucene.sudachi.ja.tokenattribute.ReadingAttribute;
-import com.worksap.nlp.lucene.sudachi.ja.util.Romanizer;
-
-public final class SudachiReadingFormFilter extends TokenFilter {
-    private final CharTermAttribute termAttr;
-    private final ReadingAttribute readingAttr;
-
-    private StringBuilder buffer = new StringBuilder();
-    private boolean useRomaji;
-
-    public SudachiReadingFormFilter(TokenStream input, boolean useRomaji) {
-        super(input);
-        this.useRomaji = useRomaji;
-        termAttr = addAttribute(CharTermAttribute.class);
-        readingAttr = addAttribute(ReadingAttribute.class);
+class SudachiReadingFormFilter
+@JvmOverloads
+constructor(input: TokenStream, private val useRomaji: Boolean = false) :
+    MorphemeFieldFilter(
+        input,
+    ) {
+  private val buffer = StringBuilder()
+  override fun value(m: Morpheme): CharSequence? {
+    val reading = m.readingForm() ?: return null
+    return if (useRomaji) {
+      buffer.setLength(0)
+      Romanizer.romanize(reading, buffer)
+      buffer
+    } else {
+      reading
     }
+  }
+}
 
-    public SudachiReadingFormFilter(TokenStream input) {
-        this(input, false);
-    }
+class SudachiReadingFormFilterFactory(args: MutableMap<String, String>) : TokenFilterFactory(args) {
+  private val useRomaji = getBoolean(args, ROMAJI_PARAM, false)
+  init {
+    require(args.isEmpty()) { "Unknown parameters: $args" }
+  }
 
-    @Override
-    public boolean incrementToken() throws IOException {
-        if (input.incrementToken()) {
-            String reading = readingAttr.getReading();
+  override fun create(input: TokenStream): TokenStream {
+    return SudachiReadingFormFilter(input, useRomaji)
+  }
 
-            if (useRomaji) {
-                if (reading == null) {
-                    buffer.setLength(0);
-                    Romanizer.getRomanization(buffer, termAttr);
-                    termAttr.setEmpty().append(buffer);
-                } else {
-                    Romanizer.getRomanization(termAttr.setEmpty(), reading);
-                }
-            } else {
-                if (reading != null) {
-                    termAttr.setEmpty().append(reading);
-                }
-            }
-            return true;
-        } else {
-            return false;
-        }
-    }
+  companion object {
+    private const val ROMAJI_PARAM = "useRomaji"
+  }
 }

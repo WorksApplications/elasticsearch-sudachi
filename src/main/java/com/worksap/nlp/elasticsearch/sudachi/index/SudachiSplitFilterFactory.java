@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2020 Works Applications Co., Ltd.
+ * Copyright (c) 2020-2022 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import java.util.Locale;
 import com.worksap.nlp.lucene.sudachi.ja.SudachiSplitFilter;
 import com.worksap.nlp.lucene.sudachi.ja.SudachiSplitFilter.Mode;
 
+import com.worksap.nlp.sudachi.Tokenizer;
 import org.apache.lucene.analysis.TokenStream;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.env.Environment;
@@ -28,18 +29,18 @@ import org.elasticsearch.index.IndexSettings;
 import org.elasticsearch.index.analysis.AbstractTokenFilterFactory;
 
 public class SudachiSplitFilterFactory extends AbstractTokenFilterFactory {
-   
     private static final String MODE_PARAM = "mode";
 
     private final Mode mode;
 
     public SudachiSplitFilterFactory(IndexSettings indexSettings, Environment env, String name, Settings settings) {
         super(indexSettings, name, settings);
-        mode = Mode.valueOf(settings.get(MODE_PARAM, SudachiSplitFilter.DEFAULT_MODE.toString()).toUpperCase(Locale.ROOT));
+        mode = Mode
+                .valueOf(settings.get(MODE_PARAM, SudachiSplitFilter.DEFAULT_MODE.toString()).toUpperCase(Locale.ROOT));
     }
 
     @Override
     public TokenStream create(TokenStream tokenStream) {
-        return new SudachiSplitFilter(tokenStream, mode);
+        return new SudachiSplitFilter(tokenStream, mode, Tokenizer.SplitMode.A);
     }
 }

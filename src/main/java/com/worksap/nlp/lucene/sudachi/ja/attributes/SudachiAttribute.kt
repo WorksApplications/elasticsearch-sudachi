@@ -14,15 +14,23 @@
  * limitations under the License.
  */
 
-package com.worksap.nlp.lucene.sudachi.aliases
+package com.worksap.nlp.lucene.sudachi.ja.attributes
 
-abstract class TokenFilterFactory(args: Map<String, String>) :
-    org.apache.lucene.analysis.TokenFilterFactory(args)
+import com.worksap.nlp.elasticsearch.sudachi.plugin.ReloadableDictionary
+import org.apache.lucene.util.Attribute
+import org.apache.lucene.util.AttributeImpl
+import org.apache.lucene.util.AttributeReflector
 
-/** this type should be used in overrides as argument */
-typealias ResourceLoaderArgument = org.apache.lucene.util.ResourceLoader
+interface SudachiAttribute : Attribute {
+  var dictionary: ReloadableDictionary
+}
 
-interface ResourceLoaderAware : org.apache.lucene.util.ResourceLoaderAware
+class SudachiAttributeImpl : AttributeImpl(), SudachiAttribute {
+  override fun clear() {}
 
-/** This type should be inherited */
-interface ResourceLoaderParent : ResourceLoaderArgument
+  override fun reflectWith(reflector: AttributeReflector?) {}
+
+  override fun copyTo(target: AttributeImpl?) {}
+
+  override lateinit var dictionary: ReloadableDictionary
+}

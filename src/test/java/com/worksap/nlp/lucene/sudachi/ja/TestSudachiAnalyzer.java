@@ -20,15 +20,16 @@ import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.worksap.nlp.lucene.sudachi.ja.input.NoopInputExtractor;
+import com.worksap.nlp.lucene.sudachi.ja.util.AnalysisCache;
 import com.worksap.nlp.lucene.test.Top_docsKt;
 import com.worksap.nlp.sudachi.Tokenizer;
 
+import com.worksap.nlp.test.InMemoryDictionary;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.TextField;
@@ -39,13 +40,11 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.BytesRef;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
 // Test of character segmentation using analyzer
 public class TestSudachiAnalyzer {
@@ -54,32 +53,15 @@ public class TestSudachiAnalyzer {
 
     private SudachiAnalyzer analyzer;
     private Directory dir;
-
-    @Rule
-    public TemporaryFolder tempFolder = new TemporaryFolder();
-
-    @Rule
-    public TemporaryFolder tempFolderForDictionary = new TemporaryFolder();
+    private final InMemoryDictionary dic = new InMemoryDictionary();
 
     @Before
     public void setUp() throws IOException {
-        tempFolderForDictionary.create();
-        File tempFileForDictionary = tempFolderForDictionary.newFolder("sudachiDictionary");
-
-        ResourceUtil.copy(tempFileForDictionary);
-
-        String settings;
-        try (InputStream is = this.getClass().getResourceAsStream("sudachi.json");) {
-            settings = ResourceUtil.getSudachiSetting(is);
-        }
-
-        analyzer = new SudachiAnalyzer(Tokenizer.SplitMode.C, tempFileForDictionary.getPath(), settings, false,
-                SudachiAnalyzer.getDefaultStopSet(), SudachiAnalyzer.getDefaultStopTags());
+        analyzer = new SudachiAnalyzer(dic.getDic(), new AnalysisCache(0, NoopInputExtractor.INSTANCE), true,
+                Tokenizer.SplitMode.C, SudachiAnalyzer.getDefaultStopSet(), SudachiAnalyzer.getDefaultStopTags());
         IndexWriterConfig config = new IndexWriterConfig(analyzer);
 
-        tempFolder.create();
-        File tempFile = tempFolder.newFolder("sudachi");
-        dir = FSDirectory.open(tempFile.toPath());
+        dir = new RAMDirectory();
 
         try (IndexWriter writer = new IndexWriter(dir, config)) {
             createIndex(writer);

@@ -14,15 +14,24 @@
  * limitations under the License.
  */
 
-package com.worksap.nlp.lucene.sudachi.aliases
+package com.worksap.nlp.lucene.sudachi.ja.input
 
-abstract class TokenFilterFactory(args: Map<String, String>) :
-    org.apache.lucene.analysis.TokenFilterFactory(args)
+import java.io.Reader
 
-/** this type should be used in overrides as argument */
-typealias ResourceLoaderArgument = org.apache.lucene.util.ResourceLoader
+class ConcatenatingReader(private val data: String, private val remaining: Reader) : Reader() {
+  private var offset = 0
 
-interface ResourceLoaderAware : org.apache.lucene.util.ResourceLoaderAware
+  override fun read(cbuf: CharArray, off: Int, len: Int): Int {
+    if (offset < data.length) {
+      val toRead = len.coerceAtMost(offset - data.length)
+      data.toCharArray(cbuf, off, offset, offset + toRead)
+      offset += toRead
+      return toRead
+    }
+    return remaining.read(cbuf, off, len)
+  }
 
-/** This type should be inherited */
-interface ResourceLoaderParent : ResourceLoaderArgument
+  override fun close() {
+    remaining.close()
+  }
+}

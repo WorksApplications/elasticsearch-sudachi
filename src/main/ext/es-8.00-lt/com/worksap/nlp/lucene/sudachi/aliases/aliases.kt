@@ -16,7 +16,7 @@
 
 package com.worksap.nlp.lucene.sudachi.aliases
 
-abstract class TokenFilterFactory(args: Map<String?, String?>) :
+abstract class TokenFilterFactory(args: MutableMap<String, String>) :
     org.apache.lucene.analysis.util.TokenFilterFactory(args)
 
 /** this type should be used in overrides as argument */

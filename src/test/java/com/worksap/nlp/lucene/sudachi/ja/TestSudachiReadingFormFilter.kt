@@ -14,65 +14,29 @@
  * limitations under the License.
  */
 
-package com.worksap.nlp.lucene.sudachi.ja;
+package com.worksap.nlp.lucene.sudachi.ja
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.util.Collections;
-import java.util.HashMap;
+import com.worksap.nlp.lucene.sudachi.aliases.BaseTokenStreamTestCase
+import com.worksap.nlp.test.InMemoryDictionary
+import org.apache.lucene.analysis.Tokenizer
+import org.junit.Test
 
-import com.worksap.nlp.lucene.sudachi.aliases.BaseTokenStreamTestCase;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+class TestSudachiReadingFormFilter : BaseTokenStreamTestCase() {
+  private val dic = InMemoryDictionary()
 
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.Tokenizer;
+  @Test
+  fun testReadingForm() {
+    val factory = SudachiReadingFormFilterFactory(mutableMapOf())
+    val tokenizer: Tokenizer = dic.tokenizer("東京都に行った。")
+    val tokenStream = factory.create(tokenizer)
+    assertTokenStreamContents(tokenStream, arrayOf("トウキョウト", "ニ", "イッ", "タ"))
+  }
 
-import com.worksap.nlp.sudachi.Tokenizer.SplitMode;
-
-public class TestSudachiReadingFormFilter extends BaseTokenStreamTestCase {
-    TokenStream tokenStream;
-
-    @Rule
-    public TemporaryFolder tempFolderForDictionary = new TemporaryFolder();
-
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-        tempFolderForDictionary.create();
-        File tempFileForDictionary = tempFolderForDictionary.newFolder("sudachiDictionary");
-        ResourceUtil.copy(tempFileForDictionary);
-
-        String settings;
-        try (InputStream is = this.getClass().getResourceAsStream("sudachi.json")) {
-            settings = ResourceUtil.getSudachiSetting(is);
-        }
-
-        tokenStream = new SudachiTokenizer(true, SplitMode.C, tempFileForDictionary.getPath(), settings, false);
-    }
-
-    @Test
-    public void testReadingForm() throws IOException {
-        SudachiReadingFormFilterFactory factory = new SudachiReadingFormFilterFactory(Collections.emptyMap());
-        ((Tokenizer) tokenStream).setReader(new StringReader("東京都に行った。"));
-        tokenStream = factory.create(tokenStream);
-        assertTokenStreamContents(tokenStream, new String[] { "トウキョウト", "ニ", "イッ", "タ" });
-    }
-
-    @Test
-    public void testRomanizedReadingForm() throws IOException {
-        @SuppressWarnings("serial")
-        SudachiReadingFormFilterFactory factory = new SudachiReadingFormFilterFactory(new HashMap<String, String>() {
-            {
-                put("useRomaji", "true");
-            }
-        });
-        ((Tokenizer) tokenStream).setReader(new StringReader("東京都に行った。"));
-        tokenStream = factory.create(tokenStream);
-        assertTokenStreamContents(tokenStream, new String[] { "toukyouto", "ni", "iltu", "ta" });
-    }
+  @Test
+  fun testRomanizedReadingForm() {
+    val factory = SudachiReadingFormFilterFactory(mutableMapOf("useRomaji" to "true"))
+    val tokenizer: Tokenizer = dic.tokenizer("東京都に行った。")
+    val tokenStream = factory.create(tokenizer)
+    assertTokenStreamContents(tokenStream, arrayOf("toukyouto", "ni", "iltu", "ta"))
+  }
 }

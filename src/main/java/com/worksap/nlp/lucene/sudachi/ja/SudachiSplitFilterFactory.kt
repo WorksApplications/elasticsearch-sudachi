@@ -14,30 +14,58 @@
  * limitations under the License.
  */
 
-package com.worksap.nlp.lucene.sudachi.ja;
+package com.worksap.nlp.lucene.sudachi.ja
 
-import java.util.Locale;
-import java.util.Map;
+import com.worksap.nlp.lucene.sudachi.aliases.TokenFilterFactory
+import com.worksap.nlp.sudachi.Tokenizer
+import java.lang.IllegalArgumentException
+import java.lang.reflect.ParameterizedType
+import org.apache.lucene.analysis.TokenStream
 
-import com.worksap.nlp.lucene.sudachi.aliases.TokenFilterFactory;
-import com.worksap.nlp.lucene.sudachi.ja.SudachiSplitFilter.Mode;
+abstract class EnumFlag<T : Enum<T>>(private val name: String, private val default: T? = null) {
+  @Suppress("UNCHECKED_CAST")
+  private val enumClazz = run {
+    val superclazz = javaClass.annotatedSuperclass.type as ParameterizedType
+    val typeArgs = superclazz.actualTypeArguments
+    typeArgs[0] as Class<T>
+  }
+  private val values: Array<T> = enumClazz.enumConstants
 
-import org.apache.lucene.analysis.TokenStream;
-
-public class SudachiSplitFilterFactory extends TokenFilterFactory {
-    private static final String MODE_PARAM = "mode";
-    private final Mode mode;
-
-    public SudachiSplitFilterFactory(Map<String, String> args) {
-        super(args);
-        mode = Mode.valueOf(get(args, MODE_PARAM, SudachiSplitFilter.DEFAULT_MODE.toString()).toUpperCase(Locale.ROOT));
-        if (!args.isEmpty()) {
-            throw new IllegalArgumentException("Unknown parameters: " + args);
-        }
+  fun extract(args: MutableMap<String, String>): T {
+    val raw = args.remove(name)
+    if (raw == null) {
+      if (default != null) {
+        return default
+      } else {
+        throw IllegalArgumentException("required property $name was not present")
+      }
     }
 
-    @Override
-    public TokenStream create(TokenStream input) {
-        return new SudachiSplitFilter(input, mode);
+    for (v in values) {
+      if (v.name.equals(raw, true)) {
+        return v
+      }
     }
+    val acceptedValues = values.joinToString(",", "[", "]") { it.name }
+    throw IllegalArgumentException(
+        "property $name had unknown value $raw, accepted values: $acceptedValues")
+  }
+}
+
+class SudachiSplitFilterFactory(args: MutableMap<String, String>) : TokenFilterFactory(args) {
+  private val mode = Mode.extract(args)
+  private val splitMode = SplitMode.extract(args)
+
+  init {
+    require(args.isEmpty()) { "Unknown parameters: $args" }
+  }
+
+  override fun create(input: TokenStream): TokenStream {
+    return SudachiSplitFilter(input, mode, splitMode)
+  }
+
+  companion object {
+    object Mode : EnumFlag<SudachiSplitFilter.Mode>("mode", SudachiSplitFilter.DEFAULT_MODE)
+    object SplitMode : EnumFlag<Tokenizer.SplitMode>("split_mode", Tokenizer.SplitMode.A)
+  }
 }

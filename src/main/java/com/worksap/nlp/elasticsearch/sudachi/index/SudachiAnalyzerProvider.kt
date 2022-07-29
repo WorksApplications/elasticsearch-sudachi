@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2017 Works Applications Co., Ltd.
+ * Copyright (c) 2017-2022 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,40 +14,69 @@
  * limitations under the License.
  */
 
-package com.worksap.nlp.elasticsearch.sudachi.index;
+package com.worksap.nlp.elasticsearch.sudachi.index
 
-import java.io.IOException;
-import java.util.Set;
+import com.worksap.nlp.elasticsearch.sudachi.ConfigAdapter
+import com.worksap.nlp.elasticsearch.sudachi.plugin.AnalysisCacheService
+import com.worksap.nlp.elasticsearch.sudachi.plugin.DictionaryService
+import com.worksap.nlp.lucene.sudachi.ja.SudachiAnalyzer
+import org.apache.lucene.analysis.Analyzer
+import org.apache.lucene.analysis.CharArraySet
+import org.elasticsearch.common.settings.Settings
+import org.elasticsearch.env.Environment
+import org.elasticsearch.index.IndexSettings
+import org.elasticsearch.index.analysis.AbstractIndexAnalyzerProvider
+import org.elasticsearch.index.analysis.Analysis
+import org.elasticsearch.index.analysis.AnalyzerProvider
+import org.elasticsearch.indices.analysis.AnalysisModule.AnalysisProvider
 
-import org.apache.lucene.analysis.CharArraySet;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.env.Environment;
-import org.elasticsearch.index.IndexSettings;
-import org.elasticsearch.index.analysis.AbstractIndexAnalyzerProvider;
-import org.elasticsearch.index.analysis.Analysis;
+class SudachiAnalyzerProvider(
+    analysisCache: AnalysisCacheService,
+    dictionaryService: DictionaryService,
+    indexSettings: IndexSettings,
+    env: Environment?,
+    name: String?,
+    settings: Settings?
+) : AbstractIndexAnalyzerProvider<SudachiAnalyzer>(indexSettings, name, settings) {
+  private val analyzer: SudachiAnalyzer
 
-import com.worksap.nlp.lucene.sudachi.ja.SudachiAnalyzer;
-import com.worksap.nlp.sudachi.Tokenizer.SplitMode;
+  init {
+    val stopWords: Set<*> =
+        Analysis.parseStopWords(env, settings, SudachiAnalyzer.getDefaultStopSet(), false)
+    val configs = ConfigAdapter(indexSettings, name!!, settings!!, env!!)
+    val dictionary = dictionaryService.forConfig(configs.compiled)
+    val cache = analysisCache.analysisCache(indexSettings.index.name, configs.mode, settings)
+    analyzer =
+        SudachiAnalyzer(
+            dictionary,
+            cache,
+            configs.discardPunctuation,
+            configs.mode,
+            CharArraySet.copy(stopWords),
+            SudachiAnalyzer.getDefaultStopTags(),
+        )
+  }
 
-public class SudachiAnalyzerProvider extends
-        AbstractIndexAnalyzerProvider<SudachiAnalyzer> {
+  override fun get(): SudachiAnalyzer {
+    return analyzer
+  }
 
-    private final SudachiAnalyzer analyzer;
-
-    public SudachiAnalyzerProvider(IndexSettings indexSettings, Environment env, String name, Settings settings) throws IOException {
-        super(indexSettings, name, settings);
-        final Set<?> stopWords = Analysis.parseStopWords(env, settings, SudachiAnalyzer.getDefaultStopSet(), false);
-        final SplitMode mode = SudachiTokenizerFactory.getMode(settings);
-        final String resourcesPath = SudachiTokenizerFactory.getResourcesPath(env, settings);
-        final String[] settingsStrings = SudachiTokenizerFactory.getSettingsJSON(env, settings);
-        final String settingsJSON = settingsStrings[0];
-        final boolean mergeSettings = settingsStrings[1].equals("true");
-        analyzer = new SudachiAnalyzer(mode, resourcesPath, settingsJSON, mergeSettings, CharArraySet.copy(stopWords), SudachiAnalyzer.getDefaultStopTags());
+  companion object {
+    @JvmStatic
+    fun maker(
+        dictionaryService: DictionaryService,
+        cacheService: AnalysisCacheService
+    ): AnalysisProvider<AnalyzerProvider<out Analyzer?>> {
+      return AnalysisProvider { a, b, c, d ->
+        SudachiAnalyzerProvider(
+            cacheService,
+            dictionaryService,
+            a,
+            b,
+            c,
+            d,
+        )
+      }
     }
-
-    @Override
-    public SudachiAnalyzer get() {
-        return this.analyzer;
-    }
-
+  }
 }

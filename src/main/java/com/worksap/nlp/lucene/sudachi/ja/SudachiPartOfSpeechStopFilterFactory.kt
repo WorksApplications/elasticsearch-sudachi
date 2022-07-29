@@ -16,17 +16,20 @@
 
 package com.worksap.nlp.lucene.sudachi.ja
 
+import com.worksap.nlp.elasticsearch.sudachi.plugin.ReloadAware
 import com.worksap.nlp.lucene.sudachi.aliases.ResourceLoaderArgument
 import com.worksap.nlp.lucene.sudachi.aliases.ResourceLoaderAware
 import com.worksap.nlp.lucene.sudachi.aliases.TokenFilterFactory
-import java.io.IOException
+import com.worksap.nlp.lucene.sudachi.ja.attributes.SudachiAttribute
+import com.worksap.nlp.lucene.sudachi.ja.util.Stoptags
+import com.worksap.nlp.sudachi.PartialPOS
 import org.apache.lucene.analysis.CharArraySet
 import org.apache.lucene.analysis.TokenStream
 
-class SudachiPartOfSpeechStopFilterFactory(args: Map<String?, String?>) :
+class SudachiPartOfSpeechStopFilterFactory(args: MutableMap<String, String>) :
     TokenFilterFactory(args), ResourceLoaderAware {
   private val stopTagFiles: String
-  private var stopTags: PartOfSpeechTrie? = null
+  private lateinit var stopTags: List<PartialPOS>
 
   init {
     val stopTagFiles = get(args, "tags")
@@ -34,25 +37,29 @@ class SudachiPartOfSpeechStopFilterFactory(args: Map<String?, String?>) :
     this.stopTagFiles = stopTagFiles
   }
 
-  @Throws(IOException::class)
   override fun inform(loader: ResourceLoaderArgument?) {
-    stopTags = null
     val cas: CharArraySet? = getWordSet(loader, stopTagFiles, false)
     if (cas != null) {
-      val stopTags = PartOfSpeechTrie()
+      val stopTags = ArrayList<PartialPOS>()
       for (element in cas) {
         val chars = element as CharArray
-        val elements = java.lang.String(chars).split(",")
-        stopTags.add(*elements)
+        stopTags.add(Stoptags.parse(String(chars)))
       }
       this.stopTags = stopTags
+    } else {
+      stopTags = emptyList()
     }
   }
 
   override fun create(stream: TokenStream): TokenStream {
-    // if stoptags is null, it means the file is empty
-    return if (stopTags != null) {
-      SudachiPartOfSpeechStopFilter(stream, stopTags)
+    return if (stopTags.isNotEmpty()) {
+      val sudachi =
+          stream.getAttribute<SudachiAttribute>()
+              ?: throw IllegalArgumentException(
+                  "Sudachi Tokenizer does not present in the filter chain")
+      val matcher = ReloadAware { it.posMatcher(stopTags) }
+      matcher.maybeReload(sudachi.dictionary)
+      SudachiPartOfSpeechStopFilter(stream, matcher)
     } else {
       stream
     }

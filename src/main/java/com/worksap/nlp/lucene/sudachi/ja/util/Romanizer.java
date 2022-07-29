@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2018 Works Applications Co., Ltd.
+ * Copyright (c) 2018-2022 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,34 +16,37 @@
 
 package com.worksap.nlp.lucene.sudachi.ja.util;
 
-
 import java.io.IOException;
+import java.io.UncheckedIOException;
 
 public class Romanizer {
 
     /*
      * Romanize katakana
      */
-    public static String getRomanization(String s) {
+    public static String romanize(CharSequence s) {
         StringBuilder output = new StringBuilder();
-        try {
-            getRomanization(output, s);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        romanize(s, output);
         return output.toString();
     }
-  
+
+    public static void romanize(CharSequence s, Appendable builder) {
+        try {
+            romanizeMsIme(s, builder);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
 
     /*
      * Romanize katakana with MS-IME format
      */
-    public static void getRomanization(Appendable builder, CharSequence s) throws IOException {
+    public static void romanizeMsIme(CharSequence s, Appendable builder) throws IOException {
         final int len = s.length();
         for (int i = 0; i < len; i++) {
             char ch = s.charAt(i);
             char ch2 = (i < len - 1) ? s.charAt(i + 1) : 0;
-      
+
             main: switch (ch) {
             case 'ッ':
                 switch (ch2) {
@@ -139,7 +142,7 @@ public class Romanizer {
                 builder.append('i');
                 break;
             case 'ウ':
-                switch(ch2) {
+                switch (ch2) {
                 case 'ァ':
                     builder.append("wha");
                     i++;
@@ -171,7 +174,7 @@ public class Romanizer {
                 builder.append("ka");
                 break;
             case 'キ':
-                switch(ch2) {
+                switch (ch2) {
                 case 'ャ':
                     builder.append("kya");
                     i++;
@@ -198,7 +201,7 @@ public class Romanizer {
                 }
                 break;
             case 'ク':
-                switch(ch2) {
+                switch (ch2) {
                 case 'ァ':
                     builder.append("qwa");
                     i++;
@@ -234,7 +237,7 @@ public class Romanizer {
                 builder.append("sa");
                 break;
             case 'シ':
-                switch(ch2) {
+                switch (ch2) {
                 case 'ャ':
                     builder.append("sya");
                     i++;
@@ -261,7 +264,7 @@ public class Romanizer {
                 }
                 break;
             case 'ス':
-                switch(ch2) {
+                switch (ch2) {
                 case 'ァ':
                     builder.append("swa");
                     i++;
@@ -297,7 +300,7 @@ public class Romanizer {
                 builder.append("ta");
                 break;
             case 'チ':
-                switch(ch2) {
+                switch (ch2) {
                 case 'ャ':
                     builder.append("tya");
                     i++;
@@ -324,7 +327,7 @@ public class Romanizer {
                 }
                 break;
             case 'ツ':
-                switch(ch2) {
+                switch (ch2) {
                 case 'ァ':
                     builder.append("tsa");
                     i++;
@@ -347,7 +350,7 @@ public class Romanizer {
                 }
                 break;
             case 'テ':
-                switch(ch2) {
+                switch (ch2) {
                 case 'ャ':
                     builder.append("tha");
                     i++;
@@ -374,7 +377,7 @@ public class Romanizer {
                 }
                 break;
             case 'ト':
-                switch(ch2) {
+                switch (ch2) {
                 case 'ァ':
                     builder.append("twa");
                     i++;
@@ -404,7 +407,7 @@ public class Romanizer {
                 builder.append("na");
                 break;
             case 'ニ':
-                switch(ch2) {
+                switch (ch2) {
                 case 'ャ':
                     builder.append("nya");
                     i++;
@@ -443,7 +446,7 @@ public class Romanizer {
                 builder.append("ha");
                 break;
             case 'ヒ':
-                switch(ch2) {
+                switch (ch2) {
                 case 'ャ':
                     builder.append("hya");
                     i++;
@@ -470,7 +473,7 @@ public class Romanizer {
                 }
                 break;
             case 'フ':
-                switch(ch2) {
+                switch (ch2) {
                 case 'ァ':
                     builder.append("fwa");
                     i++;
@@ -518,7 +521,7 @@ public class Romanizer {
                 builder.append("ma");
                 break;
             case 'ミ':
-                switch(ch2) {
+                switch (ch2) {
                 case 'ャ':
                     builder.append("mya");
                     i++;
@@ -566,7 +569,7 @@ public class Romanizer {
                 builder.append("ra");
                 break;
             case 'リ':
-                switch(ch2) {
+                switch (ch2) {
                 case 'ャ':
                     builder.append("rya");
                     i++;
@@ -634,7 +637,7 @@ public class Romanizer {
                 builder.append("ga");
                 break;
             case 'ギ':
-                switch(ch2) {
+                switch (ch2) {
                 case 'ャ':
                     builder.append("gya");
                     i++;
@@ -661,7 +664,7 @@ public class Romanizer {
                 }
                 break;
             case 'グ':
-                switch(ch2) {
+                switch (ch2) {
                 case 'ァ':
                     builder.append("gwa");
                     i++;
@@ -697,7 +700,7 @@ public class Romanizer {
                 builder.append("za");
                 break;
             case 'ジ':
-                switch(ch2) {
+                switch (ch2) {
                 case 'ャ':
                     builder.append("zya");
                     i++;
@@ -736,7 +739,7 @@ public class Romanizer {
                 builder.append("da");
                 break;
             case 'ヂ':
-                switch(ch2) {
+                switch (ch2) {
                 case 'ャ':
                     builder.append("dya");
                     i++;
@@ -766,7 +769,7 @@ public class Romanizer {
                 builder.append("du");
                 break;
             case 'デ':
-                switch(ch2) {
+                switch (ch2) {
                 case 'ャ':
                     builder.append("dha");
                     i++;
@@ -793,7 +796,7 @@ public class Romanizer {
                 }
                 break;
             case 'ド':
-                switch(ch2) {
+                switch (ch2) {
                 case 'ァ':
                     builder.append("dwa");
                     i++;
@@ -823,7 +826,7 @@ public class Romanizer {
                 builder.append("ba");
                 break;
             case 'ビ':
-                switch(ch2) {
+                switch (ch2) {
                 case 'ャ':
                     builder.append("bya");
                     i++;
@@ -862,7 +865,7 @@ public class Romanizer {
                 builder.append("pa");
                 break;
             case 'ピ':
-                switch(ch2) {
+                switch (ch2) {
                 case 'ャ':
                     builder.append("pya");
                     i++;
@@ -898,7 +901,7 @@ public class Romanizer {
                 builder.append("po");
                 break;
             case 'ヴ':
-                switch(ch2) {
+                switch (ch2) {
                 case 'ァ':
                     builder.append("va");
                     i++;

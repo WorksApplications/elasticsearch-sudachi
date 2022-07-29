@@ -9,40 +9,36 @@ plugins {
 
 group = 'com.worksap.nlp'
 archivesBaseName = 'analysis-sudachi'
-version = '2.1.1-SNAPSHOT'
+version = '3.0.0-SNAPSHOT'
 
 tasks.withType(JavaCompile) {
-    options.release = 8
+    options.release = 11
     options.encoding = 'UTF-8'
 }
 
 compileKotlin {
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "11"
     }
 }
 
 repositories {
     mavenLocal()
     mavenCentral()
+    if (project.version.endsWith("-SNAPSHOT")) {
+        maven {
+            url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
+        }
+    }
 }
 
 dependencies {
-    implementation 'com.worksap.nlp:sudachi:0.6.2'
+    implementation 'com.worksap.nlp:sudachi:0.6.3-SNAPSHOT'
     compileClasspath "org.elasticsearch:elasticsearch:${elasticsearchVersion}"
     testImplementation "org.elasticsearch:elasticsearch:${elasticsearchVersion}"
     testImplementation "org.elasticsearch.test:framework:${elasticsearchVersion}"
     testRuntimeOnly 'org.apache.logging.log4j:log4j-core:2.17.2'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 }
-
-def buildTestDict = tasks.register('buildTestDict', JavaExec) {
-    dependsOn processTestResources
-    mainClass = 'com.worksap.nlp.sudachi.dictionary.DictionaryBuilder'
-    classpath = sourceSets.main.runtimeClasspath
-    args('-o', 'build/resources/test/com/worksap/nlp/lucene/sudachi/ja/system_core.dic', '-m', 'src/test/dict/matrix.def', 'src/test/dict/lex.csv')
-}
-test.dependsOn buildTestDict
 
 def embedVersion = tasks.register('embedVersion', Copy) {
     from 'src/main/extras/plugin-descriptor.properties'
@@ -87,7 +83,7 @@ spotless {
     }
     kotlin {
         // by default the target is every '.kt' and '.kts` file in the java sourcesets
-        ktfmt('0.36')
+        ktfmt('0.39')
         licenseHeaderFile('.formatter/license-header')
     }
 }

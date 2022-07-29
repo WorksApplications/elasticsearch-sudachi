@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2017 Works Applications Co., Ltd.
+ * Copyright (c) 2022 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,14 @@
  * limitations under the License.
  */
 
-package com.worksap.nlp.lucene.sudachi.ja.tokenattribute;
+package com.worksap.nlp.lucene.sudachi.ja.util
 
-import java.util.List;
+import com.worksap.nlp.sudachi.PartialPOS
 
-import org.apache.lucene.util.Attribute;
-
-import com.worksap.nlp.sudachi.Morpheme;
-
-public interface PartOfSpeechAttribute extends Attribute {
-    public List<String> getPartOfSpeechAsList();
-
-    public String getPartOfSpeech();
-
-    public void setMorpheme(Morpheme morpheme);
+object Stoptags {
+  @JvmStatic
+  fun parse(data: String): PartialPOS {
+    val parts = data.split(',').map { if (it == "*") null else it }
+    return PartialPOS(*parts.toTypedArray())
+  }
 }

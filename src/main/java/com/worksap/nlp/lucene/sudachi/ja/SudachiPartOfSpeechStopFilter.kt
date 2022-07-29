@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2017 Works Applications Co., Ltd.
+ * Copyright (c) 2017-2022 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,44 +14,27 @@
  * limitations under the License.
  */
 
-package com.worksap.nlp.lucene.sudachi.ja;
+package com.worksap.nlp.lucene.sudachi.ja
 
-import java.util.List;
+import com.worksap.nlp.elasticsearch.sudachi.plugin.ReloadAware
+import com.worksap.nlp.lucene.sudachi.ja.attributes.MorphemeAttribute
+import com.worksap.nlp.sudachi.PosMatcher
+import org.apache.lucene.analysis.FilteringTokenFilter
+import org.apache.lucene.analysis.TokenStream
 
-import org.apache.lucene.analysis.FilteringTokenFilter;
-import org.apache.lucene.analysis.TokenStream;
+/** Removes tokens that match a set of part-of-speech tags. */
+class SudachiPartOfSpeechStopFilter(
+    input: TokenStream?,
+    private val matcher: ReloadAware<PosMatcher>
+) : FilteringTokenFilter(input) {
+  private val morpheme = addAttribute<MorphemeAttribute>()
 
-import com.worksap.nlp.lucene.sudachi.ja.tokenattribute.PartOfSpeechAttribute;
+  override fun reset() {
+    super.reset()
+    matcher.maybeReload()
+  }
 
-/**
- * Removes tokens that match a set of part-of-speech tags.
- */
-public final class SudachiPartOfSpeechStopFilter extends FilteringTokenFilter {
-    private final PartOfSpeechTrie stopTags;
-    private final PartOfSpeechAttribute posAtt;
-
-    /**
-     * Create a new {@link SudachiPartOfSpeechStopFilter}.
-     * 
-     * @param input
-     *            the {@link TokenStream} to consume
-     * @param stopTags
-     *            the part-of-speech tags that should be removed
-     */
-    public SudachiPartOfSpeechStopFilter(TokenStream input, PartOfSpeechTrie stopTags) {
-        super(input);
-        this.stopTags = stopTags;
-        posAtt = addAttribute(PartOfSpeechAttribute.class);
-    }
-
-    @Override
-    protected boolean accept() {
-        final List<String> pos = posAtt.getPartOfSpeechAsList();
-        if (pos.isEmpty()) {
-            return true;
-        }
-        return !stopTags.isPrefixOf(pos, 0, 4) && // POS w/o conjugation info
-            !stopTags.isPrefixOf(pos, 4, 6) && // conjugation type and form
-            !stopTags.isPrefixOf(pos, 5, 6); // only conjugation form
-    }
+  override fun accept(): Boolean {
+    return !matcher.get().test(morpheme.morpheme)
+  }
 }

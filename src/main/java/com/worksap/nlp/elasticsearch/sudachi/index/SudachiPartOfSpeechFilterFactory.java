@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2017 Works Applications Co., Ltd.
+ * Copyright (c) 2017-2022 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,13 @@
 
 package com.worksap.nlp.elasticsearch.sudachi.index;
 
-import java.util.List;
-
+import com.worksap.nlp.elasticsearch.sudachi.plugin.ReloadAware;
+import com.worksap.nlp.elasticsearch.sudachi.plugin.ReloadableDictionary;
+import com.worksap.nlp.lucene.sudachi.ja.SudachiPartOfSpeechStopFilter;
+import com.worksap.nlp.lucene.sudachi.ja.attributes.SudachiAttribute;
+import com.worksap.nlp.lucene.sudachi.ja.util.Stoptags;
+import com.worksap.nlp.sudachi.PartialPOS;
+import com.worksap.nlp.sudachi.PosMatcher;
 import org.apache.lucene.analysis.TokenStream;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.env.Environment;
@@ -25,28 +30,37 @@ import org.elasticsearch.index.IndexSettings;
 import org.elasticsearch.index.analysis.AbstractTokenFilterFactory;
 import org.elasticsearch.index.analysis.Analysis;
 
-import com.worksap.nlp.lucene.sudachi.ja.SudachiPartOfSpeechStopFilter;
-import com.worksap.nlp.lucene.sudachi.ja.PartOfSpeechTrie;
+import java.util.ArrayList;
+import java.util.List;
 
-public class SudachiPartOfSpeechFilterFactory extends
-        AbstractTokenFilterFactory {
+public class SudachiPartOfSpeechFilterFactory extends AbstractTokenFilterFactory {
 
-    private final PartOfSpeechTrie stopTags = new PartOfSpeechTrie();
+    private final List<PartialPOS> stopTags = new ArrayList<>();
 
-    public SudachiPartOfSpeechFilterFactory(IndexSettings indexSettings,
-            Environment env, String name, Settings settings) {
+    public SudachiPartOfSpeechFilterFactory(IndexSettings indexSettings, Environment env, String name,
+            Settings settings) {
         super(indexSettings, name, settings);
         List<String> tagList = Analysis.getWordList(env, settings, "stoptags");
         if (tagList != null) {
             for (String tag : tagList) {
-                stopTags.add(tag.split(","));
+                stopTags.add(Stoptags.parse(tag));
             }
         }
     }
 
     @Override
     public TokenStream create(TokenStream tokenStream) {
-        return new SudachiPartOfSpeechStopFilter(tokenStream, stopTags);
+        if (stopTags.isEmpty()) {
+            return tokenStream;
+        } else {
+            SudachiAttribute sudachi = tokenStream.getAttribute(SudachiAttribute.class);
+            if (sudachi == null) {
+                throw new IllegalStateException("Sudachi-based tokenizer was not present in the filter chain");
+            }
+            ReloadableDictionary dic = sudachi.getDictionary();
+            ReloadAware<PosMatcher> matcher = new ReloadAware<>(dic, d -> d.posMatcher(stopTags));
+            return new SudachiPartOfSpeechStopFilter(tokenStream, matcher);
+        }
     }
 
 }

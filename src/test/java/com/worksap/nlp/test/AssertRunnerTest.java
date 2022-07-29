@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2020 Works Applications Co., Ltd.
+ * Copyright (c) 2022 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,9 @@
  * limitations under the License.
  */
 
-package com.worksap.nlp.lucene.sudachi.ja.tokenattribute;
+package com.worksap.nlp.test;
 
-import org.apache.lucene.util.Attribute;
+import com.worksap.nlp.lucene.sudachi.aliases.BaseTokenStreamTestCase;
 
-import java.util.List;
-
-import com.worksap.nlp.sudachi.Morpheme;
-
-public interface SplitAttribute extends Attribute {
-
-    public List<Morpheme> getAUnits();
-    public List<Morpheme> getBUnits();
-    public boolean isOOV();
-    
-    public void setMorpheme(Morpheme morpheme);
+public class AssertRunnerTest extends BaseTokenStreamTestCase {
 }

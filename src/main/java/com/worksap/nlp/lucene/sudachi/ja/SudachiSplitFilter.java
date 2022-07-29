@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2020 Works Applications Co., Ltd.
+ * Copyright (c) 2020-2022 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,11 @@ import java.io.IOException;
 import java.util.List;
 import java.util.ListIterator;
 
-import com.worksap.nlp.lucene.sudachi.ja.tokenattribute.BaseFormAttribute;
-import com.worksap.nlp.lucene.sudachi.ja.tokenattribute.NormalizedFormAttribute;
-import com.worksap.nlp.lucene.sudachi.ja.tokenattribute.PartOfSpeechAttribute;
-import com.worksap.nlp.lucene.sudachi.ja.tokenattribute.ReadingAttribute;
-import com.worksap.nlp.lucene.sudachi.ja.tokenattribute.SplitAttribute;
+import com.worksap.nlp.lucene.sudachi.ja.attributes.*;
+import com.worksap.nlp.lucene.sudachi.ja.util.Strings;
 import com.worksap.nlp.sudachi.Morpheme;
 
+import com.worksap.nlp.sudachi.Tokenizer;
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
@@ -42,7 +40,7 @@ public class SudachiSplitFilter extends TokenFilter {
 
     public static final Mode DEFAULT_MODE = Mode.SEARCH;
 
-    class OovChars {
+    static class OovChars {
         private int length;
         private char[] buffer = new char[0];
         private int reserved;
@@ -65,7 +63,11 @@ public class SudachiSplitFilter extends TokenFilter {
         }
 
         public char next() {
-            return (index < length) ? buffer[index++] : null;
+            if (index < length) {
+                return buffer[index++];
+            } else {
+                throw new IllegalStateException();
+            }
         }
 
         public int index() {
@@ -78,39 +80,30 @@ public class SudachiSplitFilter extends TokenFilter {
     }
 
     private final Mode mode;
-
+    private final Tokenizer.SplitMode splitMode;
     private final CharTermAttribute termAtt;
-    private final BaseFormAttribute basicFormAtt;
-    private final NormalizedFormAttribute normFormAtt;
-    private final PartOfSpeechAttribute posAtt;
-    private final ReadingAttribute readingAtt;
     private final OffsetAttribute offsetAtt;
     private final PositionIncrementAttribute posIncAtt;
     private final PositionLengthAttribute posLengthAtt;
-    private final SplitAttribute splitAtt;
-
+    private final MorphemeAttribute morphemeAtt;
+    private final MorphemeConsumerAttribute consumerAttribute;
     private ListIterator<Morpheme> aUnitIterator;
-    private OovChars oovChars = new OovChars();
+    private final OovChars oovChars = new OovChars();
 
     private int aUnitOffset = 0;
-    
-    public SudachiSplitFilter(TokenStream input, Mode mode) {
+
+    public SudachiSplitFilter(TokenStream input, Mode mode, Tokenizer.SplitMode splitMode) {
         super(input);
         this.mode = mode;
+        this.splitMode = splitMode;
 
         termAtt = addAttribute(CharTermAttribute.class);
-        basicFormAtt = addAttribute(BaseFormAttribute.class);
-        normFormAtt = addAttribute(NormalizedFormAttribute.class);
-        posAtt = addAttribute(PartOfSpeechAttribute.class);
-        readingAtt = addAttribute(ReadingAttribute.class);
         offsetAtt = addAttribute(OffsetAttribute.class);
         posIncAtt = addAttribute(PositionIncrementAttribute.class);
         posLengthAtt = addAttribute(PositionLengthAttribute.class);
-        splitAtt = addAttribute(SplitAttribute.class);
-    }
-
-    public SudachiSplitFilter(TokenStream input) {
-        this(input, DEFAULT_MODE);
+        morphemeAtt = addAttribute(MorphemeAttribute.class);
+        consumerAttribute = addAttribute(MorphemeConsumerAttribute.class);
+        consumerAttribute.setInstance(this);
     }
 
     @Override
@@ -128,15 +121,22 @@ public class SudachiSplitFilter extends TokenFilter {
 
         if (input.incrementToken()) {
             int length = 0;
-            if (mode == Mode.EXTENDED && splitAtt.isOOV() && (length = codePointCount(termAtt)) > 1) {
+            Morpheme m = morphemeAtt.getMorpheme();
+            if (m == null) {
+                return true;
+            }
+            if (consumerAttribute.shouldConsume(this)) {
+                termAtt.append(m.surface());
+            }
+            if (mode == Mode.EXTENDED && m.isOOV() && (length = Strings.codepointCount(termAtt)) > 1) {
                 oovChars.setOov(offsetAtt.startOffset(), termAtt.buffer(), termAtt.length());
                 posLengthAtt.setPositionLength(length);
-            } else {
-                List<Morpheme> aUnits = splitAtt.getAUnits();
-                if (aUnits.size() > 1) {
-                    aUnitIterator = aUnits.listIterator();
+            } else if (splitMode != Tokenizer.SplitMode.C) {
+                List<Morpheme> subUnits = m.split(splitMode);
+                if (subUnits.size() > 1) {
+                    aUnitIterator = subUnits.listIterator();
                     aUnitOffset = offsetAtt.startOffset();
-                    posLengthAtt.setPositionLength(aUnits.size());
+                    posLengthAtt.setPositionLength(subUnits.size());
                 } else {
                     posLengthAtt.setPositionLength(1);
                 }
@@ -147,26 +147,24 @@ public class SudachiSplitFilter extends TokenFilter {
         }
     }
 
-    private void setAUnitAttribute(Morpheme morpheme) throws IOException {
+    private void setAUnitAttribute(Morpheme morpheme) {
         posLengthAtt.setPositionLength(1);
         if (aUnitIterator.previousIndex() == 0) {
             posIncAtt.setPositionIncrement(0);
         } else {
             posIncAtt.setPositionIncrement(1);
         }
-        basicFormAtt.setMorpheme(morpheme);
-        normFormAtt.setMorpheme(morpheme);
-        posAtt.setMorpheme(morpheme);
-        readingAtt.setMorpheme(morpheme);
         int length = morpheme.end() - morpheme.begin();
         offsetAtt.setOffset(aUnitOffset, aUnitOffset + length);
         aUnitOffset += length;
-        termAtt.append(morpheme.surface());
+        morphemeAtt.setMorpheme(morpheme);
+        if (consumerAttribute.shouldConsume(this)) {
+            termAtt.append(morpheme.surface());
+        }
     }
 
-    private void setOOVAttribute() throws IOException {
+    private void setOOVAttribute() {
         int offset = oovChars.offset();
-        offsetAtt.setOffset(offset, offset + 1);
         posLengthAtt.setPositionLength(1);
         if (oovChars.index() == 0) {
             posIncAtt.setPositionIncrement(0);
@@ -178,18 +176,8 @@ public class SudachiSplitFilter extends TokenFilter {
         if (Character.isSurrogate(c) && oovChars.hasNext()) {
             termAtt.append(oovChars.next());
             offsetAtt.setOffset(offset, offset + 2);
+        } else {
+            offsetAtt.setOffset(offset, offset + 1);
         }
-    }
-
-    private int codePointCount(CharTermAttribute attr) {
-        int count = attr.length();
-        for (int i = 0; i < attr.length(); ) {
-            if (Character.isHighSurrogate(attr.charAt(i++)) &&
-                Character.isLowSurrogate(attr.charAt(i))) {
-                    count--;
-                    i++;
-                }
-        }
-        return count;
     }
 }
