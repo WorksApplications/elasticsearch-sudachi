@@ -11,7 +11,17 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        es-version:
+          - 8.2.3
+          - 7.14.2
+          - 7.10.2
+          - 7.4.2
+          - 7.0.1
+          - 6.8.23
+          - 5.6.16
+    continue-on-error: true
     steps:
     - uses: actions/checkout@v3
       with:
@@ -29,17 +39,10 @@ jobs:
     - name: Build and analyze # This stage sets up gradle caching
       uses: eskatos/gradle-command-action@v2
       with:
-        arguments: --info clean build jacocoTestReport
+        arguments: -PelasticsearchVersion=${{ matrix.es-version }} --info clean build jacocoTestReport sonarqube
         cache-read-only: false # ${{ github.ref != 'refs/heads/develop' }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: Analyze with sonarqube
-      uses: eskatos/gradle-command-action@v2
-      with:
-        arguments: --info sonarqube
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
     - uses: actions/upload-artifact@v3
       if: failure()
       with:

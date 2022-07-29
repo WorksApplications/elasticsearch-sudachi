@@ -22,7 +22,6 @@ import com.worksap.nlp.elasticsearch.sudachi.plugin.AnalysisCacheService
 import com.worksap.nlp.elasticsearch.sudachi.plugin.DictionaryService
 import com.worksap.nlp.lucene.sudachi.ja.IndexTokenizer
 import com.worksap.nlp.lucene.sudachi.ja.SudachiTokenizer
-import com.worksap.nlp.sudachi.Tokenizer.SplitMode
 import org.apache.lucene.analysis.Tokenizer
 import org.elasticsearch.common.settings.Settings
 import org.elasticsearch.env.Environment
@@ -49,14 +48,7 @@ class SudachiTokenizerFactory(
     }
   }
 
-  private val mode = let {
-    val m = ConfigAdapter.splitMode(settings)
-    if (m != SplitMode.C) {
-      deprecationLogger.deprecatedAndMaybeLog(
-          "Sudachi.SplitMode", "Use SplitFilter instead of specifying split_mode in the tokenizer")
-    }
-    m
-  }
+  private val mode = ConfigAdapter.splitMode(settings)
 
   private val config = ConfigAdapter(indexSettings, name, settings, env)
 
