@@ -14,33 +14,34 @@
  * limitations under the License.
  */
 
-package com.worksap.nlp.elasticsearch.sudachi.index;
+package com.worksap.nlp.elasticsearch.sudachi.index
 
-import java.util.Locale;
+import com.worksap.nlp.lucene.sudachi.ja.SudachiSplitFilter
+import com.worksap.nlp.sudachi.Tokenizer
+import com.worksap.nlp.tools.EnumFlag
+import org.apache.lucene.analysis.TokenStream
+import org.elasticsearch.common.settings.Settings
+import org.elasticsearch.env.Environment
+import org.elasticsearch.index.IndexSettings
+import org.elasticsearch.index.analysis.AbstractTokenFilterFactory
 
-import com.worksap.nlp.lucene.sudachi.ja.SudachiSplitFilter;
-import com.worksap.nlp.lucene.sudachi.ja.SudachiSplitFilter.Mode;
+class SudachiSplitFilterFactory(
+    indexSettings: IndexSettings?,
+    env: Environment?,
+    name: String?,
+    settings: Settings
+) : AbstractTokenFilterFactory(indexSettings, name, settings) {
 
-import com.worksap.nlp.sudachi.Tokenizer;
-import org.apache.lucene.analysis.TokenStream;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.env.Environment;
-import org.elasticsearch.index.IndexSettings;
-import org.elasticsearch.index.analysis.AbstractTokenFilterFactory;
+  private val mode = Mode.get(settings)
+  private val splitMode = SplitMode.get(settings)
 
-public class SudachiSplitFilterFactory extends AbstractTokenFilterFactory {
-    private static final String MODE_PARAM = "mode";
+  override fun create(tokenStream: TokenStream): TokenStream {
+    return SudachiSplitFilter(tokenStream, mode, splitMode)
+  }
 
-    private final Mode mode;
-
-    public SudachiSplitFilterFactory(IndexSettings indexSettings, Environment env, String name, Settings settings) {
-        super(indexSettings, name, settings);
-        mode = Mode
-                .valueOf(settings.get(MODE_PARAM, SudachiSplitFilter.DEFAULT_MODE.toString()).toUpperCase(Locale.ROOT));
-    }
-
-    @Override
-    public TokenStream create(TokenStream tokenStream) {
-        return new SudachiSplitFilter(tokenStream, mode, Tokenizer.SplitMode.A);
-    }
+  companion object {
+    private object Mode :
+        EnumFlag<SudachiSplitFilter.Mode>("mode", SudachiSplitFilter.DEFAULT_MODE)
+    private object SplitMode : EnumFlag<Tokenizer.SplitMode>("split_mode", Tokenizer.SplitMode.A)
+  }
 }

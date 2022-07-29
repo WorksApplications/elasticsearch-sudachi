@@ -18,39 +18,8 @@ package com.worksap.nlp.lucene.sudachi.ja
 
 import com.worksap.nlp.lucene.sudachi.aliases.TokenFilterFactory
 import com.worksap.nlp.sudachi.Tokenizer
-import java.lang.IllegalArgumentException
-import java.lang.reflect.ParameterizedType
+import com.worksap.nlp.tools.EnumFlag
 import org.apache.lucene.analysis.TokenStream
-
-abstract class EnumFlag<T : Enum<T>>(private val name: String, private val default: T? = null) {
-  @Suppress("UNCHECKED_CAST")
-  private val enumClazz = run {
-    val superclazz = javaClass.annotatedSuperclass.type as ParameterizedType
-    val typeArgs = superclazz.actualTypeArguments
-    typeArgs[0] as Class<T>
-  }
-  private val values: Array<T> = enumClazz.enumConstants
-
-  fun extract(args: MutableMap<String, String>): T {
-    val raw = args.remove(name)
-    if (raw == null) {
-      if (default != null) {
-        return default
-      } else {
-        throw IllegalArgumentException("required property $name was not present")
-      }
-    }
-
-    for (v in values) {
-      if (v.name.equals(raw, true)) {
-        return v
-      }
-    }
-    val acceptedValues = values.joinToString(",", "[", "]") { it.name }
-    throw IllegalArgumentException(
-        "property $name had unknown value $raw, accepted values: $acceptedValues")
-  }
-}
 
 class SudachiSplitFilterFactory(args: MutableMap<String, String>) : TokenFilterFactory(args) {
   private val mode = Mode.extract(args)
