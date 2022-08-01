@@ -22,7 +22,8 @@ import com.worksap.nlp.lucene.sudachi.ja.util.AnalysisCache
 import com.worksap.nlp.sudachi.Tokenizer.SplitMode
 import java.io.Reader
 
-class IndexTokenizer(
+/** Objective of this class is to combine reloadable tokenizer with analysis cache. */
+class CachingTokenizer(
     val tokenizer: ReloadableTokenizer,
     private val splitMode: SplitMode,
     private val cache: AnalysisCache
@@ -33,4 +34,7 @@ class IndexTokenizer(
 
   val dictionary: ReloadableDictionary
     get() = tokenizer.dictionary
+
+  val cacheMainSize: Int
+    get() = cache.mainSize
 }

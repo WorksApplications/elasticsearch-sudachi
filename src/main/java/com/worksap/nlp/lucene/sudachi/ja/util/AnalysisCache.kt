@@ -28,9 +28,10 @@ import java.io.Reader
 import java.util.concurrent.ConcurrentHashMap
 
 /**
- * This cache implements pseudo-LRU strategy with two hashmaps
+ * This cache implements pseudo-LRU strategy with two hashmaps. Caches analysis results when
+ * [InputExtractor] allows it and [capacity] `> 0`.
  *
- * It is thread safe
+ * This is thread safe and a single instance for an index should be created.
  */
 class AnalysisCache(private val capacity: Int, private val extractor: InputExtractor) {
   @Volatile private var main = ConcurrentHashMap<String, MorphemeList>(capacity)
@@ -48,7 +49,8 @@ class AnalysisCache(private val capacity: Int, private val extractor: InputExtra
     }
   }
 
-  fun analyze(tokenizer: Tokenizer, mode: SplitMode, input: Reader): MorphemeIterator {
+  /** Use [com.worksap.nlp.lucene.sudachi.ja.CachingTokenizer.tokenize] instead of this method. */
+  internal fun analyze(tokenizer: Tokenizer, mode: SplitMode, input: Reader): MorphemeIterator {
     if (capacity <= 0) {
       return NonCachedAnalysis(tokenizer, input, mode)
     }
@@ -79,4 +81,7 @@ class AnalysisCache(private val capacity: Int, private val extractor: InputExtra
     val list = main.computeIfAbsent(key) { k -> fallback[k] ?: factory(k) }
     return CachedAnalysis(list.split(mode))
   }
+
+  val mainSize: Int
+    get() = main.size
 }

@@ -28,7 +28,7 @@ import org.apache.lucene.util.AttributeFactory
 
 @Suppress("jol")
 class SudachiTokenizer(
-    private val tokenizer: IndexTokenizer,
+    private val tokenizer: CachingTokenizer,
     private val discardPunctuation: Boolean,
     factory: AttributeFactory = AttributeFactory.DEFAULT_ATTRIBUTE_FACTORY
 ) : Tokenizer(factory) {

@@ -17,7 +17,7 @@
 package com.worksap.nlp.test
 
 import com.worksap.nlp.elasticsearch.sudachi.plugin.ReloadableDictionary
-import com.worksap.nlp.lucene.sudachi.ja.IndexTokenizer
+import com.worksap.nlp.lucene.sudachi.ja.CachingTokenizer
 import com.worksap.nlp.lucene.sudachi.ja.ResourceUtil
 import com.worksap.nlp.lucene.sudachi.ja.SudachiTokenizer
 import com.worksap.nlp.lucene.sudachi.ja.input.NoopInputExtractor
@@ -179,7 +179,7 @@ class InMemoryDictionary {
       mode: SplitMode = SplitMode.C
   ): SudachiTokenizer {
     val cache = AnalysisCache(0, NoopInputExtractor.INSTANCE)
-    val it = IndexTokenizer(dic.newTokenizer(), mode, cache)
+    val it = CachingTokenizer(dic.newTokenizer(), mode, cache)
     val tokenizer = SudachiTokenizer(it, discardPunctuation)
     if (data != null) {
       tokenizer.setReader(StringReader(data))

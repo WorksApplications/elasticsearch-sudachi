@@ -18,5 +18,6 @@ package com.worksap.nlp.test;
 
 import com.worksap.nlp.lucene.sudachi.aliases.BaseTokenStreamTestCase;
 
+// This class needs to be written in Java, Kotlin does not work here
 public class AssertRunnerTest extends BaseTokenStreamTestCase {
 }

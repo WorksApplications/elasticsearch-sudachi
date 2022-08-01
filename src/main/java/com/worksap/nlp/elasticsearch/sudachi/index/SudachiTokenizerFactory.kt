@@ -20,7 +20,7 @@ import com.worksap.nlp.elasticsearch.sudachi.ConfigAdapter
 import com.worksap.nlp.elasticsearch.sudachi.aliases.AbstractTokenizerFactory
 import com.worksap.nlp.elasticsearch.sudachi.plugin.AnalysisCacheService
 import com.worksap.nlp.elasticsearch.sudachi.plugin.DictionaryService
-import com.worksap.nlp.lucene.sudachi.ja.IndexTokenizer
+import com.worksap.nlp.lucene.sudachi.ja.CachingTokenizer
 import com.worksap.nlp.lucene.sudachi.ja.SudachiTokenizer
 import org.apache.lucene.analysis.Tokenizer
 import org.elasticsearch.common.settings.Settings
@@ -57,7 +57,7 @@ class SudachiTokenizerFactory(
   private val cache by lazy { caches.analysisCache(indexSettings.index.name, mode, settings) }
 
   override fun create(): Tokenizer {
-    val tok = IndexTokenizer(dictionary.newTokenizer(), mode, cache)
+    val tok = CachingTokenizer(dictionary.newTokenizer(), mode, cache)
     return SudachiTokenizer(tok, config.discardPunctuation)
   }
 }

@@ -46,7 +46,7 @@ open class TestSudachiTokenizer : BaseTokenStreamTestCase() {
   fun makeTokenizer(mode: SplitMode, noPunctuation: Boolean): SudachiTokenizer {
     val dict = ReloadableDictionary(config)
     val tok =
-        IndexTokenizer(dict.newTokenizer(), mode, AnalysisCache(0, NoopInputExtractor.INSTANCE))
+        CachingTokenizer(dict.newTokenizer(), mode, AnalysisCache(0, NoopInputExtractor.INSTANCE))
     return SudachiTokenizer(tok, noPunctuation, AttributeFactory.DEFAULT_ATTRIBUTE_FACTORY)
   }
 

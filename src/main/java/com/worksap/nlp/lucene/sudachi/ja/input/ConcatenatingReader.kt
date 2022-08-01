@@ -21,12 +21,19 @@ import java.io.Reader
 class ConcatenatingReader(private val data: String, private val remaining: Reader) : Reader() {
   private var offset = 0
 
-  override fun read(cbuf: CharArray, off: Int, len: Int): Int {
+  override fun read(cbuf: CharArray, off0: Int, len0: Int): Int {
+    var off = off0
+    var len = len0
     if (offset < data.length) {
-      val toRead = len.coerceAtMost(offset - data.length)
+      val toRead = len.coerceAtMost(data.length - offset)
       data.toCharArray(cbuf, off, offset, offset + toRead)
       offset += toRead
-      return toRead
+      if (len == toRead) {
+        return toRead
+      }
+      len -= toRead
+      off += toRead
+      return toRead + remaining.read(cbuf, off, len)
     }
     return remaining.read(cbuf, off, len)
   }

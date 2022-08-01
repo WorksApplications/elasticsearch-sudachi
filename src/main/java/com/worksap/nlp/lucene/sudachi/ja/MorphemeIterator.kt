@@ -77,6 +77,7 @@ class NonCachedAnalysis(
         val morphs = sentenceIterator.next()
         currentLength = morphs.lastOrNull()?.end() ?: 0
         morphemeIterator = morphs.iterator()
+        // try once more with a recursive call
         return this.next()
       } else {
         currentLength = 0

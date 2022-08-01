@@ -17,7 +17,6 @@
 package com.worksap.nlp.lucene.sudachi.ja;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -95,7 +94,7 @@ public class SudachiAnalyzer extends StopwordAnalyzerBase {
 
     @Override
     protected TokenStreamComponents createComponents(String fieldName) {
-        IndexTokenizer it = new IndexTokenizer(dictionary.newTokenizer(), mode, cache);
+        CachingTokenizer it = new CachingTokenizer(dictionary.newTokenizer(), mode, cache);
         Tokenizer tokenizer = new SudachiTokenizer(it, discardPunctuation, AttributeFactory.DEFAULT_ATTRIBUTE_FACTORY);
         TokenStream stream = tokenizer;
         stream = new SudachiBaseFormFilter(stream);
