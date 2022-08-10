@@ -29,8 +29,14 @@ jobs:
     - name: Build and analyze # This stage sets up gradle caching
       uses: eskatos/gradle-command-action@v2
       with:
-        arguments: --info clean build jacocoTestReport sonarqube
+        arguments: --info clean build jacocoTestReport
         cache-read-only: false # ${{ github.ref != 'refs/heads/develop' }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Analyze with sonarqube
+      uses: eskatos/gradle-command-action@v2
+      with:
+        arguments: --info sonarqube
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

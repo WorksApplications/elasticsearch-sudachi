@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2018 Works Applications Co., Ltd.
+ * Copyright (c) 2018-2022 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,12 +22,12 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.util.HashMap;
 
+import com.worksap.nlp.lucene.sudachi.aliases.BaseTokenStreamTestCase;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import org.apache.lucene.analysis.BaseTokenStreamTestCase;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
 
@@ -45,8 +45,7 @@ public class TestSudachiPartOfSpeechStopFilter extends BaseTokenStreamTestCase {
     public void setUp() throws Exception {
         super.setUp();
         tempFolderForDictionary.create();
-        File tempFileForDictionary = tempFolderForDictionary
-                .newFolder("sudachiDictionary");
+        File tempFileForDictionary = tempFolderForDictionary.newFolder("sudachiDictionary");
         ResourceUtil.copy(tempFileForDictionary);
 
         String settings;
@@ -55,8 +54,12 @@ public class TestSudachiPartOfSpeechStopFilter extends BaseTokenStreamTestCase {
         }
 
         tokenStream = new SudachiTokenizer(true, SplitMode.A, tempFileForDictionary.getPath(), settings, false);
-        ((Tokenizer)tokenStream).setReader(new StringReader("東京都に行った。"));
-        factory = new SudachiPartOfSpeechStopFilterFactory(new HashMap<String, String>() {{ put("tags", "stoptags.txt"); }});
+        ((Tokenizer) tokenStream).setReader(new StringReader("東京都に行った。"));
+        factory = new SudachiPartOfSpeechStopFilterFactory(new HashMap<String, String>() {
+            {
+                put("tags", "stoptags.txt");
+            }
+        });
     }
 
     @Test
@@ -64,7 +67,7 @@ public class TestSudachiPartOfSpeechStopFilter extends BaseTokenStreamTestCase {
         String tags = "動詞,非自立可能\n名詞,固有名詞,地名,一般\n";
         factory.inform(new StringResourceLoader(tags));
         tokenStream = factory.create(tokenStream);
-        assertTokenStreamContents(tokenStream, new String[] {"都", "に", "た"});
+        assertTokenStreamContents(tokenStream, new String[] { "都", "に", "た" });
     }
 
     @Test
@@ -72,7 +75,7 @@ public class TestSudachiPartOfSpeechStopFilter extends BaseTokenStreamTestCase {
         String tags = "動詞\n名詞,固有名詞\n";
         factory.inform(new StringResourceLoader(tags));
         tokenStream = factory.create(tokenStream);
-        assertTokenStreamContents(tokenStream, new String[] {"都", "に", "た"});
+        assertTokenStreamContents(tokenStream, new String[] { "都", "に", "た" });
     }
 
     @Test
@@ -80,8 +83,7 @@ public class TestSudachiPartOfSpeechStopFilter extends BaseTokenStreamTestCase {
         String tags = "五段-カ行\n";
         factory.inform(new StringResourceLoader(tags));
         tokenStream = factory.create(tokenStream);
-        assertTokenStreamContents(tokenStream,
-                                  new String[] { "東京", "都", "に", "た"});
+        assertTokenStreamContents(tokenStream, new String[] { "東京", "都", "に", "た" });
     }
 
     @Test
@@ -89,8 +91,7 @@ public class TestSudachiPartOfSpeechStopFilter extends BaseTokenStreamTestCase {
         String tags = "五段-カ行,終止形-一般\n";
         factory.inform(new StringResourceLoader(tags));
         tokenStream = factory.create(tokenStream);
-        assertTokenStreamContents(tokenStream,
-                                  new String[] { "東京", "都", "に", "行っ", "た"});
+        assertTokenStreamContents(tokenStream, new String[] { "東京", "都", "に", "行っ", "た" });
     }
 
     @Test
@@ -98,8 +99,7 @@ public class TestSudachiPartOfSpeechStopFilter extends BaseTokenStreamTestCase {
         String tags = "終止形-一般\n";
         factory.inform(new StringResourceLoader(tags));
         tokenStream = factory.create(tokenStream);
-        assertTokenStreamContents(tokenStream,
-                                  new String[] { "東京", "都", "に", "行っ"});
+        assertTokenStreamContents(tokenStream, new String[] { "東京", "都", "に", "行っ" });
     }
 
     @Test
@@ -107,8 +107,7 @@ public class TestSudachiPartOfSpeechStopFilter extends BaseTokenStreamTestCase {
         String tags = "助詞,格助詞\n助詞,格助詞,引用\n";
         factory.inform(new StringResourceLoader(tags));
         tokenStream = factory.create(tokenStream);
-        assertTokenStreamContents(tokenStream,
-                                  new String[] { "東京", "都", "行っ", "た"});
+        assertTokenStreamContents(tokenStream, new String[] { "東京", "都", "行っ", "た" });
     }
 
     @Test
@@ -116,8 +115,7 @@ public class TestSudachiPartOfSpeechStopFilter extends BaseTokenStreamTestCase {
         String tags = "名詞,固有名詞,地名,一般,一般\n";
         factory.inform(new StringResourceLoader(tags));
         tokenStream = factory.create(tokenStream);
-        assertTokenStreamContents(tokenStream,
-                                  new String[] { "東京", "都", "に", "行っ", "た"});
+        assertTokenStreamContents(tokenStream, new String[] { "東京", "都", "に", "行っ", "た" });
     }
 
 }
