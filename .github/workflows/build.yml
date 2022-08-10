@@ -36,11 +36,17 @@ jobs:
       with:
         path: ~/.sonar/cache
         key: ${{ runner.os }}-sonar-${{ hashFiles('build.gradle') }}
+    - name: Extract version
+      uses: eskatos/gradle-command-action@v2
+      with:
+        arguments: printVersionForGithubActions
+        cache-read-only: false # ${{ github.ref != 'refs/heads/develop' }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Build # This stage sets up gradle caching
       uses: eskatos/gradle-command-action@v2
       with:
         arguments: -PelasticsearchVersion=${{ matrix.es-version }} --info clean build koverXmlReport
-        cache-read-only: false # ${{ github.ref != 'refs/heads/develop' }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Analyze with sonarqube
@@ -51,6 +57,18 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    - name: Cache elasticsearch download
+      uses: actions/cache@v3
+      with:
+        path: elasticsearch-${{ matrix.es-version }}-linux-x86_64.tar.gz
+        key: elasticsearch-${{ matrix.es-version }}
+    - name: Integration test
+      env:
+        ES_VERSION: ${{ matrix.es-version }}
+        PLUGIN_VERSION: ${{ env.PROJ_VERSION }}
+      run: |
+        bash test-scripts/zz-install-elasticsearch.sh
+        bash test-scripts/00-init-index.sh
     - uses: actions/upload-artifact@v3
       if: failure()
       with:

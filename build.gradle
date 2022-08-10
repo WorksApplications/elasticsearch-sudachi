@@ -107,3 +107,10 @@ tasks.koverXmlReport {
     enabled = true
     xmlReportFile.set(layout.buildDirectory.file("reports/jacoco/test/jacocoTestReport.xml"))
 }
+
+task printVersionForGithubActions {
+    doLast {
+        // https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#environment-files
+        file(System.getenv("GITHUB_ENV")).write("PROJ_VERSION=$project.version")
+    }
+}
