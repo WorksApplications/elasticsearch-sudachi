@@ -24,7 +24,8 @@ data class ExtractionResult(
     val remaining: Boolean,
 ) {
   companion object {
-    @JvmField val EMPTY = ExtractionResult("", remaining = true)
+    @JvmField val EMPTY_HAS_REMAINING = ExtractionResult("", remaining = true)
+    @JvmField val EMPTY_NO_REMAINING = ExtractionResult("", remaining = false)
   }
 }
 
@@ -46,7 +47,7 @@ interface InputExtractor {
 }
 
 class NoopInputExtractor : InputExtractor {
-  override fun extract(input: Reader) = ExtractionResult.EMPTY
+  override fun extract(input: Reader) = ExtractionResult.EMPTY_HAS_REMAINING
   override fun canExtract(input: Reader) = false
 
   companion object {
@@ -58,6 +59,9 @@ class CopyingInputExtractor(private val maxSize: Int) : InputExtractor {
   private val buffer = CharArray(maxSize)
   override fun extract(input: Reader): ExtractionResult {
     val sz1 = input.read(buffer)
+    if (sz1 == -1) {
+      return ExtractionResult.EMPTY_NO_REMAINING
+    }
     if (sz1 == maxSize) {
       val data = String(buffer, 0, sz1)
       return ExtractionResult(data, remaining = true)

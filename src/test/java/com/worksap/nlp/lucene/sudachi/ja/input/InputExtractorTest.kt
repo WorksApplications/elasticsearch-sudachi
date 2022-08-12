@@ -17,6 +17,7 @@
 package com.worksap.nlp.lucene.sudachi.ja.input
 
 import com.worksap.nlp.lucene.sudachi.aliases.DirectoryForTests
+import kotlin.test.*
 import org.apache.lucene.analysis.Analyzer
 import org.apache.lucene.analysis.Tokenizer
 import org.apache.lucene.document.Document
@@ -24,7 +25,6 @@ import org.apache.lucene.document.Field
 import org.apache.lucene.document.TextField
 import org.apache.lucene.index.IndexWriter
 import org.apache.lucene.index.IndexWriterConfig
-import org.junit.Assert.*
 import org.junit.Test
 
 class InputExtractorTest {
@@ -41,7 +41,7 @@ class InputExtractorTest {
   }
 
   private class ExtractingAnalyzer(private val extractor: InputExtractor) : Analyzer() {
-    var data: ExtractionResult = ExtractionResult.EMPTY
+    var data: ExtractionResult = ExtractionResult.EMPTY_HAS_REMAINING
 
     override fun createComponents(fieldName: String?): TokenStreamComponents {
       val tokenizer = ExtractorTextStream(extractor, this)
@@ -80,5 +80,12 @@ class InputExtractorTest {
     val extracted = extract(CopyingInputExtractor(100), text)
     assertTrue(extracted.remaining)
     assertEquals(text.substring(0 until 100), extracted.data)
+  }
+
+  @Test
+  fun copyImplZeroLength() {
+    val extracted = extract(CopyingInputExtractor(512), "")
+    assertEquals("", extracted.data)
+    assertFalse(extracted.remaining)
   }
 }

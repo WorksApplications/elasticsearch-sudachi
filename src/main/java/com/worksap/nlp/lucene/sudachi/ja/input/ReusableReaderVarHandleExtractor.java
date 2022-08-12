@@ -45,7 +45,7 @@ public class ReusableReaderVarHandleExtractor implements InputExtractor {
             String data = (String) S_FIELD.get(r);
             return new ExtractionResult(data, false);
         }
-        return ExtractionResult.EMPTY;
+        return ExtractionResult.EMPTY_HAS_REMAINING;
     }
 
     @Override
