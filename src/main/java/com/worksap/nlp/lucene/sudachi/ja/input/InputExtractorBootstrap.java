@@ -34,7 +34,7 @@ public class InputExtractorBootstrap {
             zeroCopy = ReusableReaderVarHandleExtractor.INSTANCE;
             logger.debug("successful instantiation of VarHandle-based input extractor");
         } catch (UnsupportedOperationException | ExceptionInInitializerError e) {
-            logger.debug("failed to instantiate VarHandle-based input extractor");
+            logger.debug("failed to instantiate VarHandle-based input extractor", e);
             zeroCopy = null;
         }
 
