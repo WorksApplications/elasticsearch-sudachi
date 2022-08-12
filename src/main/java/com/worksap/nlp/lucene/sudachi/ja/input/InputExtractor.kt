@@ -17,6 +17,7 @@
 package com.worksap.nlp.lucene.sudachi.ja.input
 
 import java.io.Reader
+import java.lang.ref.SoftReference
 import org.elasticsearch.common.settings.Settings
 
 data class ExtractionResult(
@@ -56,23 +57,37 @@ class NoopInputExtractor : InputExtractor {
 }
 
 class CopyingInputExtractor(private val maxSize: Int) : InputExtractor {
-  private val buffer = CharArray(maxSize)
+  private val bufferLocal = ThreadLocal<SoftReference<CharArray>>()
   override fun extract(input: Reader): ExtractionResult {
-    val sz1 = input.read(buffer)
+    val buf = getBuffer()
+    val sz1 = input.read(buf)
     if (sz1 == -1) {
       return ExtractionResult.EMPTY_NO_REMAINING
     }
     if (sz1 == maxSize) {
-      val data = String(buffer, 0, sz1)
+      val data = String(buf, 0, sz1)
       return ExtractionResult(data, remaining = true)
     }
-    val sz2 = input.read(buffer, sz1, maxSize - sz1)
+    val sz2 = input.read(buf, sz1, maxSize - sz1)
     if (sz2 == -1) {
-      val data = String(buffer, 0, sz1)
+      val data = String(buf, 0, sz1)
       return ExtractionResult(data, remaining = false)
     }
-    val data = String(buffer, 0, sz1 + sz2)
+    val data = String(buf, 0, sz1 + sz2)
     return ExtractionResult(data, true)
+  }
+
+  private fun getBuffer(): CharArray {
+    val ref = bufferLocal.get()
+    if (ref != null) {
+      val buf = ref.get()
+      if (buf != null) {
+        return buf
+      }
+    }
+    val buf = CharArray(maxSize)
+    bufferLocal.set(SoftReference(buf))
+    return buf
   }
 
   override fun canExtract(input: Reader): Boolean = true
