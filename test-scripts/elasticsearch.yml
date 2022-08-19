@@ -1,3 +1,5 @@
+network.host: 0.0.0.0
+http.port: 9200
 cluster.name: sudachi-test
 node.name: test-node
 discovery.type: single-node
