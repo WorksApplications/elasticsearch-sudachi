@@ -67,4 +67,5 @@ if [[ -n $RUN_ES_DAEMON ]]; then
   "$ES_DIR/bin/elasticsearch" -d
 fi
 
+date --iso-8601=seconds
 popd
