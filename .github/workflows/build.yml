@@ -62,15 +62,15 @@ jobs:
     - name: Cache dictionary download
       uses: actions/cache@v3
       with:
-        path: build/integration/sudachi-dictionary-20220709-small.zip
-        key: sudachi-dictionary-20220709
+        path: build/integration/sudachi-dictionary-20220729-small.zip
+        key: sudachi-dictionary-20220729
     - name: Integration test
       env:
         ES_VERSION: ${{ matrix.es-version }}
         PLUGIN_VERSION: ${{ env.PROJ_VERSION }}
         RUN_ES_DAEMON: 1
         ES_STARTUP_SLEEP_TIME: 30
-        DIC_VERSION: 20220709
+        DIC_VERSION: 20220729
       run: |
         bash test-scripts/00-install-elasticsearch.sh
         bash test-scripts/10-make-index.sh
