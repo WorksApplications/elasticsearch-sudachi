@@ -6,4 +6,4 @@ INDEX_NAME=${INDEX_NAME:-test_sudachi}
 
 curl -X PUT "localhost:$ES_PORT/$INDEX_NAME" \
   -H 'Content-Type: application/json' \
-  -d "@$SCRIPT_DIR/00-init-index.json"
+  -d "@$SCRIPT_DIR/10-init-index.json"

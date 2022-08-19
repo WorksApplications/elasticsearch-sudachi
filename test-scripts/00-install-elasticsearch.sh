@@ -61,4 +61,8 @@ logger.com.worksap.nlp.level = debug
 EOF
 fi
 
+if [[ -n $RUN_ES_DAEMON ]]; then
+  "$ES_DIR/bin/elasticsearch" -d
+fi
+
 popd

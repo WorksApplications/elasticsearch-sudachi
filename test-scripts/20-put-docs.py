@@ -9,7 +9,7 @@ def parse_args():
     p = argparse.ArgumentParser()
     p.add_argument("--port", type=int, default=9200)
     p.add_argument("--host", default="http://localhost")
-    p.add_argument("--docs", default=10000, type=int)
+    p.add_argument("--docs", default=20000, type=int)
     p.add_argument("--index", default="test_sudachi")
     p.add_argument("--no-data", action="store_true")
     return p.parse_args()

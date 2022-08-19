@@ -66,11 +66,17 @@ jobs:
       env:
         ES_VERSION: ${{ matrix.es-version }}
         PLUGIN_VERSION: ${{ env.PROJ_VERSION }}
+        RUN_ES_DAEMON: 1
+        ES_STARTUP_SLEEP_TIME: 20
       run: |
-        bash test-scripts/zz-install-elasticsearch.sh
-        bash test-scripts/00-init-index.sh
+        bash test-scripts/00-install-elasticsearch.sh
+        bash test-scripts/10-init-index.sh
+        python3 test-scripts/20-put-docs.py
+        python3 test-scripts/30-test-docs.py
     - uses: actions/upload-artifact@v3
       if: failure()
       with:
         name: failure reports
-        path: build/reports
+        path: |
+          build/reports
+          integration/elasticsearch-*/logs
