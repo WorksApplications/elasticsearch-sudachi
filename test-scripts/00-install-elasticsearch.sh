@@ -49,6 +49,7 @@ if [[ ! -f "$DIC_ZIP_PATH" ]]; then
 fi
 
 if [[ "$ES_DIR/config/sudachi/system_core.dic" -ot "$DIC_ZIP_PATH" ]]; then
+  mkdir -p "$ES_DIR/config/sudachi"
   unzip -p "$DIC_ZIP_PATH" "*/system_small.dic" > "$ES_DIR/config/sudachi/system_core.dic"
 fi
 
