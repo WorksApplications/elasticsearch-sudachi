@@ -24,7 +24,7 @@ pushd "$PWD"
 cd "$WORK_DIR"
 
 if [[ ! -f $ES_FILE ]]; then
-  wget --progress=dot:mega "$ES_URL"
+  wget --progress=dot:giga "$ES_URL"
 fi
 
 PLUGIN_PATH="$(readlink -f "$PLUGIN_PATH")"
@@ -45,7 +45,7 @@ cp "$SCRIPT_DIR/elasticsearch.yml" "$ES_DIR/config/elasticsearch.yml"
 DIC_ZIP_PATH="$WORK_DIR/sudachi-dictionary-$DIC_VERSION-small.zip"
 
 if [[ ! -f "$DIC_ZIP_PATH" ]]; then
-  wget --progress=dot:mega "http://sudachi.s3-website-ap-northeast-1.amazonaws.com/sudachidict/sudachi-dictionary-$DIC_VERSION-small.zip"
+  wget --progress=dot:giga "http://sudachi.s3-website-ap-northeast-1.amazonaws.com/sudachidict/sudachi-dictionary-$DIC_VERSION-small.zip"
 fi
 
 if [[ "$ES_DIR/config/sudachi/system_core.dic" -ot "$DIC_ZIP_PATH" ]]; then

@@ -70,7 +70,7 @@ jobs:
         ES_STARTUP_SLEEP_TIME: 20
       run: |
         bash test-scripts/00-install-elasticsearch.sh
-        bash test-scripts/10-init-index.sh
+        bash test-scripts/10-make-index.sh
         python3 test-scripts/20-put-docs.py
         python3 test-scripts/30-test-docs.py
     - uses: actions/upload-artifact@v3
