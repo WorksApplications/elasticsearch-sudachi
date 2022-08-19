@@ -24,7 +24,7 @@ pushd "$PWD"
 cd "$WORK_DIR"
 
 if [[ ! -f $ES_FILE ]]; then
-  wget "$ES_URL"
+  wget --progress=dot:mega "$ES_URL"
 fi
 
 PLUGIN_PATH="$(readlink -f "$PLUGIN_PATH")"
@@ -45,7 +45,7 @@ cp "$SCRIPT_DIR/elasticsearch.yml" "$ES_DIR/config/elasticsearch.yml"
 DIC_ZIP_PATH="$WORK_DIR/sudachi-dictionary-$DIC_VERSION-small.zip"
 
 if [[ ! -f "$DIC_ZIP_PATH" ]]; then
-  wget "http://sudachi.s3-website-ap-northeast-1.amazonaws.com/sudachidict/sudachi-dictionary-$DIC_VERSION-small.zip"
+  wget --progress=dot:mega "http://sudachi.s3-website-ap-northeast-1.amazonaws.com/sudachidict/sudachi-dictionary-$DIC_VERSION-small.zip"
 fi
 
 if [[ "$ES_DIR/config/sudachi/system_core.dic" -ot "$DIC_ZIP_PATH" ]]; then
@@ -55,10 +55,11 @@ fi
 
 
 # log sudachi plugin messages with debug level
-if ! grep -qF com.worskap "$ES_DIR/config/log4j2.properties"; then
+if ! grep -qF "com.worskap.nlp" "$ES_DIR/config/log4j2.properties"; then
 cat >> "$ES_DIR/config/log4j2.properties" <<'EOF'
 # sudachi debugging
-logger.com.worksap.nlp.level = debug
+logger.sudachi.name = com.worksap.nlp
+logger.sudachi.level = debug
 EOF
 fi
 
