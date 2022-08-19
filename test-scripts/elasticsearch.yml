@@ -2,4 +2,4 @@ cluster.name: sudachi-test
 node.name: test-node
 discovery.type: single-node
 xpack.security.enabled: false
-ingest.geoip.downloader.enabled: false
+# ingest.geoip.downloader.enabled: false

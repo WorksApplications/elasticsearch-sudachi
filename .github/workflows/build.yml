@@ -15,12 +15,9 @@ jobs:
       matrix:
         es-version:
           - '8.2.3'
+          - '7.17.5'
           - '7.14.2'
           - '7.10.2'
-          - '7.4.2'
-          - '7.0.1'
-          - '6.8.23'
-          - '5.6.16'
     continue-on-error: true
     steps:
     - uses: actions/checkout@v3
@@ -60,14 +57,20 @@ jobs:
     - name: Cache elasticsearch download
       uses: actions/cache@v3
       with:
-        path: elasticsearch-${{ matrix.es-version }}-linux-x86_64.tar.gz
+        path: build/integration/elasticsearch-${{ matrix.es-version }}-linux-x86_64.tar.gz
         key: elasticsearch-${{ matrix.es-version }}
+    - name: Cache dictionary download
+      uses: actions/cache@v3
+      with:
+        path: build/integration/sudachi-dictionary-20220709-small.zip
+        key: sudachi-dictionary-20220709
     - name: Integration test
       env:
         ES_VERSION: ${{ matrix.es-version }}
         PLUGIN_VERSION: ${{ env.PROJ_VERSION }}
         RUN_ES_DAEMON: 1
-        ES_STARTUP_SLEEP_TIME: 20
+        ES_STARTUP_SLEEP_TIME: 30
+        DIC_VERSION: 20220709
       run: |
         bash test-scripts/00-install-elasticsearch.sh
         bash test-scripts/10-make-index.sh
@@ -79,4 +82,4 @@ jobs:
         name: failure reports
         path: |
           build/reports
-          integration/elasticsearch-*/logs
+          build/integration/elasticsearch-*/logs
