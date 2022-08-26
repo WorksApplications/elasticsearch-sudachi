@@ -28,6 +28,8 @@ import com.worksap.nlp.lucene.sudachi.ja.util.AnalysisCache;
 import com.worksap.nlp.lucene.sudachi.ja.util.Stoptags;
 import com.worksap.nlp.sudachi.PartialPOS;
 import com.worksap.nlp.sudachi.PosMatcher;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.lucene.analysis.*;
 import org.apache.lucene.analysis.core.StopFilter;
 
@@ -35,13 +37,14 @@ import com.worksap.nlp.sudachi.Tokenizer.SplitMode;
 import org.apache.lucene.util.AttributeFactory;
 
 /**
- * Analyzer which uses Sudachi as internal tokenizer.
- *
- * It also applies BaseFormFilter and stop word/stop POS filtering.
+ * Analyzer which uses Sudachi as internal tokenizer. It also applies
+ * BaseFormFilter and stop word/stop POS filtering.
  *
  * @see SudachiTokenizer
  */
 public class SudachiAnalyzer extends StopwordAnalyzerBase {
+
+    private static final Logger logger = LogManager.getLogger(SudachiAnalyzer.class);
     private final SplitMode mode;
     private final List<PartialPOS> stoptags;
 
@@ -94,6 +97,7 @@ public class SudachiAnalyzer extends StopwordAnalyzerBase {
 
     @Override
     protected TokenStreamComponents createComponents(String fieldName) {
+        logger.debug("creating Sudachi token stream with mode={} for field={}", mode, fieldName);
         CachingTokenizer it = new CachingTokenizer(dictionary.newTokenizer(), mode, cache);
         Tokenizer tokenizer = new SudachiTokenizer(it, discardPunctuation, AttributeFactory.DEFAULT_ATTRIBUTE_FACTORY);
         TokenStream stream = tokenizer;

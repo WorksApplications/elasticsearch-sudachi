@@ -23,6 +23,7 @@ import com.worksap.nlp.sudachi.Tokenizer
 import java.lang.ref.SoftReference
 import java.util.concurrent.ConcurrentHashMap
 import java.util.function.Function
+import org.apache.logging.log4j.LogManager
 
 /** Lightweight cache with strong-referenced entries and unbounded size */
 class UnboundedCache<K : Any, V>(private val factory: java.util.function.Function<K, V>) {
@@ -109,9 +110,14 @@ class ReloadableTokenizer(val dictionary: ReloadableDictionary) {
 }
 
 class DictionaryService {
+  companion object {
+    private val logger = LogManager.getLogger(DictionaryService::class.java)
+  }
+
   private val dictionaryCache = UnboundedCache(this::makeDictionary)
 
   fun forConfig(config: Config): ReloadableDictionary {
+    logger.debug("loading dictionary with config={}", config)
     return dictionaryCache.get(config)
   }
 

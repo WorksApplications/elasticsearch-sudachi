@@ -63,22 +63,19 @@ class AnalysisCache(private val capacity: Int, private val extractor: InputExtra
         val reader = ConcatenatingReader(extracted.data, input)
         return NonCachedAnalysis(tokenizer, reader, mode)
       } else {
-        return cached(extracted.data, mode) { sent -> tokenizer.tokenize(SplitMode.C, sent) }
+        return cached(extracted.data, mode, tokenizer)
       }
     } else {
       return NonCachedAnalysis(tokenizer, input, mode)
     }
   }
 
-  private inline fun cached(
-      key: String,
-      mode: SplitMode,
-      crossinline factory: (String) -> MorphemeList
-  ): MorphemeIterator {
+  private fun cached(input: String, mode: SplitMode, tokenizer: Tokenizer): MorphemeIterator {
     if (main.size >= capacity) {
       swap()
     }
-    val list = main.computeIfAbsent(key) { k -> fallback[k] ?: factory(k) }
+    val list =
+        main.computeIfAbsent(input) { k -> fallback[k] ?: tokenizer.tokenize(SplitMode.C, input) }
     return CachedAnalysis(list.split(mode))
   }
 

@@ -21,19 +21,26 @@ import com.worksap.nlp.lucene.sudachi.ja.util.AnalysisCache
 import com.worksap.nlp.sudachi.Tokenizer.SplitMode
 import java.lang.ref.WeakReference
 import java.util.concurrent.ConcurrentHashMap
+import org.apache.logging.log4j.LogManager
 import org.elasticsearch.common.settings.Settings
 
 class AnalysisCacheService {
-  data class Key(val name: String, val mode: SplitMode)
+  data class Key(val name: String)
   // we use WeakReference here because the main reference will reside in per-index factories
   private val caches = ConcurrentHashMap<Key, WeakReference<AnalysisCache>>()
 
+  companion object {
+    private val logger = LogManager.getLogger(AnalysisCacheService::class.java)
+  }
+
   fun analysisCache(indexName: String, mode: SplitMode, settings: Settings): AnalysisCache {
-    val key = Key(indexName, mode)
+    val key = Key(indexName)
     val entry =
         caches.computeIfAbsent(key) {
           val capacity = settings.getAsInt("cache-size", 32)
           val extractor = InputExtractor.make(settings)
+          logger.debug(
+              "creating new cache service for {}, size={}, extractor={}", key, capacity, extractor)
           val x = AnalysisCache(capacity, extractor)
           WeakReference(x)
         }

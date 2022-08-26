@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.worksap.nlp.elasticsearch.sudachi.index.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.index.analysis.AnalyzerProvider;
@@ -33,10 +35,13 @@ import org.elasticsearch.plugins.AnalysisPlugin;
 import org.elasticsearch.plugins.Plugin;
 
 public class AnalysisSudachiPlugin extends Plugin implements AnalysisPlugin {
+
+    private final static Logger logger = LogManager.getLogger(AnalysisSudachiPlugin.class);
     private final DictionaryService dictionaryService = new DictionaryService();
     private final AnalysisCacheService cacheService = new AnalysisCacheService();
 
     public AnalysisSudachiPlugin(Settings settings) {
+        logger.info("loaded Sudachi plugin");
     }
 
     @Override
