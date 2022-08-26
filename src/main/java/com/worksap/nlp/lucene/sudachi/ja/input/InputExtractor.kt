@@ -18,6 +18,7 @@ package com.worksap.nlp.lucene.sudachi.ja.input
 
 import java.io.Reader
 import java.lang.ref.SoftReference
+import kotlin.text.StringBuilder
 import org.elasticsearch.common.settings.Settings
 
 data class ExtractionResult(
@@ -91,6 +92,9 @@ class CopyingInputExtractor(private val maxSize: Int) : InputExtractor {
   }
 
   override fun canExtract(input: Reader): Boolean = true
+  override fun toString(): String {
+    return super.toString() + "(maxSize=$maxSize)"
+  }
 }
 
 class ChainedExtractor(private val first: InputExtractor, private val fallback: InputExtractor) :
@@ -104,5 +108,26 @@ class ChainedExtractor(private val first: InputExtractor, private val fallback: 
 
   override fun canExtract(input: Reader): Boolean {
     return first.canExtract(input) || fallback.canExtract(input)
+  }
+
+  private fun describe(builder: StringBuilder) {
+    if (first is ChainedExtractor) {
+      first.describe(builder)
+    } else {
+      builder.append(first.toString())
+    }
+    builder.append(", ")
+    if (fallback is ChainedExtractor) {
+      fallback.describe(builder)
+    } else {
+      builder.append(fallback.toString())
+    }
+  }
+
+  override fun toString(): String {
+    val bldr = StringBuilder("ChainedExtractor[")
+    describe(bldr)
+    bldr.append("]")
+    return bldr.toString()
   }
 }

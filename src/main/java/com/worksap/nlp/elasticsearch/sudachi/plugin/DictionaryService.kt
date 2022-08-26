@@ -26,7 +26,7 @@ import java.util.function.Function
 import org.apache.logging.log4j.LogManager
 
 /** Lightweight cache with strong-referenced entries and unbounded size */
-class UnboundedCache<K : Any, V>(private val factory: java.util.function.Function<K, V>) {
+class UnboundedCache<K : Any, V>(private val factory: Function<K, V>) {
   private val cache = ConcurrentHashMap<K, V>()
 
   fun get(key: K): V {
@@ -117,11 +117,11 @@ class DictionaryService {
   private val dictionaryCache = UnboundedCache(this::makeDictionary)
 
   fun forConfig(config: Config): ReloadableDictionary {
-    logger.debug("loading dictionary with config={}", config)
     return dictionaryCache.get(config)
   }
 
   private fun makeDictionary(config: Config): ReloadableDictionary {
+    logger.debug("loading dictionary with config={}", config)
     return ReloadableDictionary(config)
   }
 }
