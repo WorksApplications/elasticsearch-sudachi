@@ -69,10 +69,10 @@ jobs:
         ES_VERSION: ${{ matrix.es-version }}
         PLUGIN_VERSION: ${{ env.PROJ_VERSION }}
         RUN_ES_DAEMON: 1
-        ES_STARTUP_SLEEP_TIME: 40
         DIC_VERSION: 20220729
       run: |
         bash test-scripts/00-install-elasticsearch.sh
+        sleep 30
         bash test-scripts/10-make-index.sh
         python3 test-scripts/20-put-docs.py
         python3 test-scripts/30-test-docs.py
