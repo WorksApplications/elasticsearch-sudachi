@@ -50,6 +50,8 @@ def put_actual(args):
         for f in futures:
             f.wait()
 
+    ElasticSearch(args).refresh()
+
 
 class ElasticSearch(object):
     def __init__(self, args):
@@ -62,7 +64,7 @@ class ElasticSearch(object):
             doc_id = self.count
             self.count += 1
         doc = {"text": data}
-        url = f"{self.url}/_doc/{doc_id}"
+        url = f"{self.url}/_create/{doc_id}"
         r = self.mgr.urlopen(
             "PUT",
             url,
@@ -70,6 +72,10 @@ class ElasticSearch(object):
             body=json.dumps(doc),
         )
         return r.data
+
+    def refresh(self):
+        url = f"{self.url}/_refresh"
+        return self.mgr.urlopen("POST", url).data
 
 
 if __name__ == "__main__":

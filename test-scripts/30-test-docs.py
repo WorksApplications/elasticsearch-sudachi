@@ -48,7 +48,7 @@ class ElasticSearch(object):
         self.count = 0
         self.mgr = urllib3.PoolManager()
 
-    def find(self, query):
+    def find(self, query, size=None):
         doc = {
             "query": {
                 "multi_match": {
@@ -58,6 +58,8 @@ class ElasticSearch(object):
                 }
             }
         }
+        if size is not None:
+            doc["size"] = size
         url = f"{self.url}/_search"
         r = self.mgr.urlopen(
             "GET",
