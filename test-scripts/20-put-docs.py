@@ -49,6 +49,7 @@ def put_actual(args):
                 futures.append(p.apply_async(worker, [line.rstrip(), i]))
         for f in futures:
             f.wait()
+        print(f"inserted {len(futures)} documents")
 
     ElasticSearch(args).refresh()
 

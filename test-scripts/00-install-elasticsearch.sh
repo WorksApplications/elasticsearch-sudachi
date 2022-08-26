@@ -63,7 +63,7 @@ logger.sudachi.level = debug
 EOF
 fi
 
-if [[ -n $RUN_ES_DAEMON ]]; then
+if [[ -n "$RUN_ES_DAEMON" ]]; then
   "$ES_DIR/bin/elasticsearch" -d
 fi
 

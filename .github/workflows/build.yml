@@ -76,6 +76,19 @@ jobs:
         bash test-scripts/10-make-index.sh
         python3 test-scripts/20-put-docs.py
         python3 test-scripts/30-test-docs.py
+        bash test-scripts/80-delete-index.sh
+        bash test-scripts/10-make-index.sh
+        python3 test-scripts/20-put-docs.py
+        python3 test-scripts/30-test-docs.py
+        bash test-scripts/80-delete-index.sh
+        bash test-scripts/10-make-index.sh
+        python3 test-scripts/20-put-docs.py
+        python3 test-scripts/30-test-docs.py
+        bash test-scripts/80-delete-index.sh
+        bash test-scripts/10-make-index.sh
+        python3 test-scripts/20-put-docs.py
+        python3 test-scripts/30-test-docs.py
+        bash test-scripts/80-delete-index.sh
     - uses: actions/upload-artifact@v3
       if: failure()
       with:
