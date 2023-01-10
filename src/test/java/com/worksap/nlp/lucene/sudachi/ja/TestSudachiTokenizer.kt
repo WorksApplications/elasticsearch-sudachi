@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2022 Works Applications Co., Ltd.
+ * Copyright (c) 2017-2023 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package com.worksap.nlp.lucene.sudachi.ja
 
 import com.worksap.nlp.elasticsearch.sudachi.plugin.ReloadableDictionary
 import com.worksap.nlp.lucene.sudachi.aliases.BaseTokenStreamTestCase
+import com.worksap.nlp.lucene.sudachi.ja.input.CopyingInputExtractor
 import com.worksap.nlp.lucene.sudachi.ja.input.NoopInputExtractor
 import com.worksap.nlp.lucene.sudachi.ja.util.AnalysisCache
 import com.worksap.nlp.sudachi.Config
@@ -34,19 +35,23 @@ import org.junit.Test
 
 // Test of character segmentation using incrementToken(tokenizer)
 open class TestSudachiTokenizer : BaseTokenStreamTestCase() {
-  lateinit var tokenizer: SudachiTokenizer
-  lateinit var tokenizerA: SudachiTokenizer
-  lateinit var tokenizerB: SudachiTokenizer
-  lateinit var tokenizerPunctuation: SudachiTokenizer
-
   @JvmField @Rule var testDic = TestDictionary("system")
 
-  lateinit var config: Config
+  private lateinit var config: Config
 
-  fun makeTokenizer(mode: SplitMode, noPunctuation: Boolean): SudachiTokenizer {
+  fun makeTokenizer(
+      mode: SplitMode,
+      noPunctuation: Boolean = true,
+      capacity: Int = 0
+  ): SudachiTokenizer {
     val dict = ReloadableDictionary(config)
-    val tok =
-        CachingTokenizer(dict.newTokenizer(), mode, AnalysisCache(0, NoopInputExtractor.INSTANCE))
+    val extractor =
+        if (capacity == 0) {
+          NoopInputExtractor.INSTANCE
+        } else {
+          CopyingInputExtractor(Short.MAX_VALUE.toInt())
+        }
+    val tok = CachingTokenizer(dict.newTokenizer(), mode, AnalysisCache(capacity, extractor))
     return SudachiTokenizer(tok, noPunctuation, AttributeFactory.DEFAULT_ATTRIBUTE_FACTORY)
   }
 
@@ -54,16 +59,13 @@ open class TestSudachiTokenizer : BaseTokenStreamTestCase() {
   fun setup() {
     val configDir = testDic.root.toPath().resolve("config/sudachi")
     config = Config.fromFile(configDir.resolve("sudachi.json"))
-    tokenizer = makeTokenizer(SplitMode.C, true)
-    tokenizerA = makeTokenizer(SplitMode.A, true)
-    tokenizerB = makeTokenizer(SplitMode.B, true)
-    tokenizerPunctuation = makeTokenizer(SplitMode.C, false)
   }
 
   @Test
   fun incrementTokenWithShiftJis() {
     val sjis = charset("Shift_JIS")
     val str = String("東京都に行った。".toByteArray(sjis), sjis)
+    val tokenizer = makeTokenizer(SplitMode.C)
     tokenizer.setReader(StringReader(str))
     assertTokenStreamContents(
         tokenizer,
@@ -72,11 +74,13 @@ open class TestSudachiTokenizer : BaseTokenStreamTestCase() {
         intArrayOf(3, 4, 6, 7),
         intArrayOf(1, 1, 1, 1),
         intArrayOf(1, 1, 1, 1),
-        8)
+        8,
+    )
   }
 
   @Test
   fun incrementTokenByDefaultMode() {
+    val tokenizer = makeTokenizer(SplitMode.C)
     tokenizer.setReader(StringReader("東京都に行った。"))
     assertTokenStreamContents(
         tokenizer,
@@ -85,24 +89,43 @@ open class TestSudachiTokenizer : BaseTokenStreamTestCase() {
         intArrayOf(3, 4, 6, 7),
         intArrayOf(1, 1, 1, 1),
         intArrayOf(1, 1, 1, 1),
-        8)
+        8,
+    )
+  }
+
+  @Test
+  fun incrementTokenByDefaultModeCached() {
+    val tokenizer = makeTokenizer(SplitMode.C, capacity = 10)
+    tokenizer.setReader(StringReader("東京都に行った。"))
+    assertTokenStreamContents(
+        tokenizer,
+        arrayOf("東京都", "に", "行っ", "た"),
+        intArrayOf(0, 3, 4, 6),
+        intArrayOf(3, 4, 6, 7),
+        intArrayOf(1, 1, 1, 1),
+        intArrayOf(1, 1, 1, 1),
+        8,
+    )
   }
 
   @Test
   fun incrementTokenByPunctuationMode() {
-    tokenizerPunctuation.setReader(StringReader("東京都に行った。"))
+    val tokenizer = makeTokenizer(SplitMode.C, false)
+    tokenizer.setReader(StringReader("東京都に行った。"))
     assertTokenStreamContents(
-        tokenizerPunctuation,
+        tokenizer,
         arrayOf("東京都", "に", "行っ", "た", "。"),
         intArrayOf(0, 3, 4, 6, 7),
         intArrayOf(3, 4, 6, 7, 8),
         intArrayOf(1, 1, 1, 1, 1),
         intArrayOf(1, 1, 1, 1, 1),
-        8)
+        8,
+    )
   }
 
   @Test
   fun incrementTokenWithPunctuationsByDefaultMode() {
+    val tokenizer = makeTokenizer(SplitMode.C, true)
     tokenizer.setReader(StringReader("東京都に行った。東京都に行った。"))
     assertTokenStreamContents(
         tokenizer,
@@ -111,24 +134,43 @@ open class TestSudachiTokenizer : BaseTokenStreamTestCase() {
         intArrayOf(3, 4, 6, 7, 11, 12, 14, 15),
         intArrayOf(1, 1, 1, 1, 1, 1, 1, 1, 1),
         intArrayOf(1, 1, 1, 1, 1, 1, 1, 1, 1),
-        16)
+        16,
+    )
   }
 
   @Test
   fun incrementTokenWithPunctuationsByPunctuationMode() {
-    tokenizerPunctuation.setReader(StringReader("東京都に行った。東京都に行った。"))
+    val tokenizer = makeTokenizer(SplitMode.C, false)
+    tokenizer.setReader(StringReader("東京都に行った。東京都に行った。"))
     assertTokenStreamContents(
-        tokenizerPunctuation,
+        tokenizer,
         arrayOf("東京都", "に", "行っ", "た", "。", "東京都", "に", "行っ", "た", "。"),
         intArrayOf(0, 3, 4, 6, 7, 8, 11, 12, 14, 15),
         intArrayOf(3, 4, 6, 7, 8, 11, 12, 14, 15, 16),
         intArrayOf(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
         intArrayOf(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
-        16)
+        16,
+    )
+  }
+
+  @Test
+  fun incrementTokenWithPunctuationsByPunctuationModeCached() {
+    val tokenizer = makeTokenizer(SplitMode.C, false, capacity = 10)
+    tokenizer.setReader(StringReader("東京都に行った。東京都に行った。"))
+    assertTokenStreamContents(
+        tokenizer,
+        arrayOf("東京都", "に", "行っ", "た", "。", "東京都", "に", "行っ", "た", "。"),
+        intArrayOf(0, 3, 4, 6, 7, 8, 11, 12, 14, 15),
+        intArrayOf(3, 4, 6, 7, 8, 11, 12, 14, 15, 16),
+        intArrayOf(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+        intArrayOf(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+        16,
+    )
   }
 
   @Test
   fun incrementTokenWithOOVByDefaultMode() {
+    val tokenizer = makeTokenizer(SplitMode.C, true)
     tokenizer.setReader(StringReader("アマゾンに行った。"))
     assertTokenStreamContents(
         tokenizer,
@@ -137,11 +179,13 @@ open class TestSudachiTokenizer : BaseTokenStreamTestCase() {
         intArrayOf(4, 5, 7, 8),
         intArrayOf(1, 1, 1, 1),
         intArrayOf(1, 1, 1, 1),
-        9)
+        9,
+    )
   }
 
   @Test
   fun incrementTokenWithOOVByPunctuationMode() {
+    val tokenizerPunctuation = makeTokenizer(SplitMode.C, false)
     tokenizerPunctuation.setReader(StringReader("アマゾンに行った。"))
     assertTokenStreamContents(
         tokenizerPunctuation,
@@ -150,11 +194,13 @@ open class TestSudachiTokenizer : BaseTokenStreamTestCase() {
         intArrayOf(4, 5, 7, 8, 9),
         intArrayOf(1, 1, 1, 1, 1),
         intArrayOf(1, 1, 1, 1, 1),
-        9)
+        9,
+    )
   }
 
   @Test
   fun incrementTokenByAMode() {
+    val tokenizerA = makeTokenizer(SplitMode.A, true)
     tokenizerA.setReader(StringReader("東京都に行った。"))
     assertTokenStreamContents(
         tokenizerA,
@@ -163,11 +209,13 @@ open class TestSudachiTokenizer : BaseTokenStreamTestCase() {
         intArrayOf(2, 3, 4, 6, 7),
         intArrayOf(1, 1, 1, 1, 1),
         intArrayOf(1, 1, 1, 1, 1),
-        8)
+        8,
+    )
   }
 
   @Test
   fun incrementTokenByBMode() {
+    val tokenizerB = makeTokenizer(SplitMode.B, true)
     tokenizerB.setReader(StringReader("東京都に行った。"))
     assertTokenStreamContents(
         tokenizerB,
@@ -176,7 +224,8 @@ open class TestSudachiTokenizer : BaseTokenStreamTestCase() {
         intArrayOf(3, 4, 6, 7),
         intArrayOf(1, 1, 1, 1),
         intArrayOf(1, 1, 1, 1),
-        8)
+        8,
+    )
   }
 
   @Test
@@ -184,6 +233,7 @@ open class TestSudachiTokenizer : BaseTokenStreamTestCase() {
     val builder = NormalizeCharMap.Builder()
     builder.add("東京都", "京都")
     val filter = MappingCharFilter(builder.build(), StringReader("東京都に行った。"))
+    val tokenizer = makeTokenizer(SplitMode.C, true)
     tokenizer.setReader(filter)
     assertTokenStreamContents(
         tokenizer,
@@ -192,34 +242,46 @@ open class TestSudachiTokenizer : BaseTokenStreamTestCase() {
         intArrayOf(3, 4, 6, 7),
         intArrayOf(1, 1, 1, 1),
         intArrayOf(1, 1, 1, 1),
-        8)
+        8,
+    )
   }
 
   @Test
   fun additionalSettings() {
+    val tokenizer = makeTokenizer(SplitMode.C, true)
     tokenizer.setReader(StringReader("自然言語"))
     assertTokenStreamContents(
-        tokenizer, arrayOf("自然言語"), intArrayOf(0), intArrayOf(4), intArrayOf(1), intArrayOf(1), 4)
+        tokenizer,
+        arrayOf("自然言語"),
+        intArrayOf(0),
+        intArrayOf(4),
+        intArrayOf(1),
+        intArrayOf(1),
+        4,
+    )
 
     var anchor = PathAnchor.filesystem(testDic.root.toPath().resolve("config/sudachi"))
     anchor = anchor.andThen(PathAnchor.classpath(ResourceUtil::class.java))
     config =
         Config.fromClasspath(ResourceUtil::class.java.getResource("additional.json"), anchor)
             .withFallback(config)
-    tokenizer = makeTokenizer(SplitMode.C, true)
-    tokenizer.setReader(StringReader("自然言語"))
+    val tokenizer2 = makeTokenizer(SplitMode.C, true)
+    tokenizer2.setReader(StringReader("自然言語"))
     assertTokenStreamContents(
-        tokenizer,
+        tokenizer2,
         arrayOf("自然", "言語"),
         intArrayOf(0, 2),
         intArrayOf(2, 4),
         intArrayOf(1, 1),
         intArrayOf(1, 1),
-        4)
+        4,
+    )
   }
 
   @Test
   fun equalsHashCodeCoverage() {
+    val tokenizerA = makeTokenizer(SplitMode.A, true)
+    val tokenizerB = makeTokenizer(SplitMode.B, true)
     assertNotEquals(tokenizerA, tokenizerB)
     assertNotEquals(tokenizerA.hashCode().toLong(), tokenizerB.hashCode().toLong())
   }

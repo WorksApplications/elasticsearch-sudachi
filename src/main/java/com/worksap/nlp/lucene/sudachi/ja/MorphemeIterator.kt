@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Works Applications Co., Ltd.
+ * Copyright (c) 2022-2023 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,21 +42,26 @@ interface MorphemeIterator {
     get() = 0
 }
 
-class CachedAnalysis(private val source: Iterable<Morpheme>) : MorphemeIterator {
+class CachedAnalysis(source: Iterable<Morpheme>) : MorphemeIterator {
   private val iter = source.iterator()
+
+  private var sequenceEnd = 0
+
   override fun next(): Morpheme? {
     if (iter.hasNext()) {
-      return iter.next()
+      val m = iter.next()
+      sequenceEnd = m.end()
+      return m
     }
+    baseOffset = sequenceEnd
     return null
   }
+
+  override var baseOffset: Int = 0
 }
 
-class NonCachedAnalysis(
-    private val tokenizer: Tokenizer,
-    private val input: Reader,
-    private val splitMode: SplitMode
-) : MorphemeIterator {
+class NonCachedAnalysis(tokenizer: Tokenizer, input: Reader, splitMode: SplitMode) :
+    MorphemeIterator {
 
   private object EmptyIterator : Iterator<Morpheme> {
     override fun hasNext() = false

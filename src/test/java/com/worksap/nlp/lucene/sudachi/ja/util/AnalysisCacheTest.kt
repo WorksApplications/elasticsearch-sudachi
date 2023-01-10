@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Works Applications Co., Ltd.
+ * Copyright (c) 2022-2023 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ class AnalysisCacheTest {
       return cache.tokenize(reader)
     }
 
-    fun cacheSize(): Int = cache.cacheMainSize
+    fun cacheStats(): AnalysisCacheStats = cache.cacheStats()
   }
 
   @Test
@@ -49,7 +49,7 @@ class AnalysisCacheTest {
     val ana = TestAnalyzer()
     ana.analyze("東京都")
     ana.analyze("東京都")
-    assertEquals(1, ana.cacheSize())
+    assertEquals(1, ana.cacheStats().hits)
   }
 
   @Test
@@ -60,7 +60,8 @@ class AnalysisCacheTest {
     ana.analyze("東京都3")
     ana.analyze("東京都4")
     ana.analyze("東京都1")
-    assertEquals(1, ana.cacheSize())
+    assertEquals(1, ana.cacheStats().hits)
+    assertEquals(4, ana.cacheStats().misses)
   }
 
   @Test

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Works Applications Co., Ltd.
+ * Copyright (c) 2022-2023 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,20 +24,21 @@ import com.worksap.nlp.lucene.sudachi.ja.input.InputExtractor
 import com.worksap.nlp.sudachi.MorphemeList
 import com.worksap.nlp.sudachi.Tokenizer
 import com.worksap.nlp.sudachi.Tokenizer.SplitMode
-import org.elasticsearch.common.cache.CacheBuilder
 import java.io.Reader
+import org.elasticsearch.common.cache.CacheBuilder
 
 /**
- * This cache implements pseudo-LRU strategy with two hashmaps. Caches analysis results when
- * [InputExtractor] allows it and [capacity] `> 0`.
+ * Cache analysis results using ES-based cache logic.
  *
- * This is thread safe and a single instance for an index should be created.
+ * Analysis are always done in C mode and cached. Splitting is done after caching on-demand as it is
+ * a relatively cheap operation.
  */
 class AnalysisCache(private val capacity: Int, private val extractor: InputExtractor) {
-  private val cache = CacheBuilder.builder<String, MorphemeList>()
-      .setMaximumWeight(capacity * 64 * 1024L)
-      .weigher { i, ml -> i.length * 4L + ml.size * 64L }
-      .build()
+  private val cache =
+      CacheBuilder.builder<String, MorphemeList>()
+          .setMaximumWeight(capacity * 64 * 1024L)
+          .weigher { i, ml -> i.length * 4L + ml.size * 64L }
+          .build()
 
   /** Use [com.worksap.nlp.lucene.sudachi.ja.CachingTokenizer.tokenize] instead of this method. */
   internal fun analyze(tokenizer: Tokenizer, mode: SplitMode, input: Reader): MorphemeIterator {
@@ -65,6 +66,10 @@ class AnalysisCache(private val capacity: Int, private val extractor: InputExtra
     return CachedAnalysis(list.split(mode))
   }
 
-  val mainSize: Int = cache.count()
-
+  fun stats(): AnalysisCacheStats {
+    val stats = cache.stats()
+    return AnalysisCacheStats(hits = stats.hits, misses = stats.misses, evictions = stats.evictions)
+  }
 }
+
+data class AnalysisCacheStats(val hits: Long, val misses: Long, val evictions: Long)
