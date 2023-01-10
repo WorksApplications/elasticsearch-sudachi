@@ -9,6 +9,7 @@ WORK_DIR="${WORK_DIR:-$(readlink -f "$SCRIPT_DIR/../build/integration")}"
 ES_DIR="$WORK_DIR/elasticsearch-${ES_VERSION}"
 ES_FILE="$WORK_DIR/elasticsearch-${ES_VERSION}-linux-x86_64.tar.gz"
 DIC_VERSION=${DIC_VERSION:-latest}
+DIC_KIND=${DIC_KIND:-small}
 unset JAVA_HOME
 
 PLUGIN_PATH="$SCRIPT_DIR/../build/distributions/analysis-sudachi-$ES_VERSION-$PLUGIN_VERSION.zip"
@@ -45,7 +46,7 @@ cp "$SCRIPT_DIR/elasticsearch.yml" "$ES_DIR/config/elasticsearch.yml"
 DIC_ZIP_PATH="$WORK_DIR/sudachi-dictionary-$DIC_VERSION-small.zip"
 
 if [[ ! -f "$DIC_ZIP_PATH" ]]; then
-  wget --progress=dot:giga "http://sudachi.s3-website-ap-northeast-1.amazonaws.com/sudachidict/sudachi-dictionary-$DIC_VERSION-small.zip"
+  wget --progress=dot:giga "http://sudachi.s3-website-ap-northeast-1.amazonaws.com/sudachidict/sudachi-dictionary-$DIC_VERSION-$DIC_KIND.zip"
 fi
 
 if [[ "$ES_DIR/config/sudachi/system_core.dic" -ot "$DIC_ZIP_PATH" ]]; then
