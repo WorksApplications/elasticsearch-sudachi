@@ -24,8 +24,8 @@ import com.worksap.nlp.lucene.sudachi.ja.input.InputExtractor
 import com.worksap.nlp.sudachi.MorphemeList
 import com.worksap.nlp.sudachi.Tokenizer
 import com.worksap.nlp.sudachi.Tokenizer.SplitMode
+import org.elasticsearch.common.cache.CacheBuilder
 import java.io.Reader
-import java.util.concurrent.ConcurrentHashMap
 
 /**
  * This cache implements pseudo-LRU strategy with two hashmaps. Caches analysis results when
@@ -34,20 +34,10 @@ import java.util.concurrent.ConcurrentHashMap
  * This is thread safe and a single instance for an index should be created.
  */
 class AnalysisCache(private val capacity: Int, private val extractor: InputExtractor) {
-  @Volatile private var main = ConcurrentHashMap<String, MorphemeList>(capacity)
-  @Volatile private var fallback = ConcurrentHashMap<String, MorphemeList>(capacity)
-
-  private fun swap() {
-    synchronized(this) {
-      if (main.size >= capacity) {
-        val main1 = main
-        val fallback1 = fallback
-        main = fallback1
-        fallback = main1
-        fallback1.clear()
-      }
-    }
-  }
+  private val cache = CacheBuilder.builder<String, MorphemeList>()
+      .setMaximumWeight(capacity * 64 * 1024L)
+      .weigher { i, ml -> i.length * 4L + ml.size * 64L }
+      .build()
 
   /** Use [com.worksap.nlp.lucene.sudachi.ja.CachingTokenizer.tokenize] instead of this method. */
   internal fun analyze(tokenizer: Tokenizer, mode: SplitMode, input: Reader): MorphemeIterator {
@@ -71,14 +61,10 @@ class AnalysisCache(private val capacity: Int, private val extractor: InputExtra
   }
 
   private fun cached(input: String, mode: SplitMode, tokenizer: Tokenizer): MorphemeIterator {
-    if (main.size >= capacity) {
-      swap()
-    }
-    val list =
-        main.computeIfAbsent(input) { k -> fallback[k] ?: tokenizer.tokenize(SplitMode.C, input) }
+    val list = cache.computeIfAbsent(input) { k -> tokenizer.tokenize(SplitMode.C, k) }
     return CachedAnalysis(list.split(mode))
   }
 
-  val mainSize: Int
-    get() = main.size
+  val mainSize: Int = cache.count()
+
 }
