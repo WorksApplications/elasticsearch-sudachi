@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Works Applications Co., Ltd.
+ * Copyright (c) 2018-2023 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,50 +16,30 @@
 
 package com.worksap.nlp.lucene.sudachi.ja;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.util.HashMap;
-
 import com.worksap.nlp.lucene.sudachi.aliases.BaseTokenStreamTestCase;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.Tokenizer;
-
 import com.worksap.nlp.sudachi.Tokenizer.SplitMode;
+import com.worksap.nlp.test.InMemoryDictionary;
+import org.apache.lucene.analysis.TokenStream;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class TestSudachiPartOfSpeechStopFilter extends BaseTokenStreamTestCase {
     TokenStream tokenStream;
     SudachiPartOfSpeechStopFilterFactory factory;
 
-    @Rule
-    public TemporaryFolder tempFolderForDictionary = new TemporaryFolder();
-
-    @SuppressWarnings("serial")
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        tempFolderForDictionary.create();
-        File tempFileForDictionary = tempFolderForDictionary.newFolder("sudachiDictionary");
-        ResourceUtil.copy(tempFileForDictionary);
+        InMemoryDictionary imd = new InMemoryDictionary();
 
-        String settings;
-        try (InputStream is = this.getClass().getResourceAsStream("sudachi.json")) {
-            settings = ResourceUtil.getSudachiSetting(is);
-        }
-
-        tokenStream = new SudachiTokenizer(true, SplitMode.A, tempFileForDictionary.getPath(), settings, false);
-        ((Tokenizer) tokenStream).setReader(new StringReader("東京都に行った。"));
-        factory = new SudachiPartOfSpeechStopFilterFactory(new HashMap<String, String>() {
-            {
-                put("tags", "stoptags.txt");
-            }
-        });
+        tokenStream = imd.tokenizer("東京都に行った。", true, SplitMode.A);
+        Map<String, String> args = new HashMap<>();
+        args.put("tags", "stoptags.txt");
+        factory = new SudachiPartOfSpeechStopFilterFactory(args);
     }
 
     @Test
@@ -80,7 +60,7 @@ public class TestSudachiPartOfSpeechStopFilter extends BaseTokenStreamTestCase {
 
     @Test
     public void testConjugationType() throws IOException {
-        String tags = "五段-カ行\n";
+        String tags = "*,*,*,*,五段-カ行\n";
         factory.inform(new StringResourceLoader(tags));
         tokenStream = factory.create(tokenStream);
         assertTokenStreamContents(tokenStream, new String[] { "東京", "都", "に", "た" });
@@ -88,7 +68,7 @@ public class TestSudachiPartOfSpeechStopFilter extends BaseTokenStreamTestCase {
 
     @Test
     public void testConjugationTypeAndForm() throws IOException {
-        String tags = "五段-カ行,終止形-一般\n";
+        String tags = "*,*,*,*,五段-カ行,終止形-一般\n";
         factory.inform(new StringResourceLoader(tags));
         tokenStream = factory.create(tokenStream);
         assertTokenStreamContents(tokenStream, new String[] { "東京", "都", "に", "行っ", "た" });
@@ -96,7 +76,7 @@ public class TestSudachiPartOfSpeechStopFilter extends BaseTokenStreamTestCase {
 
     @Test
     public void testConjugationForm() throws IOException {
-        String tags = "終止形-一般\n";
+        String tags = "*,*,*,*,*,終止形-一般\n";
         factory.inform(new StringResourceLoader(tags));
         tokenStream = factory.create(tokenStream);
         assertTokenStreamContents(tokenStream, new String[] { "東京", "都", "に", "行っ" });

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Works Applications Co., Ltd.
+ * Copyright (c) 2022-2023 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package com.worksap.nlp.lucene.sudachi.aliases
 
-abstract class TokenFilterFactory(args: Map<String?, String?>) :
+abstract class TokenFilterFactory(args: MutableMap<String, String>) :
     org.apache.lucene.analysis.util.TokenFilterFactory(args)
 
 /** this type should be used in overrides as argument */

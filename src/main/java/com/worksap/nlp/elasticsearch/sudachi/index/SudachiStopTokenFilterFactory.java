@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2017 Works Applications Co., Ltd.
+ * Copyright (c) 2017-2023 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,21 +34,19 @@ import org.elasticsearch.index.analysis.Analysis;
 import com.worksap.nlp.lucene.sudachi.ja.SudachiAnalyzer;
 
 public class SudachiStopTokenFilterFactory extends AbstractTokenFilterFactory {
-    private static final Map<String, Set<?>> NAMED_STOP_WORDS = singletonMap(
-            "_japanese_", SudachiAnalyzer.getDefaultStopSet());
+    private static final Map<String, Set<?>> NAMED_STOP_WORDS = singletonMap("_japanese_",
+            SudachiAnalyzer.getDefaultStopSet());
 
     private final CharArraySet stopWords;
     private final boolean ignoreCase;
     private final boolean removeTrailing;
 
-    public SudachiStopTokenFilterFactory(IndexSettings indexSettings,
-            Environment env, String name, Settings settings) {
+    public SudachiStopTokenFilterFactory(IndexSettings indexSettings, Environment env, String name, Settings settings) {
         super(indexSettings, name, settings);
         this.ignoreCase = settings.getAsBoolean("ignore_case", false);
         this.removeTrailing = settings.getAsBoolean("remove_trailing", true);
-        this.stopWords = Analysis.parseWords(env, settings, "stopwords",
-                SudachiAnalyzer.getDefaultStopSet(), NAMED_STOP_WORDS,
-                ignoreCase);
+        this.stopWords = Analysis.parseWords(env, settings, "stopwords", SudachiAnalyzer.getDefaultStopSet(),
+                NAMED_STOP_WORDS, ignoreCase);
     }
 
     @Override
@@ -59,13 +57,4 @@ public class SudachiStopTokenFilterFactory extends AbstractTokenFilterFactory {
             return new SuggestStopFilter(tokenStream, stopWords);
         }
     }
-
-    public Set<?> stopWords() {
-        return stopWords;
-    }
-
-    public boolean ignoreCase() {
-        return ignoreCase;
-    }
-
 }

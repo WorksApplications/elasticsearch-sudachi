@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2019 Works Applications Co., Ltd.
+ * Copyright (c) 2019-2023 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,141 +23,141 @@ public class TestRomanizer extends TestCase {
         String input = "ッカッキックッケッコッサッシッスッセッソッタッチッツッテットッハッヒッフッヘッホッマッミッムッメッモッヤッユッヨッワッガッギッグッゲッゴッザッジッズッゼッゾッダッヂッヅッデッドッバッビッブッベッボッパッピップッペッポッヴッナ";
         String expected = "kkakkikkukkekkossassissussessottattittuttettohhahhihhuhhehhommammimmummemmoyyayyuyyowwaggaggigguggeggozzazzizzuzzezzoddaddidduddeddobbabbibbubbebboppappippuppeppovvultuna";
 
-        assertEquals(expected, Romanizer.getRomanization(input));
+        assertEquals(expected, Romanizer.romanize(input));
     }
 
     public void testGetRomanizationWithA() {
         String input = "アイウウァウィウェウォ";
         String expected = "aiuwhawhiwhewho";
 
-        assertEquals(expected, Romanizer.getRomanization(input));
+        assertEquals(expected, Romanizer.romanize(input));
     }
 
     public void testGetRomanizationWithKa() {
         String input = "カキキャキィキュキェキョククァクィクゥクェクォケコ";
         String expected = "kakikyakyikyukyekyokuqwaqwiqwuqweqwokeko";
 
-        assertEquals(expected, Romanizer.getRomanization(input));
+        assertEquals(expected, Romanizer.romanize(input));
     }
 
     public void testGetRomanizationWithSa() {
         String input = "サシシャシィシュシェショススァスィスゥスェスォセソ";
         String expected = "sasisyasyisyusyesyosuswaswiswusweswoseso";
 
-        assertEquals(expected, Romanizer.getRomanization(input));
+        assertEquals(expected, Romanizer.romanize(input));
     }
 
     public void testGetRomanizationWithTa() {
         String input = "タチチャチィチュチェチョツツァツィツゥツェツォテテャティテュテェテョトトァトィトゥトェトォ";
         String expected = "tatityatyityutyetyotutsatsitulutsetsotethathithuthethototwatwitwutwetwo";
 
-        assertEquals(expected, Romanizer.getRomanization(input));
+        assertEquals(expected, Romanizer.romanize(input));
     }
 
     public void testGetRomanizationWithNa() {
         String input = "ナニニャニィニュニェニョヌネノ";
         String expected = "naninyanyinyunyenyonuneno";
 
-        assertEquals(expected, Romanizer.getRomanization(input));
+        assertEquals(expected, Romanizer.romanize(input));
     }
 
     public void testGetRomanizationWithHa() {
         String input = "ハヒヒャヒィヒュヒェヒョフファフィフゥフェフォフャフュフョヘホ";
         String expected = "hahihyahyihyuhyehyohufwafwifwufwefwofyafyufyoheho";
 
-        assertEquals(expected, Romanizer.getRomanization(input));
+        assertEquals(expected, Romanizer.romanize(input));
     }
 
     public void testGetRomanizationWithMa() {
         String input = "マミミャミィミュミェミョムメモ";
         String expected = "mamimyamyimyumyemyomumemo";
 
-        assertEquals(expected, Romanizer.getRomanization(input));
+        assertEquals(expected, Romanizer.romanize(input));
     }
 
     public void testGetRomanizationWithYa() {
         String input = "ヤユヨ";
         String expected = "yayuyo";
 
-        assertEquals(expected, Romanizer.getRomanization(input));
+        assertEquals(expected, Romanizer.romanize(input));
     }
 
     public void testGetRomanizationWithRa() {
         String input = "ラリリャリィリュリェリョルレロ";
         String expected = "rariryaryiryuryeryorurero";
 
-        assertEquals(expected, Romanizer.getRomanization(input));
+        assertEquals(expected, Romanizer.romanize(input));
     }
 
     public void testGetRomanizationWithWa() {
         String input = "ワヰヱヲ";
         String expected = "wawiwewo";
 
-        assertEquals(expected, Romanizer.getRomanization(input));
+        assertEquals(expected, Romanizer.romanize(input));
     }
 
     public void testGetRomanizationWithN() {
         String input = "ンンア";
         String expected = "nnna";
 
-        assertEquals(expected, Romanizer.getRomanization(input));
+        assertEquals(expected, Romanizer.romanize(input));
     }
 
     public void testGetRomanizationWithGa() {
         String input = "ガギギャギィギュギェギョググァグィグゥグェグォゲゴ";
         String expected = "gagigyagyigyugyegyogugwagwigwugwegwogego";
 
-        assertEquals(expected, Romanizer.getRomanization(input));
+        assertEquals(expected, Romanizer.romanize(input));
     }
 
     public void testGetRomanizationWithZa() {
         String input = "ザジジャジィジュジェジョズゼゾ";
         String expected = "zazizyazyizyuzyezyozuzezo";
 
-        assertEquals(expected, Romanizer.getRomanization(input));
+        assertEquals(expected, Romanizer.romanize(input));
     }
 
     public void testGetRomanizationWithDa() {
         String input = "ダヂヂャヂィヂュヂェヂョヅデデャディデュデェデョドドァドィドゥドェドォ";
         String expected = "dadidyadyidyudyedyodudedhadhidhudhedhododwadwidwudwedwo";
 
-        assertEquals(expected, Romanizer.getRomanization(input));
+        assertEquals(expected, Romanizer.romanize(input));
     }
 
     public void testGetRomanizationWithBa() {
         String input = "バビビャビィビュビェビョブベボ";
         String expected = "babibyabyibyubyebyobubebo";
 
-        assertEquals(expected, Romanizer.getRomanization(input));
+        assertEquals(expected, Romanizer.romanize(input));
     }
 
     public void testGetRomanizationWithPa() {
         String input = "パピピャピィピュピェピョプペポ";
         String expected = "papipyapyipyupyepyopupepo";
 
-        assertEquals(expected, Romanizer.getRomanization(input));
+        assertEquals(expected, Romanizer.romanize(input));
     }
 
     public void testGetRomanizationWithVa() {
         String input = "ヴァヴィヴヴェヴォヴャヴュヴョ";
         String expected = "vavivuvevovyavyuvyo";
 
-        assertEquals(expected, Romanizer.getRomanization(input));
+        assertEquals(expected, Romanizer.romanize(input));
     }
 
     public void testGetRomanizationWithSmall() {
         String input = "ァィゥェォヵヶャュョヮ";
         String expected = "lalilulelolkalkelyalyulyolwa";
 
-        assertEquals(expected, Romanizer.getRomanization(input));
+        assertEquals(expected, Romanizer.romanize(input));
     }
 
     public void testGetRomanizationWithSymbols() {
-        assertEquals("-", Romanizer.getRomanization("・＝ー"));
+        assertEquals("-", Romanizer.romanize("・＝ー"));
     }
 
     public void testGetRomanizationWithoutJapanese() {
-        assertEquals("", Romanizer.getRomanization(""));
-        assertEquals("abc-", Romanizer.getRomanization("abc-"));
+        assertEquals("", Romanizer.romanize(""));
+        assertEquals("abc-", Romanizer.romanize("abc-"));
     }
 }

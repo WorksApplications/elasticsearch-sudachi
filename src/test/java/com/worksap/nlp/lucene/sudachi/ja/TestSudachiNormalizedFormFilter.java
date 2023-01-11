@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Works Applications Co., Ltd.
+ * Copyright (c) 2018-2023 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,58 +16,32 @@
 
 package com.worksap.nlp.lucene.sudachi.ja;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.util.Collections;
-
 import com.worksap.nlp.lucene.sudachi.aliases.BaseTokenStreamTestCase;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-
+import com.worksap.nlp.test.InMemoryDictionary;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
+import org.junit.Test;
 
-import com.worksap.nlp.sudachi.Tokenizer.SplitMode;
+import java.io.IOException;
+import java.util.Collections;
 
 public class TestSudachiNormalizedFormFilter extends BaseTokenStreamTestCase {
-    TokenStream tokenStream;
-    SudachiNormalizedFormFilterFactory factory;
+    SudachiNormalizedFormFilterFactory factory = new SudachiNormalizedFormFilterFactory(Collections.emptyMap());
 
-    @Rule
-    public TemporaryFolder tempFolderForDictionary = new TemporaryFolder();
-
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-        tempFolderForDictionary.create();
-        File tempFileForDictionary = tempFolderForDictionary.newFolder("sudachiDictionary");
-        ResourceUtil.copy(tempFileForDictionary);
-
-        String settings;
-        try (InputStream is = this.getClass().getResourceAsStream("sudachi.json")) {
-            settings = ResourceUtil.getSudachiSetting(is);
-        }
-
-        tokenStream = new SudachiTokenizer(true, SplitMode.C, tempFileForDictionary.getPath(), settings, false);
-        factory = new SudachiNormalizedFormFilterFactory(Collections.emptyMap());
-    }
+    private final InMemoryDictionary dic = new InMemoryDictionary();
 
     @Test
     public void testNormalizedForm() throws IOException {
-        ((Tokenizer) tokenStream).setReader(new StringReader("東京都に行った。"));
-        tokenStream = factory.create(tokenStream);
-        assertTokenStreamContents(tokenStream, new String[] { "東京都", "に", "行く", "た" });
+        Tokenizer tokenizer = dic.tokenizer("東京都に行った。");
+        TokenStream stream = factory.create(tokenizer);
+        assertTokenStreamContents(stream, new String[] { "東京都", "に", "行く", "た" });
     }
 
     @Test
     public void testNormalizedFormWithUnnormalizedWord() throws IOException {
-        ((Tokenizer) tokenStream).setReader(new StringReader("東京都にいった。"));
-        tokenStream = factory.create(tokenStream);
-        assertTokenStreamContents(tokenStream, new String[] { "東京都", "に", "行く", "た" });
+        Tokenizer tokenizer = dic.tokenizer("東京都にいった。");
+        TokenStream stream = factory.create(tokenizer);
+        assertTokenStreamContents(stream, new String[] { "東京都", "に", "行く", "た" });
     }
 
 }

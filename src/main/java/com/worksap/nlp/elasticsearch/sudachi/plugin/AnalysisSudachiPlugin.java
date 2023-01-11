@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2017 Works Applications Co., Ltd.
+ * Copyright (c) 2017-2023 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,15 @@ package com.worksap.nlp.elasticsearch.sudachi.plugin;
 
 import static java.util.Collections.singletonMap;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.worksap.nlp.elasticsearch.sudachi.index.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
+import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.index.analysis.AnalyzerProvider;
 import org.elasticsearch.index.analysis.TokenFilterFactory;
 import org.elasticsearch.index.analysis.TokenizerFactory;
@@ -29,23 +34,22 @@ import org.elasticsearch.indices.analysis.AnalysisModule.AnalysisProvider;
 import org.elasticsearch.plugins.AnalysisPlugin;
 import org.elasticsearch.plugins.Plugin;
 
-import com.worksap.nlp.elasticsearch.sudachi.index.SudachiAnalyzerProvider;
-import com.worksap.nlp.elasticsearch.sudachi.index.SudachiBaseFormFilterFactory;
-import com.worksap.nlp.elasticsearch.sudachi.index.SudachiNormalizedFormFilterFactory;
-import com.worksap.nlp.elasticsearch.sudachi.index.SudachiPartOfSpeechFilterFactory;
-import com.worksap.nlp.elasticsearch.sudachi.index.SudachiReadingFormFilterFactory;
-import com.worksap.nlp.elasticsearch.sudachi.index.SudachiStopTokenFilterFactory;
-import com.worksap.nlp.elasticsearch.sudachi.index.SudachiSplitFilterFactory;
-import com.worksap.nlp.elasticsearch.sudachi.index.SudachiTokenizerFactory;
-
 public class AnalysisSudachiPlugin extends Plugin implements AnalysisPlugin {
+
+    private final static Logger logger = LogManager.getLogger(AnalysisSudachiPlugin.class);
+    private final DictionaryService dictionaryService = new DictionaryService();
+    private final AnalysisCacheService cacheService = new AnalysisCacheService();
+
+    public AnalysisSudachiPlugin(Settings settings) {
+        logger.info("loaded Sudachi plugin");
+    }
+
     @Override
     public Map<String, AnalysisProvider<TokenFilterFactory>> getTokenFilters() {
         Map<String, AnalysisProvider<TokenFilterFactory>> extra = new HashMap<>();
         extra.put("sudachi_baseform", SudachiBaseFormFilterFactory::new);
         extra.put("sudachi_normalizedform", SudachiNormalizedFormFilterFactory::new);
-        extra.put("sudachi_part_of_speech",
-                SudachiPartOfSpeechFilterFactory::new);
+        extra.put("sudachi_part_of_speech", SudachiPartOfSpeechFilterFactory::new);
         extra.put("sudachi_readingform", SudachiReadingFormFilterFactory::new);
         extra.put("sudachi_split", SudachiSplitFilterFactory::new);
         extra.put("sudachi_ja_stop", SudachiStopTokenFilterFactory::new);
@@ -54,11 +58,16 @@ public class AnalysisSudachiPlugin extends Plugin implements AnalysisPlugin {
 
     @Override
     public Map<String, AnalysisProvider<TokenizerFactory>> getTokenizers() {
-        return singletonMap("sudachi_tokenizer", SudachiTokenizerFactory::new);
+        return Map.of("sudachi_tokenizer", SudachiTokenizerFactory.maker(dictionaryService, cacheService));
     }
 
     @Override
     public Map<String, AnalysisProvider<AnalyzerProvider<? extends Analyzer>>> getAnalyzers() {
-        return singletonMap("sudachi", SudachiAnalyzerProvider::new);
+        return singletonMap("sudachi", SudachiAnalyzerProvider.maker(dictionaryService, cacheService));
+    }
+
+    @Override
+    public void close() throws IOException {
+        super.close();
     }
 }

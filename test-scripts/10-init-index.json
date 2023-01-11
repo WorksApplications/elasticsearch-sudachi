@@ -1,0 +1,115 @@
+{
+  "settings": {
+    "analysis": {
+      "filter": {
+        "search": {
+          "type": "sudachi_split",
+          "mode": "search"
+        },
+        "synonym": {
+          "type": "synonym",
+          "synonyms": [
+            "関西国際空港,関空",
+            "関西 => 近畿"
+          ]
+        },
+        "romaji_readingform": {
+          "type": "sudachi_readingform",
+          "use_romaji": true
+        },
+        "katakana_readingform": {
+          "type": "sudachi_readingform",
+          "use_romaji": false
+        }
+      },
+      "analyzer": {
+        "sudachi_baseform_analyzer": {
+          "filter": [
+            "sudachi_baseform"
+          ],
+          "type": "custom",
+          "tokenizer": "sudachi_tokenizer"
+        },
+        "sudachi_normalizedform_analyzer": {
+          "filter": [
+            "sudachi_normalizedform"
+          ],
+          "type": "custom",
+          "tokenizer": "sudachi_tokenizer"
+        },
+        "sudachi_readingform_analyzer": {
+          "filter": [
+            "katakana_readingform"
+          ],
+          "type": "custom",
+          "tokenizer": "sudachi_tokenizer"
+        },
+        "sudachi_romaji_analyzer": {
+          "filter": [
+            "romaji_readingform"
+          ],
+          "type": "custom",
+          "tokenizer": "sudachi_tokenizer"
+        },
+        "sudachi_search_analyzer": {
+          "filter": [
+            "search"
+          ],
+          "type": "custom",
+          "tokenizer": "sudachi_tokenizer"
+        },
+        "sudachi_synonym_analyzer": {
+          "filter": [
+            "synonym",
+            "search"
+          ],
+          "type": "custom",
+          "tokenizer": "sudachi_tokenizer"
+        },
+        "sudachi_analyzer": {
+          "filter": [],
+          "type": "custom",
+          "tokenizer": "sudachi_tokenizer"
+        },
+        "sudachi_a_analyzer": {
+          "filter": [],
+          "type": "custom",
+          "tokenizer": "sudachi_a_tokenizer"
+        }
+      },
+      "tokenizer": {
+        "sudachi_tokenizer": {
+          "type": "sudachi_tokenizer",
+          "split_mode": "C"
+        },
+        "sudachi_a_tokenizer": {
+          "type": "sudachi_tokenizer",
+          "split_mode": "A"
+        }
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      "text": {
+        "type": "text",
+        "analyzer": "sudachi_a_analyzer",
+        "fields": {
+          "reading_romaji": {
+            "type": "text",
+            "analyzer": "sudachi_romaji_analyzer"
+          },
+          "reading_katakana": {
+            "type": "text",
+            "analyzer": "sudachi_readingform_analyzer"
+          },
+          "baseform": {
+            "type": "text",
+            "analyzer": "sudachi_baseform_analyzer"
+          }
+        }
+      }
+    }
+
+  }
+}

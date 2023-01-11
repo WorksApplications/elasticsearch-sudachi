@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2017 Works Applications Co., Ltd.
+ * Copyright (c) 2017-2023 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,18 +21,20 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
 public class ResourceUtil {
     static final String RESOURCE_NAME_SYSTEM_DIC = "system_core.dic";
 
-    private ResourceUtil() {}
+    private ResourceUtil() {
+    }
 
-    public static String getSudachiSetting(InputStream is) throws IOException{
+    public static String getSudachiSetting(InputStream is) throws IOException {
         String settings;
         try (InputStreamReader ir = new InputStreamReader(is, StandardCharsets.UTF_8);
-            BufferedReader br = new BufferedReader(ir)) {
+                BufferedReader br = new BufferedReader(ir)) {
             String sudachiSettingsLine = "";
             StringBuilder sb = new StringBuilder();
             while ((sudachiSettingsLine = br.readLine()) != null) {
@@ -47,11 +49,14 @@ public class ResourceUtil {
         copyResource(RESOURCE_NAME_SYSTEM_DIC, destDir, false);
     }
 
-    public static void copyResource(String filename, File destDir, boolean fromRoot)
-        throws IOException {
+    public static void copyResource(String filename, File destDir, boolean fromRoot) throws IOException {
         String src = (fromRoot) ? "/" + filename : filename;
         try (InputStream stream = ResourceUtil.class.getResourceAsStream(src)) {
             Files.copy(stream, destDir.toPath().resolve(filename));
         }
+    }
+
+    public static URL resource(String name) {
+        return ResourceUtil.class.getResource(name);
     }
 }
