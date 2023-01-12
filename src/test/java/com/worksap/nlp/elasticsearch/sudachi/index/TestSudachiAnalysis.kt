@@ -77,14 +77,13 @@ open class TestSudachiAnalysis : BaseTokenStreamTestCase() {
     val env = TestEnvironment.newEnvironment(nodeSettings)
     val settings = Settings.builder().put("settings_path", "sudachi.json").build()
     val provider =
-        SudachiAnalyzerProvider(
-            AnalysisCacheService(),
-            DictionaryService(),
-            IndexSettingsModule.newIndexSettings(Index("test", "_na_"), indexSettings),
-            env,
-            "sudachi",
-            settings)
-    provider.get().tokenStream("_na_", "東京へ行く。").use { stream ->
+        SudachiAnalyzerProvider.maker(DictionaryService(), AnalysisCacheService())
+            .get(
+                IndexSettingsModule.newIndexSettings(Index("test", "_na_"), indexSettings),
+                env,
+                "sudachi",
+                settings)
+    provider.get()!!.tokenStream("_na_", "東京へ行く。").use { stream ->
       assertTokenStreamContents(stream, arrayOf("東京", "行く"))
     }
   }

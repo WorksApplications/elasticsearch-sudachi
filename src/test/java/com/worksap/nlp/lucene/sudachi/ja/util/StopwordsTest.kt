@@ -16,20 +16,13 @@
 
 package com.worksap.nlp.lucene.sudachi.ja.util
 
-import com.worksap.nlp.lucene.sudachi.ja.SudachiAnalyzer
-import java.io.IOException
-import java.lang.IllegalArgumentException
-import org.apache.lucene.analysis.CharArraySet
-import org.apache.lucene.analysis.WordlistLoader
+import kotlin.test.Test
+import kotlin.test.assertFailsWith
 
-object Stopwords {
-  @JvmStatic
-  @Throws(IOException::class)
-  fun load(ignoreCase: Boolean, filename: String, comment: String = "#"): CharArraySet {
-    SudachiAnalyzer::class.java.getResourceAsStream(filename)?.use {
-      val result = CharArraySet(16, ignoreCase)
-      return WordlistLoader.getWordSet(it.bufferedReader(), comment, result)
-    }
-        ?: throw IllegalArgumentException("resource $filename was not found")
+class StopwordsTest {
+
+  @Test
+  fun nonExistingFile() {
+    assertFailsWith<IllegalArgumentException> { Stopwords.load(false, "does-not-exist.xxx") }
   }
 }
