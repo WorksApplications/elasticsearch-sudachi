@@ -59,7 +59,7 @@ analysis-sudachi is an Elasticsearch plugin for tokenization of Japanese text us
 
 ## Supported ElasticSearch versions
 
-1. 8.* - supported, integration tests in CI
+1. 8.0.* until 8.6.* supported, integration tests in CI
 2. 7.17.* (latest patch version) - supported, integration tests in CI
 3. 7.11.* until 7.16.* - best effort support, not tested in CI
 4. 7.10.* integration tests for the latest patch version
