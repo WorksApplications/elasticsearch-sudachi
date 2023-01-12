@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2017 Works Applications Co., Ltd.
+ * Copyright (c) 2017-2023 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,11 @@
 
 package com.worksap.nlp.elasticsearch.sudachi.index;
 
+import com.worksap.nlp.elasticsearch.sudachi.aliases.AbstractTokenFilterFactory;
 import org.apache.lucene.analysis.TokenStream;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.env.Environment;
 import org.elasticsearch.index.IndexSettings;
-import org.elasticsearch.index.analysis.AbstractTokenFilterFactory;
 
 import com.worksap.nlp.lucene.sudachi.ja.SudachiReadingFormFilter;
 
@@ -28,8 +28,8 @@ public class SudachiReadingFormFilterFactory extends AbstractTokenFilterFactory 
 
     private final boolean useRomaji;
 
-    public SudachiReadingFormFilterFactory(IndexSettings indexSettings,
-            Environment environment, String name, Settings settings) {
+    public SudachiReadingFormFilterFactory(IndexSettings indexSettings, Environment environment, String name,
+            Settings settings) {
         super(indexSettings, name, settings);
         useRomaji = settings.getAsBoolean("use_romaji", false);
     }

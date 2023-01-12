@@ -4,12 +4,11 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 
 enum EsSupport {
-    Es56("es-5.06"),
-    Es68("es-6.08"),
-    Es70("es-7.00"),
     Es74("es-7.04"),
     Es78("es-7.08"),
-    Es80("es-8.00")
+    Es80("es-8.00"),
+    Es83("es-8.30"),
+    Es84("es-8.40")
 
     String tag
     List<String> keys
@@ -49,18 +48,18 @@ class Version {
         var minor = fields[1].toInteger()
         var vers = new Version(major, minor)
 
-        if (vers.ge(5, 6) && vers.lt(6, 8)) {
-            return EsSupport.Es56
-        } else if (vers.ge(6, 8) && vers.lt(7, 0)) {
-            return EsSupport.Es68
-        } else if (vers.ge(7, 0) && vers.lt(7, 4)) {
-            return EsSupport.Es70
+        if (vers.lt(7, 4)) {
+            throw new IllegalArgumentException("versions below 7.4 are not supported")
         } else if (vers.ge(7, 4) && vers.lt(7, 8)) {
             return EsSupport.Es74
         } else if (vers.ge(7, 8) && vers.lt(8, 0)) {
             return EsSupport.Es78
-        } else if (vers.ge(8, 0)) {
+        } else if (vers.ge(8, 0) && vers.lt(8, 3)) {
             return EsSupport.Es80
+        } else if (vers.ge(8, 3) && vers.lt(8, 4)) {
+            return EsSupport.Es83
+        } else if (vers.ge(8, 4) && vers.lt(9, 0)) {
+            return EsSupport.Es84
         } else {
             throw new IllegalArgumentException("unsupported ElasticSearch version: " + version)
         }
@@ -93,7 +92,6 @@ class EsSudachiPlugin implements Plugin<Project> {
         tags.addAll(version.keys)
 
         println("ES support kind for version $verString is $version, using additional directories src/{test,main}/ext/{${tags.join(",")}}")
-
 
         project.sourceSets {
             main.kotlin.srcDirs += tags.collect {"src/main/ext/$it" }

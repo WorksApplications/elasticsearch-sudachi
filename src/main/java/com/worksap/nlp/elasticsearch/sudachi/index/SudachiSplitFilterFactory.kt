@@ -16,6 +16,7 @@
 
 package com.worksap.nlp.elasticsearch.sudachi.index
 
+import com.worksap.nlp.elasticsearch.sudachi.aliases.AbstractTokenFilterFactory
 import com.worksap.nlp.lucene.sudachi.ja.SudachiSplitFilter
 import com.worksap.nlp.sudachi.Tokenizer
 import com.worksap.nlp.tools.EnumFlag
@@ -23,7 +24,6 @@ import org.apache.lucene.analysis.TokenStream
 import org.elasticsearch.common.settings.Settings
 import org.elasticsearch.env.Environment
 import org.elasticsearch.index.IndexSettings
-import org.elasticsearch.index.analysis.AbstractTokenFilterFactory
 
 class SudachiSplitFilterFactory(
     indexSettings: IndexSettings?,

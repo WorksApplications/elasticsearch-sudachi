@@ -20,17 +20,17 @@ import com.worksap.nlp.elasticsearch.sudachi.aliases.MetadataConstants
 import com.worksap.nlp.elasticsearch.sudachi.plugin.AnalysisCacheService
 import com.worksap.nlp.elasticsearch.sudachi.plugin.AnalysisSudachiPlugin
 import com.worksap.nlp.elasticsearch.sudachi.plugin.DictionaryService
-import com.worksap.nlp.elasticsearch.test.TestEnvironment.newEnvironment
 import com.worksap.nlp.lucene.sudachi.aliases.BaseTokenStreamTestCase
 import com.worksap.nlp.lucene.sudachi.ja.ResourceUtil
 import com.worksap.nlp.test.TestDictionary
 import java.io.StringReader
-import java.util.*
 import org.apache.lucene.analysis.TokenStream
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute
 import org.elasticsearch.Version
+import org.elasticsearch.common.logging.LogConfigurator
 import org.elasticsearch.common.settings.Settings
 import org.elasticsearch.env.Environment
+import org.elasticsearch.env.TestEnvironment
 import org.elasticsearch.index.Index
 import org.elasticsearch.index.analysis.TokenizerFactory
 import org.elasticsearch.indices.analysis.AnalysisModule
@@ -74,7 +74,7 @@ open class TestSudachiAnalysis : BaseTokenStreamTestCase() {
         Settings.builder().put(MetadataConstants.SETTING_VERSION_CREATED, Version.CURRENT).build()
     val nodeSettings =
         Settings.builder().put(Environment.PATH_HOME_SETTING.key, testDic.root.path).build()
-    val env = newEnvironment(nodeSettings)
+    val env = TestEnvironment.newEnvironment(nodeSettings)
     val settings = Settings.builder().put("settings_path", "sudachi.json").build()
     val provider =
         SudachiAnalyzerProvider(
@@ -96,15 +96,68 @@ open class TestSudachiAnalysis : BaseTokenStreamTestCase() {
     val indexSettings = builder.build()
     val nodeSettings =
         Settings.builder().put(Environment.PATH_HOME_SETTING.key, testDic.root.path).build()
-    val env = newEnvironment(nodeSettings)
-    val analysisModule =
-        AnalysisModule(env, listOf<AnalysisPlugin>(AnalysisSudachiPlugin(nodeSettings)))
+    val env = TestEnvironment.newEnvironment(nodeSettings)
+    val analysisModule = makeAnalysisModule(env, AnalysisSudachiPlugin(nodeSettings))
     val analysisRegistry = analysisModule.analysisRegistry
     return analysisRegistry.buildTokenizerFactories(
         IndexSettingsModule.newIndexSettings(Index("test", "_na_"), indexSettings))
   }
 
   companion object {
+
+    init {
+      initLogging()
+    }
+
+    private fun initLogging() {
+      val clz = LogConfigurator::class.java
+      try {
+        // since ES 8.5
+        val m = clz.getMethod("configureESLogging")
+        m.invoke(null)
+      } catch (_: NoSuchMethodException) {
+        // do nothing
+      }
+
+      LogConfigurator.configureWithoutConfig(Settings.EMPTY)
+    }
+
+    /**
+     * Reflection hack for instantiating AnalysisModule
+     *
+     * From ES 8.5 it has StablePluginsRegistry mechanism which require a different constructor of
+     * the AnalysisModule
+     */
+    private fun makeAnalysisModule(
+        env: Environment,
+        vararg plugins: AnalysisPlugin
+    ): AnalysisModule {
+      val constructors = AnalysisModule::class.java.declaredConstructors
+      val pluginList = plugins.asList()
+      val clz =
+          try {
+            Class.forName("org.elasticsearch.plugins.scanners.StablePluginsRegistry")
+          } catch (_: ClassNotFoundException) {
+            null
+          }
+
+      if (clz == null) {
+        constructors
+            .find { it.parameterCount == 2 }
+            ?.let {
+              return it.newInstance(env, pluginList) as AnalysisModule
+            }
+      } else {
+        constructors
+            .find { it.parameterCount == 3 }
+            ?.let {
+              val stablePluginRegistry = clz.getConstructor().newInstance()
+              return it.newInstance(env, pluginList, stablePluginRegistry) as AnalysisModule
+            }
+      }
+      throw IllegalStateException("failed to instantiate AnalysisModule")
+    }
+
     fun assertTerms(stream: TokenStream, vararg expected: String?) {
       stream.reset()
       val termAttr = stream.getAttribute(CharTermAttribute::class.java)

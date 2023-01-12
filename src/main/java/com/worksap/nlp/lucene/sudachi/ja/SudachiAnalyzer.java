@@ -24,6 +24,7 @@ import java.util.List;
 
 import com.worksap.nlp.elasticsearch.sudachi.plugin.ReloadAware;
 import com.worksap.nlp.elasticsearch.sudachi.plugin.ReloadableDictionary;
+import com.worksap.nlp.lucene.sudachi.ja.util.Stopwords;
 import com.worksap.nlp.lucene.sudachi.ja.util.AnalysisCache;
 import com.worksap.nlp.lucene.sudachi.ja.util.Stoptags;
 import com.worksap.nlp.sudachi.PartialPOS;
@@ -78,8 +79,8 @@ public class SudachiAnalyzer extends StopwordAnalyzerBase {
 
         static {
             try {
-                STOP_WORDS = loadStopwordSet(true, SudachiAnalyzer.class, "stopwords.txt", "#");
-                final CharArraySet tagset = loadStopwordSet(false, SudachiAnalyzer.class, "stoptags.txt", "#");
+                STOP_WORDS = Stopwords.load(true, "stopwords.txt", "#");
+                final CharArraySet tagset = Stopwords.load(false, "stoptags.txt", "#");
                 List<PartialPOS> tags = new ArrayList<>();
                 for (Object element : tagset) {
                     char[] chars = (char[]) element;

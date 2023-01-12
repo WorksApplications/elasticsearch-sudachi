@@ -44,7 +44,9 @@ class SudachiTokenizerFactory(
         service: DictionaryService,
         caches: AnalysisCacheService
     ): AnalysisProvider<TokenizerFactory> {
-      return AnalysisProvider { a, b, c, d -> SudachiTokenizerFactory(service, caches, a, b, c, d) }
+      return AnalysisProvider { indexSettings, environment, name, settings ->
+        SudachiTokenizerFactory(service, caches, indexSettings, environment, name, settings)
+      }
     }
   }
 

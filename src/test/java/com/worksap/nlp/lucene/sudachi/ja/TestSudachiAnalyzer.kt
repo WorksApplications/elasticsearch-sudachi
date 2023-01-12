@@ -16,10 +16,8 @@
 
 package com.worksap.nlp.lucene.sudachi.ja
 
-import com.worksap.nlp.lucene.sudachi.aliases.DirectoryForTests
 import com.worksap.nlp.lucene.sudachi.ja.input.NoopInputExtractor
 import com.worksap.nlp.lucene.sudachi.ja.util.AnalysisCache
-import com.worksap.nlp.lucene.test.hits
 import com.worksap.nlp.sudachi.Tokenizer
 import com.worksap.nlp.test.InMemoryDictionary
 import java.io.IOException
@@ -31,6 +29,7 @@ import org.apache.lucene.index.IndexWriter
 import org.apache.lucene.index.IndexWriterConfig
 import org.apache.lucene.queryparser.classic.QueryParser
 import org.apache.lucene.search.IndexSearcher
+import org.apache.lucene.store.ByteBuffersDirectory
 import org.apache.lucene.store.Directory
 import org.apache.lucene.util.BytesRef
 import org.hamcrest.CoreMatchers
@@ -42,7 +41,7 @@ import org.junit.Test
 // Test of character segmentation using analyzer
 class TestSudachiAnalyzer {
   private var analyzer: SudachiAnalyzer? = null
-  private val dir: Directory = DirectoryForTests()
+  private val dir: Directory = ByteBuffersDirectory()
   private val dic = InMemoryDictionary()
 
   @Before
@@ -110,9 +109,9 @@ class TestSudachiAnalyzer {
       MatcherAssert.assertThat(values.size, CoreMatchers.`is`(1))
       MatcherAssert.assertThat(values[0], CoreMatchers.`is`(INPUT_TEXT))
       query = queryParser.parse("京都")
-      MatcherAssert.assertThat(searcher.search(query, 5).hits(), CoreMatchers.`is`(0L))
+      MatcherAssert.assertThat(searcher.search(query, 5).totalHits.value, CoreMatchers.`is`(0L))
       query = queryParser.parse("岩波")
-      MatcherAssert.assertThat(searcher.search(query, 5).hits(), CoreMatchers.`is`(0L))
+      MatcherAssert.assertThat(searcher.search(query, 5).totalHits.value, CoreMatchers.`is`(0L))
     }
   }
 
