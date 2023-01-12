@@ -11,8 +11,8 @@ group = 'com.worksap.nlp'
 archivesBaseName = 'analysis-sudachi'
 version = '3.0.0-SNAPSHOT'
 
-tasks.withType(JavaCompile) {
-    options.release = 11
+tasks.withType(JavaCompile).configureEach {
+    options.release.set(11)
     options.encoding = 'UTF-8'
 }
 
@@ -40,11 +40,15 @@ repositories {
 
 dependencies {
     implementation 'com.worksap.nlp:sudachi:0.7.0'
-    compileClasspath "org.elasticsearch:elasticsearch:${elasticsearchVersion}"
+    compileOnly "org.elasticsearch:elasticsearch:${elasticsearchVersion}"
     testImplementation "org.elasticsearch:elasticsearch:${elasticsearchVersion}"
-    testImplementation "org.elasticsearch.test:framework:${elasticsearchVersion}"
-    testImplementation 'org.apache.logging.log4j:log4j-core:2.17.2'
-    testImplementation 'org.jetbrains.kotlin:kotlin-test-junit'
+    testImplementation("org.elasticsearch.test:framework:${elasticsearchVersion}") {
+        exclude(group: 'junit', module: 'junit')
+    }
+    testImplementation('org.apache.logging.log4j:log4j-core:2.17.2')
+    testImplementation('org.jetbrains.kotlin:kotlin-test-junit') {
+        exclude(group: 'org.hamcrest')
+    }
 }
 
 def embedVersion = tasks.register('embedVersion', Copy) {
@@ -60,8 +64,8 @@ def copyDependencies = tasks.register('copyDependencies', Copy) {
 
 def distZip = tasks.register('distZip', Zip) {
     dependsOn tasks.jar, embedVersion, copyDependencies
-    archiveBaseName = archivesBaseName
-    archiveAppendix = elasticsearchVersion
+    archiveBaseName.set(archivesBaseName)
+    archiveAppendix.set(elasticsearchVersion)
     from 'build/libs/', 'build/descriptor', 'LICENSE', 'README.md'
 }
 
@@ -108,7 +112,7 @@ tasks.koverXmlReport {
     xmlReportFile.set(layout.buildDirectory.file("reports/jacoco/test/jacocoTestReport.xml"))
 }
 
-task printVersionForGithubActions {
+tasks.register("printVersionForGithubActions") {
     doLast {
         // https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#environment-files
         file(System.getenv("GITHUB_ENV")).write("PROJ_VERSION=$project.version")

@@ -17,6 +17,7 @@
 package com.worksap.nlp.elasticsearch.sudachi.index
 
 import com.worksap.nlp.elasticsearch.sudachi.ConfigAdapter
+import com.worksap.nlp.elasticsearch.sudachi.aliases.AbstractIndexAnalyzerProvider
 import com.worksap.nlp.elasticsearch.sudachi.plugin.AnalysisCacheService
 import com.worksap.nlp.elasticsearch.sudachi.plugin.DictionaryService
 import com.worksap.nlp.lucene.sudachi.ja.SudachiAnalyzer
@@ -25,7 +26,6 @@ import org.apache.lucene.analysis.CharArraySet
 import org.elasticsearch.common.settings.Settings
 import org.elasticsearch.env.Environment
 import org.elasticsearch.index.IndexSettings
-import org.elasticsearch.index.analysis.AbstractIndexAnalyzerProvider
 import org.elasticsearch.index.analysis.Analysis
 import org.elasticsearch.index.analysis.AnalyzerProvider
 import org.elasticsearch.indices.analysis.AnalysisModule.AnalysisProvider
@@ -67,14 +67,14 @@ class SudachiAnalyzerProvider(
         dictionaryService: DictionaryService,
         cacheService: AnalysisCacheService
     ): AnalysisProvider<AnalyzerProvider<out Analyzer?>> {
-      return AnalysisProvider { a, b, c, d ->
+      return AnalysisProvider { indexSettings, environment, name, settings ->
         SudachiAnalyzerProvider(
             cacheService,
             dictionaryService,
-            a,
-            b,
-            c,
-            d,
+            indexSettings,
+            environment,
+            name,
+            settings,
         )
       }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Works Applications Co., Ltd.
+ * Copyright (c) 2023 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package com.worksap.nlp.elasticsearch.sudachi.aliases
+package com.worksap.nlp.lucene.sudachi.ja.util
 
-import org.elasticsearch.common.settings.Settings
-import org.elasticsearch.index.IndexSettings
+import kotlin.test.Test
+import kotlin.test.assertFailsWith
 
-abstract class AbstractTokenizerFactory(
-    indexSettings: IndexSettings,
-    settings: Settings,
-    @Suppress("UNUSED_PARAMETER") name: String?
-) : org.elasticsearch.index.analysis.AbstractTokenizerFactory(indexSettings, settings)
+class StopwordsTest {
+
+  @Test
+  fun nonExistingFile() {
+    assertFailsWith<IllegalArgumentException> { Stopwords.load(false, "does-not-exist.xxx") }
+  }
+}

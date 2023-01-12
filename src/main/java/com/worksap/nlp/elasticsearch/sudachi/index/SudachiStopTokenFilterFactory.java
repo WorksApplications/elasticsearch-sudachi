@@ -21,6 +21,7 @@ import static java.util.Collections.singletonMap;
 import java.util.Map;
 import java.util.Set;
 
+import com.worksap.nlp.elasticsearch.sudachi.aliases.AbstractTokenFilterFactory;
 import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.core.StopFilter;
@@ -28,7 +29,6 @@ import org.apache.lucene.search.suggest.analyzing.SuggestStopFilter;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.env.Environment;
 import org.elasticsearch.index.IndexSettings;
-import org.elasticsearch.index.analysis.AbstractTokenFilterFactory;
 import org.elasticsearch.index.analysis.Analysis;
 
 import com.worksap.nlp.lucene.sudachi.ja.SudachiAnalyzer;

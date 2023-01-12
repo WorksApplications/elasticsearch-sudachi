@@ -14,6 +14,9 @@ jobs:
     strategy:
       matrix:
         es-version:
+          - '8.6.0'
+          - '8.5.3'
+          - '8.4.3'
           - '8.2.3'
           - '7.17.8'
           - '7.14.2'
@@ -69,7 +72,7 @@ jobs:
         ES_VERSION: ${{ matrix.es-version }}
         PLUGIN_VERSION: ${{ env.PROJ_VERSION }}
         RUN_ES_DAEMON: 1
-        DIC_VERSION: 20220729
+        DIC_VERSION: 20230110
       run: |
         bash test-scripts/00-install-elasticsearch.sh
         sleep 30
