@@ -39,9 +39,9 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.worksap.nlp:sudachi:0.7.0'
-    compileOnly "org.elasticsearch:elasticsearch:${elasticsearchVersion}"
-    testImplementation "org.elasticsearch:elasticsearch:${elasticsearchVersion}"
+    implementation('com.worksap.nlp:sudachi:0.7.0')
+    compileOnly("org.elasticsearch:elasticsearch:${elasticsearchVersion}")
+    testImplementation("org.elasticsearch:elasticsearch:${elasticsearchVersion}")
     testImplementation("org.elasticsearch.test:framework:${elasticsearchVersion}") {
         exclude(group: 'junit', module: 'junit')
     }
@@ -55,6 +55,8 @@ def embedVersion = tasks.register('embedVersion', Copy) {
     from 'src/main/extras/plugin-descriptor.properties'
     into 'build/descriptor'
     expand([version: version, elasticsearchVersion: elasticsearchVersion])
+    inputs.property("version", version)
+    inputs.property("elasticSearchVersion", elasticsearchVersion)
 }
 
 def copyDependencies = tasks.register('copyDependencies', Copy) {
@@ -100,11 +102,11 @@ spotless {
 }
 
 sonarqube {
-  properties {
-    property "sonar.projectKey", "WorksApplications_elasticsearch-sudachi"
-    property "sonar.organization", "worksapplications"
-    property "sonar.host.url", "https://sonarcloud.io"
-  }
+    properties {
+        property "sonar.projectKey", "WorksApplications_elasticsearch-sudachi"
+        property "sonar.organization", "worksapplications"
+        property "sonar.host.url", "https://sonarcloud.io"
+    }
 }
 
 tasks.koverXmlReport {
