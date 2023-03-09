@@ -37,7 +37,7 @@ repositories {
 }
 
 dependencies {
-    implementation('com.worksap.nlp:sudachi:0.7.0')
+    implementation('com.worksap.nlp:sudachi:0.7.1')
     compileOnly("org.elasticsearch:elasticsearch:${elasticsearchVersion}")
     testImplementation("org.elasticsearch:elasticsearch:${elasticsearchVersion}")
     testImplementation("org.elasticsearch.test:framework:${elasticsearchVersion}") {
