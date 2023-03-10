@@ -11,7 +11,7 @@ plugins {
 
 group = 'com.worksap.nlp'
 archivesBaseName = 'analysis-sudachi'
-version = '3.0.1'
+version = '3.0.2-SNAPSHOT'
 
 tasks.withType(JavaCompile).configureEach {
     options.release.set(11)
