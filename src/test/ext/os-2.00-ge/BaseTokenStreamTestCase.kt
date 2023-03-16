@@ -14,14 +14,6 @@
  * limitations under the License.
  */
 
-package com.worksap.nlp.lucene.sudachi.ja.util
+package com.worksap.nlp.lucene.sudachi.aliases
 
-import com.worksap.nlp.sudachi.PartialPOS
-
-object Stoptags {
-  @JvmStatic
-  fun parse(data: CharSequence): PartialPOS {
-    val parts = data.split(',').map { if (it == "*") null else it }
-    return PartialPOS(*parts.toTypedArray())
-  }
-}
+abstract class BaseTokenStreamTestCase : org.apache.lucene.tests.analysis.BaseTokenStreamTestCase()

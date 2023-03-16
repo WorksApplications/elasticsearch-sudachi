@@ -16,17 +16,19 @@
 
 package com.worksap.nlp.lucene.sudachi.ja
 
-import com.worksap.nlp.lucene.sudachi.aliases.TokenFilterFactory
+import com.worksap.nlp.lucene.aliases.TokenFilterFactory
 import com.worksap.nlp.sudachi.Morpheme
 import org.apache.lucene.analysis.TokenStream
 
 /**
- * Replaces term text with the [NormalizedFormAttribute].
+ * Replaces term text with the value of normalized text field.
  *
  * This acts as a lemmatizer for verbs and adjectives.
  *
- * To prevent terms from being stemmed use an instance of [SetKeywordMarkerFilter] or a custom
- * [TokenFilter] that sets the [KeywordAttribute] before this [TokenStream].
+ * To prevent terms from being stemmed use an instance of
+ * [org.apache.lucene.analysis.miscellaneous.SetKeywordMarkerFilter] or a custom
+ * [org.apache.lucene.analysis.TokenFilter] that sets the
+ * [org.apache.lucene.analysis.tokenattributes.KeywordAttribute] before this [TokenStream].
  */
 class SudachiNormalizedFormFilter(input: TokenStream) :
     MorphemeFieldFilter(
@@ -42,6 +44,7 @@ class SudachiNormalizedFormFilterFactory(args: MutableMap<String, String>) :
   init {
     require(args.isEmpty()) { "Unknown parameters: $args" }
   }
+
   override fun create(input: TokenStream): TokenStream {
     return SudachiNormalizedFormFilter(input)
   }

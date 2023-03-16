@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package com.worksap.nlp.lucene.sudachi.ja.util
+package com.worksap.nlp.elasticsearch.sudachi.plugin
 
 import com.worksap.nlp.lucene.sudachi.ja.CachedAnalysis
 import com.worksap.nlp.lucene.sudachi.ja.MorphemeIterator
 import com.worksap.nlp.lucene.sudachi.ja.NonCachedAnalysis
 import com.worksap.nlp.lucene.sudachi.ja.input.ConcatenatingReader
 import com.worksap.nlp.lucene.sudachi.ja.input.InputExtractor
+import com.worksap.nlp.search.aliases.CacheBuilder
 import com.worksap.nlp.sudachi.MorphemeList
 import com.worksap.nlp.sudachi.Tokenizer
 import com.worksap.nlp.sudachi.Tokenizer.SplitMode
 import java.io.Reader
-import org.elasticsearch.common.cache.CacheBuilder
 
 /**
  * Cache analysis results using ES-based cache logic.

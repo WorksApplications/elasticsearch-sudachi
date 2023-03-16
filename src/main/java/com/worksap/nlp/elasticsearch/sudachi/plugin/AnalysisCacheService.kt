@@ -17,12 +17,11 @@
 package com.worksap.nlp.elasticsearch.sudachi.plugin
 
 import com.worksap.nlp.lucene.sudachi.ja.input.InputExtractor
-import com.worksap.nlp.lucene.sudachi.ja.util.AnalysisCache
+import com.worksap.nlp.search.aliases.Settings
 import com.worksap.nlp.sudachi.Tokenizer.SplitMode
 import java.lang.ref.WeakReference
 import java.util.concurrent.ConcurrentHashMap
 import org.apache.logging.log4j.LogManager
-import org.elasticsearch.common.settings.Settings
 
 class AnalysisCacheService {
   data class Key(val name: String)

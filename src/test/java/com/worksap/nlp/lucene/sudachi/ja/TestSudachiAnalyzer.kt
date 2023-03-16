@@ -16,8 +16,8 @@
 
 package com.worksap.nlp.lucene.sudachi.ja
 
+import com.worksap.nlp.elasticsearch.sudachi.plugin.AnalysisCache
 import com.worksap.nlp.lucene.sudachi.ja.input.NoopInputExtractor
-import com.worksap.nlp.lucene.sudachi.ja.util.AnalysisCache
 import com.worksap.nlp.sudachi.Tokenizer
 import com.worksap.nlp.test.InMemoryDictionary
 import java.io.IOException
@@ -62,9 +62,7 @@ class TestSudachiAnalyzer {
   @Throws(IOException::class)
   fun tearDown() {
     dir.close()
-    if (analyzer != null) {
-      analyzer!!.close()
-    }
+    analyzer?.close()
   }
 
   @Test

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Works Applications Co., Ltd.
+ * Copyright (c) 2023 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-package com.worksap.nlp.lucene.sudachi.ja.util
+@file:Suppress("PackageDirectoryMismatch")
 
-import com.worksap.nlp.sudachi.PartialPOS
+package com.worksap.nlp.search.aliases
 
-object Stoptags {
-  @JvmStatic
-  fun parse(data: CharSequence): PartialPOS {
-    val parts = data.split(',').map { if (it == "*") null else it }
-    return PartialPOS(*parts.toTypedArray())
-  }
-}
+typealias Version = org.opensearch.Version
+
+typealias LogConfigurator = org.opensearch.common.logging.LogConfigurator
+
+typealias TestEnvironment = org.opensearch.env.TestEnvironment
+
+typealias Index = org.opensearch.index.Index
+
+typealias AnalysisModule = org.opensearch.indices.analysis.AnalysisModule
+
+typealias IndexSettingsModule = org.opensearch.test.IndexSettingsModule

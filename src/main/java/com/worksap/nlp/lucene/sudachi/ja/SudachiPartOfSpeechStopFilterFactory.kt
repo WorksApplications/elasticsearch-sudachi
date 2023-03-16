@@ -17,9 +17,9 @@
 package com.worksap.nlp.lucene.sudachi.ja
 
 import com.worksap.nlp.elasticsearch.sudachi.plugin.ReloadAware
-import com.worksap.nlp.lucene.sudachi.aliases.ResourceLoaderArgument
-import com.worksap.nlp.lucene.sudachi.aliases.ResourceLoaderAware
-import com.worksap.nlp.lucene.sudachi.aliases.TokenFilterFactory
+import com.worksap.nlp.lucene.aliases.ResourceLoaderArgument
+import com.worksap.nlp.lucene.aliases.ResourceLoaderAware
+import com.worksap.nlp.lucene.aliases.TokenFilterFactory
 import com.worksap.nlp.lucene.sudachi.ja.attributes.SudachiAttribute
 import com.worksap.nlp.lucene.sudachi.ja.util.Stoptags
 import com.worksap.nlp.sudachi.PartialPOS

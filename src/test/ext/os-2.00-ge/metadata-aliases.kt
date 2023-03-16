@@ -14,14 +14,10 @@
  * limitations under the License.
  */
 
-package com.worksap.nlp.lucene.sudachi.ja.util
+package com.worksap.nlp.elasticsearch.sudachi.aliases
 
-import com.worksap.nlp.sudachi.PartialPOS
+import org.opensearch.cluster.metadata.IndexMetadata
 
-object Stoptags {
-  @JvmStatic
-  fun parse(data: CharSequence): PartialPOS {
-    val parts = data.split(',').map { if (it == "*") null else it }
-    return PartialPOS(*parts.toTypedArray())
-  }
+object MetadataConstants {
+  const val SETTING_VERSION_CREATED = IndexMetadata.SETTING_VERSION_CREATED
 }

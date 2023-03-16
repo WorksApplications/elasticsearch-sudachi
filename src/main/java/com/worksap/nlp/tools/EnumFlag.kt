@@ -16,9 +16,9 @@
 
 package com.worksap.nlp.tools
 
+import com.worksap.nlp.search.aliases.Settings
 import java.lang.IllegalArgumentException
 import java.lang.reflect.ParameterizedType
-import org.elasticsearch.common.settings.Settings
 
 /**
  * Helper for extracting converting enums from property values

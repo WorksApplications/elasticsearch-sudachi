@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2023 Works Applications Co., Ltd.
+ * Copyright (c) 2017-2023 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,32 +16,46 @@
 
 package com.worksap.nlp.elasticsearch.sudachi.index
 
-import com.worksap.nlp.lucene.sudachi.ja.SudachiSplitFilter
+import com.worksap.nlp.lucene.sudachi.ja.SudachiAnalyzer
 import com.worksap.nlp.search.aliases.AbstractTokenFilterFactory
 import com.worksap.nlp.search.aliases.Environment
 import com.worksap.nlp.search.aliases.IndexSettings
 import com.worksap.nlp.search.aliases.Settings
-import com.worksap.nlp.sudachi.Tokenizer
-import com.worksap.nlp.tools.EnumFlag
+import com.worksap.nlp.search.aliases.parseWords
 import org.apache.lucene.analysis.TokenStream
+import org.apache.lucene.analysis.core.StopFilter
+import org.apache.lucene.search.suggest.analyzing.SuggestStopFilter
 
-class SudachiSplitFilterFactory(
+class SudachiStopTokenFilterFactory(
     indexSettings: IndexSettings?,
     env: Environment?,
     name: String?,
     settings: Settings
 ) : AbstractTokenFilterFactory(indexSettings, env, name, settings) {
+  private val ignoreCase = settings.getAsBoolean("ignore_case", false)
+  private val removeTrailing = settings.getAsBoolean("remove_trailing", true)
+  private val stopWords =
+      parseWords(
+          env,
+          settings,
+          "stopwords",
+          SudachiAnalyzer.getDefaultStopSet(),
+          NAMED_STOP_WORDS,
+          ignoreCase,
+      )
 
-  private val mode = Mode.get(settings)
-  private val splitMode = SplitMode.get(settings)
-
-  override fun create(tokenStream: TokenStream): TokenStream {
-    return SudachiSplitFilter(tokenStream, mode, splitMode)
+  override fun create(tokenStream: TokenStream?): TokenStream {
+    return if (removeTrailing) {
+      StopFilter(tokenStream, stopWords)
+    } else {
+      SuggestStopFilter(tokenStream, stopWords)
+    }
   }
 
   companion object {
-    private object Mode :
-        EnumFlag<SudachiSplitFilter.Mode>("mode", SudachiSplitFilter.DEFAULT_MODE)
-    private object SplitMode : EnumFlag<Tokenizer.SplitMode>("split_mode", Tokenizer.SplitMode.A)
+    private val NAMED_STOP_WORDS =
+        mapOf(
+            "_japanese_" to SudachiAnalyzer.getDefaultStopSet(),
+        )
   }
 }

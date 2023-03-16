@@ -16,15 +16,15 @@
 
 package com.worksap.nlp.elasticsearch.sudachi
 
+import com.worksap.nlp.search.aliases.Environment
+import com.worksap.nlp.search.aliases.IndexSettings
+import com.worksap.nlp.search.aliases.Settings
 import com.worksap.nlp.sudachi.Config
 import com.worksap.nlp.sudachi.PathAnchor
 import com.worksap.nlp.sudachi.Tokenizer.SplitMode
 import com.worksap.nlp.tools.EnumFlag
 import java.nio.file.Path
 import kotlin.io.path.exists
-import org.elasticsearch.common.settings.Settings
-import org.elasticsearch.env.Environment
-import org.elasticsearch.index.IndexSettings
 
 @Suppress("UNUSED_PARAMETER")
 class ConfigAdapter(index: IndexSettings, name: String, settings: Settings, env: Environment) {

@@ -16,7 +16,7 @@
 
 package com.worksap.nlp.lucene.sudachi.ja
 
-import com.worksap.nlp.lucene.sudachi.aliases.TokenFilterFactory
+import com.worksap.nlp.lucene.aliases.TokenFilterFactory
 import com.worksap.nlp.sudachi.Tokenizer
 import com.worksap.nlp.tools.EnumFlag
 import org.apache.lucene.analysis.TokenStream
