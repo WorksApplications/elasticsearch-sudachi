@@ -6,7 +6,6 @@ ES_VERSION=${ES_VERSION:-$DEFAULT_ES_VERSION}
 SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]:-$0}"; )" &> /dev/null && pwd 2> /dev/null; )";
 WORK_DIR="${WORK_DIR:-$(readlink -f "$SCRIPT_DIR/../build/integration")}"
 ES_DIR="$WORK_DIR/$ES_KIND-${ES_VERSION}"
-ES_FILE="$WORK_DIR/$ES_KIND-${ES_VERSION}-linux-x86_64.tar.gz"
 ES_KIND=${ES_KIND:-$ES_KIND}
 DIC_VERSION=${DIC_VERSION:-latest}
 DIC_KIND=${DIC_KIND:-small}
@@ -16,10 +15,12 @@ if [[ "$ES_KIND" == "elasticsearch" ]]; then
   ES_URL="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}-linux-x86_64.tar.gz"
   ES_BIN=elasticsearch
   ES_PLUGIN_BIN=elasticsearch-plugin
+  ES_FILE="$WORK_DIR/$ES_KIND-${ES_VERSION}-linux-x86_64.tar.gz"
 elif [[ "$ES_KIND" == "opensearch" ]]; then
   ES_URL="https://artifacts.opensearch.org/releases/bundle/opensearch/${ES_VERSION}/opensearch-${ES_VERSION}-linux-x64.tar.gz"
   ES_BIN=opensearch
   ES_PLUGIN_BIN=opensearch-plugin
+  ES_FILE="$WORK_DIR/$ES_KIND-${ES_VERSION}-linux-x64.tar.gz"
 else
   echo "Error: script supports only Elasticsearch or OpenSearch, was '$ES_KIND'"
   exit 1
