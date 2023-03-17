@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-@file:Suppress("UNUSED_PARAMETER")
+@file:Suppress("UNUSED_PARAMETER", "PackageDirectoryMismatch")
 
-package com.worksap.nlp.elasticsearch.sudachi.aliases
+package com.worksap.nlp.search.aliases
 
 import org.apache.lucene.analysis.Analyzer
 import org.elasticsearch.common.settings.Settings
@@ -24,18 +24,21 @@ import org.elasticsearch.index.IndexSettings
 
 abstract class AbstractTokenizerFactory(
     indexSettings: IndexSettings?,
-    settings: Settings?,
-    name: String?
+    environment: Environment?,
+    name: String?,
+    settings: Settings?
 ) : org.elasticsearch.index.analysis.AbstractTokenizerFactory(indexSettings, settings, name)
 
 abstract class AbstractTokenFilterFactory(
     indexSettings: IndexSettings?,
+    environment: Environment?,
     name: String?,
-    settings: Settings?,
+    settings: Settings?
 ) : org.elasticsearch.index.analysis.AbstractTokenFilterFactory(name, settings)
 
 abstract class AbstractIndexAnalyzerProvider<T : Analyzer>(
     indexSettings: IndexSettings?,
+    environment: Environment?,
     name: String?,
-    settings: Settings?,
+    settings: Settings?
 ) : org.elasticsearch.index.analysis.AbstractIndexAnalyzerProvider<T>(name, settings)

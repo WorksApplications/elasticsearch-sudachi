@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Works Applications Co., Ltd.
+ * Copyright (c) 2023 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,18 @@
  * limitations under the License.
  */
 
-package com.worksap.nlp.elasticsearch.sudachi.aliases
+@file:Suppress("PackageDirectoryMismatch")
 
-import org.opensearch.cluster.metadata.IndexMetadata
+package com.worksap.nlp.search.aliases
 
-object MetadataConstants {
-  const val SETTING_VERSION_CREATED = IndexMetadata.SETTING_VERSION_CREATED
-}
+typealias Version = org.elasticsearch.Version
+
+typealias LogConfigurator = org.elasticsearch.common.logging.LogConfigurator
+
+typealias TestEnvironment = org.elasticsearch.env.TestEnvironment
+
+typealias Index = org.elasticsearch.index.Index
+
+typealias AnalysisModule = org.elasticsearch.indices.analysis.AnalysisModule
+
+typealias IndexSettingsModule = org.elasticsearch.test.IndexSettingsModule

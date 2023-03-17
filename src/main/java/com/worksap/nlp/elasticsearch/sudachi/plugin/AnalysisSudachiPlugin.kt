@@ -22,8 +22,6 @@ import java.io.IOException
 import java.util.*
 import org.apache.logging.log4j.LogManager
 import org.apache.lucene.analysis.Analyzer
-import org.opensearch.index.analysis.AnalyzerProvider
-import org.opensearch.indices.analysis.AnalysisModule
 
 private inline fun <reified T> provider(
     crossinline fn: (IndexSettings, Environment, String, Settings) -> T
@@ -55,8 +53,7 @@ class AnalysisSudachiPlugin(settings: Settings?) : Plugin(), AnalysisPlugin {
         "sudachi_tokenizer" to SudachiTokenizerFactory.maker(dictionaryService, cacheService))
   }
 
-  override fun getAnalyzers():
-      Map<String, AnalysisModule.AnalysisProvider<AnalyzerProvider<out Analyzer>>> {
+  override fun getAnalyzers(): Map<String, AnalysisProvider<AnalyzerProvider<out Analyzer>>> {
     return mapOf(
         "sudachi" to SudachiAnalyzerProvider.maker(dictionaryService, cacheService),
     )

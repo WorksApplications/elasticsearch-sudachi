@@ -112,6 +112,10 @@ tasks.koverXmlReport {
 tasks.register("printVersionForGithubActions") {
     doLast {
         // https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#environment-files
-        file(System.getenv("GITHUB_ENV")).write("PROJ_VERSION=$project.version")
+        var esKind = sudachiEs.kind.get()
+
+        file(System.getenv("GITHUB_ENV")).write(
+                "PROJ_VERSION=${project.version}\nENGINE_VERSION=${esKind.version}\nENGINE_KIND=${esKind.engine.kind}"
+        )
     }
 }

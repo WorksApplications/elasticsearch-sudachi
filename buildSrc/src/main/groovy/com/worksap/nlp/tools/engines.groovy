@@ -95,6 +95,8 @@ enum EngineType {
         EngineSupport supportVersion(Version version) {
             return EsSupport.supportVersion(version)
         }
+
+        final String kind = "elasticsearch"
     },
     OpenSearch{
         List<EngineSupport> allTags() {
@@ -104,11 +106,15 @@ enum EngineType {
         EngineSupport supportVersion(Version version) {
             return OsSupport.supportVersion(version)
         }
+
+        final String kind = "opensearch"
     }
 
     abstract List<EngineSupport> allTags();
 
     abstract EngineSupport supportVersion(Version version);
+
+    abstract String getKind()
 }
 
 class ProjectKind {

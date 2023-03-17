@@ -14,13 +14,13 @@ jobs:
     strategy:
       matrix:
         es-version:
-          - '8.6.0'
-          - '8.5.3'
-          - '8.4.3'
-          - '8.2.3'
-          - '7.17.8'
-          - '7.14.2'
-          - '7.10.2'
+          - 'es:8.6.2'
+          - 'es:8.5.3'
+          - 'es:8.4.3'
+          - 'es:8.2.3'
+          - 'es:7.17.9'
+          - 'es:7.14.2'
+          - 'es:7.10.2'
     continue-on-error: true
     steps:
     - uses: actions/checkout@v3
@@ -46,11 +46,11 @@ jobs:
     - name: Build # This stage sets up gradle caching
       uses: eskatos/gradle-command-action@v2
       with:
-        arguments: -PelasticsearchVersion=${{ matrix.es-version }} --info clean build koverXmlReport
+        arguments: -PengineVersion=${{ matrix.es-version }} --info clean build koverXmlReport
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Analyze with sonarqube
-      if: matrix.es-version == '8.2.3'
+      if: matrix.es-version == '8.5.3'
       uses: eskatos/gradle-command-action@v2
       with:
         arguments: --info sonarqube
@@ -60,16 +60,16 @@ jobs:
     - name: Cache elasticsearch download
       uses: actions/cache@v3
       with:
-        path: build/integration/elasticsearch-${{ matrix.es-version }}-linux-x86_64.tar.gz
+        path: build/integration/${{ env.ENGINE_KIND }}-${{ env.ENGINE_VERSION }}-linux-x86_64.tar.gz
         key: elasticsearch-${{ matrix.es-version }}
     - name: Cache dictionary download
       uses: actions/cache@v3
       with:
-        path: build/integration/sudachi-dictionary-20220729-small.zip
-        key: sudachi-dictionary-20220729
+        path: build/integration/sudachi-dictionary-20230110-small.zip
+        key: sudachi-dictionary-20230110
     - name: Integration test
       env:
-        ES_VERSION: ${{ matrix.es-version }}
+        ES_VERSION: ${{ env.ENGINE_VERSION }}
         PLUGIN_VERSION: ${{ env.PROJ_VERSION }}
         RUN_ES_DAEMON: 1
         DIC_VERSION: 20230110

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Works Applications Co., Ltd.
+ * Copyright (c) 2023 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-package com.worksap.nlp.lucene.sudachi.aliases
+@file:Suppress("PackageDirectoryMismatch")
 
-abstract class TokenFilterFactory(args: MutableMap<String, String>) :
-    org.apache.lucene.analysis.util.TokenFilterFactory(args)
+package com.worksap.nlp.lucene.aliases
 
-/** this type should be used in overrides as argument */
-typealias ResourceLoaderArgument = org.apache.lucene.analysis.util.ResourceLoader
+typealias TokenFilterFactory = org.apache.lucene.analysis.TokenFilterFactory
 
-interface ResourceLoaderAware : org.apache.lucene.analysis.util.ResourceLoaderAware
+typealias ResourceLoaderArgument = org.apache.lucene.util.ResourceLoader
 
-/** This type should be inherited */
-interface ResourceLoaderParent : ResourceLoaderArgument
+typealias ResourceLoaderAware = org.apache.lucene.util.ResourceLoaderAware

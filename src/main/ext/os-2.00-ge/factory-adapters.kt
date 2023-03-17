@@ -14,11 +14,18 @@
  * limitations under the License.
  */
 
-@file:Suppress("PackageDirectoryMismatch")
+@file:Suppress("UNUSED_PARAMETER", "PackageDirectoryMismatch")
 
 package com.worksap.nlp.search.aliases
 
 import org.apache.lucene.analysis.Analyzer
+
+abstract class AbstractTokenizerFactory(
+  indexSettings: IndexSettings?,
+  environment: Environment?,
+  name: String?,
+  settings: Settings?
+) : org.opensearch.index.analysis.AbstractTokenizerFactory(indexSettings, settings, name)
 
 abstract class AbstractTokenFilterFactory(
     indexSettings: IndexSettings?,

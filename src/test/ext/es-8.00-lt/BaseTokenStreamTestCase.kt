@@ -14,15 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("UNUSED_PARAMETER", "PackageDirectoryMismatch")
+
 package com.worksap.nlp.lucene.sudachi.aliases
 
-abstract class TokenFilterFactory(args: Map<String, String>) :
-    org.apache.lucene.analysis.TokenFilterFactory(args)
-
-/** this type should be used in overrides as argument */
-typealias ResourceLoaderArgument = org.apache.lucene.util.ResourceLoader
-
-interface ResourceLoaderAware : org.apache.lucene.util.ResourceLoaderAware
-
-/** This type should be inherited */
-interface ResourceLoaderParent : ResourceLoaderArgument
+abstract class BaseTokenStreamTestCase : org.apache.lucene.analysis.BaseTokenStreamTestCase()

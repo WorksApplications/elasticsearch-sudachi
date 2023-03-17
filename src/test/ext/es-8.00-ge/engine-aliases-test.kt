@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Works Applications Co., Ltd.
+ * Copyright (c) 2023 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,18 @@
  * limitations under the License.
  */
 
-package com.worksap.nlp.lucene.sudachi.aliases
+@file:Suppress("PackageDirectoryMismatch")
 
-abstract class BaseTokenStreamTestCase : org.apache.lucene.analysis.BaseTokenStreamTestCase() {}
+package com.worksap.nlp.search.aliases
+
+typealias Version = org.elasticsearch.Version
+
+typealias LogConfigurator = org.elasticsearch.common.logging.LogConfigurator
+
+typealias TestEnvironment = org.elasticsearch.env.TestEnvironment
+
+typealias Index = org.elasticsearch.index.Index
+
+typealias AnalysisModule = org.elasticsearch.indices.analysis.AnalysisModule
+
+typealias IndexSettingsModule = org.elasticsearch.test.IndexSettingsModule
