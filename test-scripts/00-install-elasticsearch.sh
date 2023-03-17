@@ -57,7 +57,11 @@ fi
 
 "$ES_DIR/bin/$ES_PLUGIN_BIN" install "$PLUGIN"
 
-cp "$SCRIPT_DIR/elasticsearch.yml" "$ES_DIR/config/elasticsearch.yml"
+if [[ "$ES_KIND" == "elasticsearch" ]]; then
+  cp "$SCRIPT_DIR/elasticsearch.yml" "$ES_DIR/config/elasticsearch.yml"
+else
+  cp "$SCRIPT_DIR/opensearch.yml" "$ES_DIR/config/opensearch.yml"
+fi
 
 DIC_ZIP_PATH="$WORK_DIR/sudachi-dictionary-$DIC_VERSION-small.zip"
 
