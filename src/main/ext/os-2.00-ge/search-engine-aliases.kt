@@ -60,8 +60,8 @@ fun parseStopWords(
   )
 }
 
-fun getWordList(environment: Environment?, settings: Settings?, prefix: String): CharArraySet {
-  return org.opensearch.index.analysis.Analysis.getWordSet(environment, settings, prefix)
+fun getWordList(environment: Environment?, settings: Settings?, prefix: String): List<String>? {
+  return org.opensearch.index.analysis.Analysis.getWordList(environment, settings, prefix)
 }
 
 fun parseWords(
