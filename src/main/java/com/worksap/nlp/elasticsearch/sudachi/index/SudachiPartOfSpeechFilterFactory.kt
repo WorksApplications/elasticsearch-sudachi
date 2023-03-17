@@ -37,10 +37,7 @@ class SudachiPartOfSpeechFilterFactory(
 
   private val stopTags = run {
     val tagList = getWordList(env, settings, "stoptags")
-    tagList?.let { tags ->
-      tags.asIterable().map { Stoptags.parse(it) }
-    }
-        ?: emptyList()
+    tagList?.let { tags -> tags.asIterable().map { Stoptags.parse(it) } } ?: emptyList()
   }
 
   override fun create(tokenStream: TokenStream): TokenStream {

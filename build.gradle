@@ -48,7 +48,11 @@ def embedVersion = tasks.register('embedVersion', Copy) {
     from 'src/main/extras/plugin-descriptor.properties'
     into 'build/descriptor'
     var esKind = sudachiEs.kind.get()
-    expand([version: version, elasticsearchVersion: esKind.version])
+    expand([
+            version: version,
+            engineVersion: esKind.version,
+            engineKind: esKind.engine.kind
+    ])
     inputs.property("version", version)
     inputs.property("elasticSearchVersion", esKind.version)
 }

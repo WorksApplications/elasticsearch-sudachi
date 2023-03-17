@@ -21,10 +21,10 @@ package com.worksap.nlp.search.aliases
 import org.apache.lucene.analysis.Analyzer
 
 abstract class AbstractTokenizerFactory(
-  indexSettings: IndexSettings?,
-  environment: Environment?,
-  name: String?,
-  settings: Settings?
+    indexSettings: IndexSettings?,
+    environment: Environment?,
+    name: String?,
+    settings: Settings?
 ) : org.opensearch.index.analysis.AbstractTokenizerFactory(indexSettings, settings, name)
 
 abstract class AbstractTokenFilterFactory(

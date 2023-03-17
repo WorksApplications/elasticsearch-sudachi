@@ -4,14 +4,28 @@ set -euxo pipefail
 DEFAULT_ES_VERSION=8.2.3
 ES_VERSION=${ES_VERSION:-$DEFAULT_ES_VERSION}
 SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]:-$0}"; )" &> /dev/null && pwd 2> /dev/null; )";
-ES_URL="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}-linux-x86_64.tar.gz"
 WORK_DIR="${WORK_DIR:-$(readlink -f "$SCRIPT_DIR/../build/integration")}"
-ES_DIR="$WORK_DIR/elasticsearch-${ES_VERSION}"
-ES_FILE="$WORK_DIR/elasticsearch-${ES_VERSION}-linux-x86_64.tar.gz"
+ES_DIR="$WORK_DIR/$ES_KIND-${ES_VERSION}"
+ES_FILE="$WORK_DIR/$ES_KIND-${ES_VERSION}-linux-x86_64.tar.gz"
 ES_KIND=${ES_KIND:-$ES_KIND}
 DIC_VERSION=${DIC_VERSION:-latest}
 DIC_KIND=${DIC_KIND:-small}
 unset JAVA_HOME
+
+if [[ "$ES_KIND" == "elasticsearch" ]]; then
+  ES_URL="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}-linux-x86_64.tar.gz"
+  ES_BIN=elasticsearch
+  ES_PLUGIN_BIN=elasticsearch-plugin
+elif [[ "$ES_KIND" == "opensearch" ]]; then
+  ES_URL="https://artifacts.opensearch.org/releases/bundle/opensearch/${ES_VERSION}/opensearch-${ES_VERSION}-linux-x64.tar.gz"
+  ES_BIN=opensearch
+  ES_PLUGIN_BIN=opensearch-plugin
+else
+  echo "Error: script supports only Elasticsearch or OpenSearch, was '$ES_KIND'"
+  exit 1
+fi
+
+
 
 PLUGIN_PATH="$SCRIPT_DIR/../build/distributions/$ES_KIND-$ES_VERSION-analysis-sudachi-$PLUGIN_VERSION.zip"
 
@@ -37,10 +51,10 @@ if [[ ! -d "$ES_DIR" ]]; then
 fi
 
 if [[ -d "$ES_DIR/plugins/analysis-sudachi" ]]; then
-  "$ES_DIR/bin/elasticsearch-plugin" remove analysis-sudachi
+  "$ES_DIR/bin/$ES_PLUGIN_BIN" remove analysis-sudachi
 fi
 
-"$ES_DIR/bin/elasticsearch-plugin" install "$PLUGIN"
+"$ES_DIR/bin/$ES_PLUGIN_BIN" install "$PLUGIN"
 
 cp "$SCRIPT_DIR/elasticsearch.yml" "$ES_DIR/config/elasticsearch.yml"
 
@@ -66,7 +80,7 @@ EOF
 fi
 
 if [[ -n "$RUN_ES_DAEMON" ]]; then
-  "$ES_DIR/bin/elasticsearch" -d
+  "$ES_DIR/bin/$ES_BIN" -d
 fi
 
 date --iso-8601=seconds

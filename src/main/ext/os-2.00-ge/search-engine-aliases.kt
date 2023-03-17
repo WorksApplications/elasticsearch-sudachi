@@ -61,7 +61,7 @@ fun parseStopWords(
 }
 
 fun getWordList(environment: Environment?, settings: Settings?, prefix: String): List<String>? {
-  return org.opensearch.index.analysis.Analysis.getWordList(environment, settings, prefix)
+  return org.opensearch.index.analysis.Analysis.parseWordList(environment, settings, prefix) { it }
 }
 
 fun parseWords(

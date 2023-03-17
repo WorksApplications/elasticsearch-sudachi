@@ -21,6 +21,7 @@ jobs:
           - 'es:7.17.9'
           - 'es:7.14.2'
           - 'es:7.10.2'
+          - 'os:2.6.0'
     continue-on-error: true
     steps:
     - uses: actions/checkout@v3
