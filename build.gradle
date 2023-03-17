@@ -5,7 +5,7 @@ plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.8.0'
     id 'com.diffplug.spotless' version '6.16.0'
     id 'org.sonarqube' version '4.0.0.2929'
-    id("org.jetbrains.kotlinx.kover") version "0.6.1"
+    id("org.jetbrains.kotlinx.kover") version "0.7.0-Alpha"
     id 'com.worksap.nlp.sudachi.es'
 }
 
@@ -103,9 +103,15 @@ sonarqube {
     }
 }
 
-tasks.koverXmlReport {
-    enabled = true
-    xmlReportFile.set(layout.buildDirectory.file("reports/jacoco/test/jacocoTestReport.xml"))
+kover {
+    disabledForProject = false
+    useKoverTool()
+}
+
+koverReport {
+    xml {
+        setReportFile(layout.buildDirectory.file("reports/jacoco/test/jacocoTestReport.xml"))
+    }
 }
 
 tasks.register("printVersionForGithubActions") {

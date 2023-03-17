@@ -26,7 +26,6 @@ import com.worksap.nlp.search.aliases.Environment
 import com.worksap.nlp.search.aliases.IndexSettings
 import com.worksap.nlp.search.aliases.Settings
 import com.worksap.nlp.search.aliases.getWordList
-import java.nio.CharBuffer
 import org.apache.lucene.analysis.TokenStream
 
 class SudachiPartOfSpeechFilterFactory(
@@ -39,7 +38,7 @@ class SudachiPartOfSpeechFilterFactory(
   private val stopTags = run {
     val tagList = getWordList(env, settings, "stoptags")
     tagList?.let { tags ->
-      tags.asIterable().map { Stoptags.parse(CharBuffer.wrap(it as CharArray)) }
+      tags.asIterable().map { Stoptags.parse(it) }
     }
         ?: emptyList()
   }
