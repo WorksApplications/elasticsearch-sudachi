@@ -39,7 +39,7 @@ jobs:
     - name: Extract version
       uses: eskatos/gradle-command-action@v2
       with:
-        arguments: printVersionForGithubActions
+        arguments: -PengineVersion=${{ matrix.es-version }} printVersionForGithubActions
         cache-read-only: false # ${{ github.ref != 'refs/heads/develop' }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -50,10 +50,10 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Analyze with sonarqube
-      if: matrix.es-version == '8.5.3'
+      if: matrix.es-version == 'es:8.5.3'
       uses: eskatos/gradle-command-action@v2
       with:
-        arguments: --info sonarqube
+        arguments: -PengineVersion=${{ matrix.es-version }} --info sonarqube
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
