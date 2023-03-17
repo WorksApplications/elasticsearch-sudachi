@@ -61,8 +61,7 @@ def copyDependencies = tasks.register('copyDependencies', Copy) {
 def distZip = tasks.register('distZip', Zip) {
     var esKind = sudachiEs.kind.get()
     dependsOn tasks.jar, embedVersion, copyDependencies
-    archiveBaseName.set(archivesBaseName)
-    archiveAppendix.set(esKind.version)
+    archiveBaseName.set("${esKind.engine.kind}-${esKind.version}-$archivesBaseName")
     from 'build/libs/', 'build/descriptor', 'LICENSE', 'README.md'
 }
 

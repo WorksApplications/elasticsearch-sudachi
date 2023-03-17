@@ -61,7 +61,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: build/integration/${{ env.ENGINE_KIND }}-${{ env.ENGINE_VERSION }}-linux-x86_64.tar.gz
-        key: elasticsearch-${{ matrix.es-version }}
+        key: ${{ env.ENGINE_KIND }}-${{ env.ENGINE_VERSION }}
     - name: Cache dictionary download
       uses: actions/cache@v3
       with:
@@ -69,6 +69,7 @@ jobs:
         key: sudachi-dictionary-20230110
     - name: Integration test
       env:
+        ES_KIND: ${{ env.ENGINE_KIND }}
         ES_VERSION: ${{ env.ENGINE_VERSION }}
         PLUGIN_VERSION: ${{ env.PROJ_VERSION }}
         RUN_ES_DAEMON: 1

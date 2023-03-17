@@ -8,11 +8,12 @@ ES_URL="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_
 WORK_DIR="${WORK_DIR:-$(readlink -f "$SCRIPT_DIR/../build/integration")}"
 ES_DIR="$WORK_DIR/elasticsearch-${ES_VERSION}"
 ES_FILE="$WORK_DIR/elasticsearch-${ES_VERSION}-linux-x86_64.tar.gz"
+ES_KIND=${ES_KIND:-$ES_KIND}
 DIC_VERSION=${DIC_VERSION:-latest}
 DIC_KIND=${DIC_KIND:-small}
 unset JAVA_HOME
 
-PLUGIN_PATH="$SCRIPT_DIR/../build/distributions/analysis-sudachi-$ES_VERSION-$PLUGIN_VERSION.zip"
+PLUGIN_PATH="$SCRIPT_DIR/../build/distributions/$ES_KIND-$ES_VERSION-analysis-sudachi-$PLUGIN_VERSION.zip"
 
 if [[ ! -f "$PLUGIN_PATH" ]]; then
   echo "Plugin is not built, run ./gradlew build"
