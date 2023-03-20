@@ -7,6 +7,7 @@ trait EngineSupport {
 enum EsSupport implements EngineSupport {
     Es74("es-7.04"),
     Es78("es-7.08"),
+    Es715("es-7.15"),
     Es80("es-8.00"),
     Es83("es-8.30"),
     Es84("es-8.40")
@@ -24,8 +25,10 @@ enum EsSupport implements EngineSupport {
             throw new IllegalArgumentException("versions below 7.4 are not supported")
         } else if (vers.ge(7, 4) && vers.lt(7, 8)) {
             return Es74
-        } else if (vers.ge(7, 8) && vers.lt(8, 0)) {
+        } else if (vers.ge(7, 8) && vers.lt(7, 15)) {
             return Es78
+        } else if (vers.ge(7, 15) && vers.lt(8, 0)) {
+            return Es715
         } else if (vers.ge(8, 0) && vers.lt(8, 3)) {
             return Es80
         } else if (vers.ge(8, 3) && vers.lt(8, 4)) {

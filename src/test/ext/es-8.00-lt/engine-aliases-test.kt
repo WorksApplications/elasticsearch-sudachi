@@ -29,3 +29,7 @@ typealias Index = org.elasticsearch.index.Index
 typealias AnalysisModule = org.elasticsearch.indices.analysis.AnalysisModule
 
 typealias IndexSettingsModule = org.elasticsearch.test.IndexSettingsModule
+
+typealias NamedAnalyzer = org.elasticsearch.index.analysis.NamedAnalyzer
+
+typealias IndexAnalyzers = org.elasticsearch.index.analysis.IndexAnalyzers

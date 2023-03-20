@@ -59,7 +59,7 @@ class ReloadableDictionary(private val config: Config) {
   fun newTokenizer(): ReloadableTokenizer = ReloadableTokenizer(this)
 
   fun <T> reloadable(fn: (Dictionary) -> T): ReloadAware<T> {
-    return ReloadAware(fn)
+    return ReloadAware(this, fn)
   }
 }
 

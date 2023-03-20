@@ -29,3 +29,9 @@ typealias Index = org.opensearch.index.Index
 typealias AnalysisModule = org.opensearch.indices.analysis.AnalysisModule
 
 typealias IndexSettingsModule = org.opensearch.test.IndexSettingsModule
+
+typealias NamedAnalyzer = org.opensearch.index.analysis.NamedAnalyzer
+
+typealias IndexAnalyzers = org.opensearch.index.analysis.IndexAnalyzers
+
+typealias XContentType = org.opensearch.common.xcontent.XContentType
