@@ -25,7 +25,7 @@ import java.util.List;
 import com.worksap.nlp.elasticsearch.sudachi.plugin.ReloadAware;
 import com.worksap.nlp.elasticsearch.sudachi.plugin.ReloadableDictionary;
 import com.worksap.nlp.lucene.sudachi.ja.util.Stopwords;
-import com.worksap.nlp.lucene.sudachi.ja.util.AnalysisCache;
+import com.worksap.nlp.elasticsearch.sudachi.plugin.AnalysisCache;
 import com.worksap.nlp.lucene.sudachi.ja.util.Stoptags;
 import com.worksap.nlp.sudachi.PartialPOS;
 import com.worksap.nlp.sudachi.PosMatcher;

@@ -16,6 +16,8 @@
 
 package com.worksap.nlp.lucene.sudachi.ja.util
 
+import com.worksap.nlp.elasticsearch.sudachi.plugin.AnalysisCache
+import com.worksap.nlp.elasticsearch.sudachi.plugin.AnalysisCacheStats
 import com.worksap.nlp.lucene.sudachi.ja.CachingTokenizer
 import com.worksap.nlp.lucene.sudachi.ja.MorphemeIterator
 import com.worksap.nlp.lucene.sudachi.ja.NonCachedAnalysis

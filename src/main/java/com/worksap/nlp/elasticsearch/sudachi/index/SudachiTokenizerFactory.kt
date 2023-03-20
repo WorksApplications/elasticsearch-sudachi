@@ -17,17 +17,17 @@
 package com.worksap.nlp.elasticsearch.sudachi.index
 
 import com.worksap.nlp.elasticsearch.sudachi.ConfigAdapter
-import com.worksap.nlp.elasticsearch.sudachi.aliases.AbstractTokenizerFactory
 import com.worksap.nlp.elasticsearch.sudachi.plugin.AnalysisCacheService
 import com.worksap.nlp.elasticsearch.sudachi.plugin.DictionaryService
 import com.worksap.nlp.lucene.sudachi.ja.CachingTokenizer
 import com.worksap.nlp.lucene.sudachi.ja.SudachiTokenizer
+import com.worksap.nlp.search.aliases.AbstractTokenizerFactory
+import com.worksap.nlp.search.aliases.AnalysisProvider
+import com.worksap.nlp.search.aliases.Environment
+import com.worksap.nlp.search.aliases.IndexSettings
+import com.worksap.nlp.search.aliases.Settings
+import com.worksap.nlp.search.aliases.TokenizerFactory
 import org.apache.lucene.analysis.Tokenizer
-import org.elasticsearch.common.settings.Settings
-import org.elasticsearch.env.Environment
-import org.elasticsearch.index.IndexSettings
-import org.elasticsearch.index.analysis.TokenizerFactory
-import org.elasticsearch.indices.analysis.AnalysisModule.AnalysisProvider
 
 class SudachiTokenizerFactory(
     private val service: DictionaryService,
@@ -36,7 +36,7 @@ class SudachiTokenizerFactory(
     private val env: Environment,
     name: String,
     settings: Settings
-) : AbstractTokenizerFactory(indexSettings, settings, name) {
+) : AbstractTokenizerFactory(indexSettings, env, name, settings) {
 
   companion object {
     @JvmStatic

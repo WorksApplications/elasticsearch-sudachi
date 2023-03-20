@@ -16,7 +16,7 @@
 
 package com.worksap.nlp.lucene.sudachi.ja
 
-import com.worksap.nlp.lucene.sudachi.aliases.TokenFilterFactory
+import com.worksap.nlp.lucene.aliases.TokenFilterFactory
 import com.worksap.nlp.sudachi.Morpheme
 import org.apache.lucene.analysis.TokenFilter
 import org.apache.lucene.analysis.TokenStream

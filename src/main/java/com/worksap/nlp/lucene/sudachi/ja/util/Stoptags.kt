@@ -20,7 +20,7 @@ import com.worksap.nlp.sudachi.PartialPOS
 
 object Stoptags {
   @JvmStatic
-  fun parse(data: String): PartialPOS {
+  fun parse(data: CharSequence): PartialPOS {
     val parts = data.split(',').map { if (it == "*") null else it }
     return PartialPOS(*parts.toTypedArray())
   }

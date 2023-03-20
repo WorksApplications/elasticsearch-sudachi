@@ -16,11 +16,11 @@
 
 package com.worksap.nlp.lucene.sudachi.ja
 
+import com.worksap.nlp.elasticsearch.sudachi.plugin.AnalysisCache
 import com.worksap.nlp.elasticsearch.sudachi.plugin.ReloadableDictionary
 import com.worksap.nlp.lucene.sudachi.aliases.BaseTokenStreamTestCase
 import com.worksap.nlp.lucene.sudachi.ja.input.CopyingInputExtractor
 import com.worksap.nlp.lucene.sudachi.ja.input.NoopInputExtractor
-import com.worksap.nlp.lucene.sudachi.ja.util.AnalysisCache
 import com.worksap.nlp.sudachi.Config
 import com.worksap.nlp.sudachi.PathAnchor
 import com.worksap.nlp.sudachi.Tokenizer.SplitMode

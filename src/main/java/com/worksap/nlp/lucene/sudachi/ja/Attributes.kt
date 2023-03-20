@@ -36,7 +36,7 @@ inline fun <reified T : Attribute> AttributeSource.getAttribute(fn: (T) -> Unit 
 
 inline fun <reified T : Attribute> AttributeSource.existingAttribute(fn: (T) -> Unit = {}): T {
   val attr = getAttribute(fn)
-  return checkNotNull(attr) { "Attribute ${T::class.simpleName} was not present" }
+  return checkNotNull(attr) { "Attribute ${T::class.java.simpleName} was not present" }
 }
 
 inline fun <reified T : Attribute> AttributeReflector.reflect(key: String, value: Any?) {

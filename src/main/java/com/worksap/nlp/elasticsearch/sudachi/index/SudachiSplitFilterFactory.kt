@@ -16,21 +16,21 @@
 
 package com.worksap.nlp.elasticsearch.sudachi.index
 
-import com.worksap.nlp.elasticsearch.sudachi.aliases.AbstractTokenFilterFactory
 import com.worksap.nlp.lucene.sudachi.ja.SudachiSplitFilter
+import com.worksap.nlp.search.aliases.AbstractTokenFilterFactory
+import com.worksap.nlp.search.aliases.Environment
+import com.worksap.nlp.search.aliases.IndexSettings
+import com.worksap.nlp.search.aliases.Settings
 import com.worksap.nlp.sudachi.Tokenizer
 import com.worksap.nlp.tools.EnumFlag
 import org.apache.lucene.analysis.TokenStream
-import org.elasticsearch.common.settings.Settings
-import org.elasticsearch.env.Environment
-import org.elasticsearch.index.IndexSettings
 
 class SudachiSplitFilterFactory(
     indexSettings: IndexSettings?,
     env: Environment?,
     name: String?,
     settings: Settings
-) : AbstractTokenFilterFactory(indexSettings, name, settings) {
+) : AbstractTokenFilterFactory(indexSettings, env, name, settings) {
 
   private val mode = Mode.get(settings)
   private val splitMode = SplitMode.get(settings)

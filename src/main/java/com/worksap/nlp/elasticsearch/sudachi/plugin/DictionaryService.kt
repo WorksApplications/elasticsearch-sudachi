@@ -57,6 +57,10 @@ class ReloadableDictionary(private val config: Config) {
   internal fun holder(): Holder = current
 
   fun newTokenizer(): ReloadableTokenizer = ReloadableTokenizer(this)
+
+  fun <T> reloadable(fn: (Dictionary) -> T): ReloadAware<T> {
+    return ReloadAware(this, fn)
+  }
 }
 
 /** Smart reference for objects which need to be aware of reloadable dictionary */

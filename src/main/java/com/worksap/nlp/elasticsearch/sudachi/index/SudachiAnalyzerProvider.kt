@@ -17,18 +17,13 @@
 package com.worksap.nlp.elasticsearch.sudachi.index
 
 import com.worksap.nlp.elasticsearch.sudachi.ConfigAdapter
-import com.worksap.nlp.elasticsearch.sudachi.aliases.AbstractIndexAnalyzerProvider
 import com.worksap.nlp.elasticsearch.sudachi.plugin.AnalysisCacheService
 import com.worksap.nlp.elasticsearch.sudachi.plugin.DictionaryService
 import com.worksap.nlp.lucene.sudachi.ja.SudachiAnalyzer
+import com.worksap.nlp.search.aliases.*
+import com.worksap.nlp.search.aliases.AbstractIndexAnalyzerProvider
 import org.apache.lucene.analysis.Analyzer
 import org.apache.lucene.analysis.CharArraySet
-import org.elasticsearch.common.settings.Settings
-import org.elasticsearch.env.Environment
-import org.elasticsearch.index.IndexSettings
-import org.elasticsearch.index.analysis.Analysis
-import org.elasticsearch.index.analysis.AnalyzerProvider
-import org.elasticsearch.indices.analysis.AnalysisModule.AnalysisProvider
 
 class SudachiAnalyzerProvider(
     analysisCache: AnalysisCacheService,
@@ -37,12 +32,12 @@ class SudachiAnalyzerProvider(
     env: Environment?,
     name: String?,
     settings: Settings?
-) : AbstractIndexAnalyzerProvider<SudachiAnalyzer>(indexSettings, name, settings) {
+) : AbstractIndexAnalyzerProvider<SudachiAnalyzer>(indexSettings, env, name, settings) {
   private val analyzer: SudachiAnalyzer
 
   init {
     val stopWords: Set<*> =
-        Analysis.parseStopWords(env, settings, SudachiAnalyzer.getDefaultStopSet(), false)
+        parseStopWords(env, settings, SudachiAnalyzer.getDefaultStopSet(), false)
     val configs = ConfigAdapter(indexSettings, name!!, settings!!, env!!)
     val dictionary = dictionaryService.forConfig(configs.compiled)
     val cache = analysisCache.analysisCache(indexSettings.index.name, configs.mode, settings)

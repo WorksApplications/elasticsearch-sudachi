@@ -16,10 +16,10 @@
 
 package com.worksap.nlp.lucene.sudachi.ja
 
+import com.worksap.nlp.elasticsearch.sudachi.plugin.AnalysisCache
+import com.worksap.nlp.elasticsearch.sudachi.plugin.AnalysisCacheStats
 import com.worksap.nlp.elasticsearch.sudachi.plugin.ReloadableDictionary
 import com.worksap.nlp.elasticsearch.sudachi.plugin.ReloadableTokenizer
-import com.worksap.nlp.lucene.sudachi.ja.util.AnalysisCache
-import com.worksap.nlp.lucene.sudachi.ja.util.AnalysisCacheStats
 import com.worksap.nlp.sudachi.Tokenizer.SplitMode
 import java.io.Reader
 

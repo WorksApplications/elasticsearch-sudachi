@@ -16,10 +16,10 @@
 
 package com.worksap.nlp.lucene.sudachi.ja.input
 
+import com.worksap.nlp.search.aliases.Settings
 import java.io.Reader
 import java.lang.ref.SoftReference
 import kotlin.text.StringBuilder
-import org.elasticsearch.common.settings.Settings
 
 data class ExtractionResult(
     val data: String,

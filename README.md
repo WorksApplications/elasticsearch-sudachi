@@ -7,6 +7,10 @@ analysis-sudachi is an Elasticsearch plugin for tokenization of Japanese text us
 
 # What's new?
 
+- version 3.1.0
+    - support OpenSearch 2.6.0 in addition to ElasticSearch
+- version 3.0.0
+    - Plugin is now implemented in Kotlin
 - version 2.1.0
     - Added a new property `additional_settings` to write Sudachi settings directly in config
     - Added support for specifying Elasticsearch version at build time
@@ -54,8 +58,10 @@ analysis-sudachi is an Elasticsearch plugin for tokenization of Japanese text us
 
 1. Build analysis-sudachi.
 ```
-   $ ./gradlew -PelasticsearchVersion=7.10.1 build
+   $ ./gradlew -PengineVersion=es:8.6.2 build
 ```
+
+Use `-PengineVersion=os:2.6.0` for OpenSearch.
 
 ## Supported ElasticSearch versions
 

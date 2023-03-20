@@ -16,12 +16,12 @@
 
 package com.worksap.nlp.test
 
+import com.worksap.nlp.elasticsearch.sudachi.plugin.AnalysisCache
 import com.worksap.nlp.elasticsearch.sudachi.plugin.ReloadableDictionary
 import com.worksap.nlp.lucene.sudachi.ja.CachingTokenizer
 import com.worksap.nlp.lucene.sudachi.ja.ResourceUtil
 import com.worksap.nlp.lucene.sudachi.ja.SudachiTokenizer
 import com.worksap.nlp.lucene.sudachi.ja.input.NoopInputExtractor
-import com.worksap.nlp.lucene.sudachi.ja.util.AnalysisCache
 import com.worksap.nlp.sudachi.Config
 import com.worksap.nlp.sudachi.PathAnchor
 import com.worksap.nlp.sudachi.Tokenizer.SplitMode

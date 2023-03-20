@@ -5,7 +5,7 @@ plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.8.0'
     id 'com.diffplug.spotless' version '6.16.0'
     id 'org.sonarqube' version '4.0.0.2929'
-    id("org.jetbrains.kotlinx.kover") version "0.6.1"
+    id("org.jetbrains.kotlinx.kover") version "0.7.0-Alpha"
     id 'com.worksap.nlp.sudachi.es'
 }
 
@@ -38,11 +38,6 @@ repositories {
 
 dependencies {
     implementation('com.worksap.nlp:sudachi:0.7.1')
-    compileOnly("org.elasticsearch:elasticsearch:${elasticsearchVersion}")
-    testImplementation("org.elasticsearch:elasticsearch:${elasticsearchVersion}")
-    testImplementation("org.elasticsearch.test:framework:${elasticsearchVersion}") {
-        exclude(group: 'junit', module: 'junit')
-    }
     testImplementation('org.apache.logging.log4j:log4j-core:2.17.2')
     testImplementation('org.jetbrains.kotlin:kotlin-test-junit') {
         exclude(group: 'org.hamcrest')
@@ -52,9 +47,14 @@ dependencies {
 def embedVersion = tasks.register('embedVersion', Copy) {
     from 'src/main/extras/plugin-descriptor.properties'
     into 'build/descriptor'
-    expand([version: version, elasticsearchVersion: elasticsearchVersion])
+    var esKind = sudachiEs.kind.get()
+    expand([
+            version: version,
+            engineVersion: esKind.version,
+            engineKind: esKind.engine.kind
+    ])
     inputs.property("version", version)
-    inputs.property("elasticSearchVersion", elasticsearchVersion)
+    inputs.property("elasticSearchVersion", esKind.version)
 }
 
 def copyDependencies = tasks.register('copyDependencies', Copy) {
@@ -63,9 +63,9 @@ def copyDependencies = tasks.register('copyDependencies', Copy) {
 }
 
 def distZip = tasks.register('distZip', Zip) {
+    var esKind = sudachiEs.kind.get()
     dependsOn tasks.jar, embedVersion, copyDependencies
-    archiveBaseName.set(archivesBaseName)
-    archiveAppendix.set(elasticsearchVersion)
+    archiveBaseName.set("${esKind.engine.kind}-${esKind.version}-$archivesBaseName")
     from 'build/libs/', 'build/descriptor', 'LICENSE', 'README.md'
 }
 
@@ -107,14 +107,24 @@ sonarqube {
     }
 }
 
-tasks.koverXmlReport {
-    enabled = true
-    xmlReportFile.set(layout.buildDirectory.file("reports/jacoco/test/jacocoTestReport.xml"))
+kover {
+    disabledForProject = false
+    useKoverTool()
+}
+
+koverReport {
+    xml {
+        setReportFile(layout.buildDirectory.file("reports/jacoco/test/jacocoTestReport.xml"))
+    }
 }
 
 tasks.register("printVersionForGithubActions") {
     doLast {
         // https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#environment-files
-        file(System.getenv("GITHUB_ENV")).write("PROJ_VERSION=$project.version")
+        var esKind = sudachiEs.kind.get()
+
+        file(System.getenv("GITHUB_ENV")).write(
+                "PROJ_VERSION=${project.version}\nENGINE_VERSION=${esKind.version}\nENGINE_KIND=${esKind.engine.kind}"
+        )
     }
 }
