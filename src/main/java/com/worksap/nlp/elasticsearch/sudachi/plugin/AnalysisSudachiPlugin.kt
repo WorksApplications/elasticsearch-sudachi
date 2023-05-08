@@ -29,7 +29,7 @@ private inline fun <reified T> provider(
   return AnalysisProvider { a, b, c, d -> fn(a, b, c, d) }
 }
 
-class AnalysisSudachiPlugin(settings: Settings?) : Plugin(), AnalysisPlugin {
+class AnalysisSudachiPlugin(settings: Settings?) : Plugin(), AnalysisPlugin, ExtensiblePlugin {
   private val dictionaryService = DictionaryService()
   private val cacheService = AnalysisCacheService()
 

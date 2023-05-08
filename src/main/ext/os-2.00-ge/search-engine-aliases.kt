@@ -44,6 +44,8 @@ typealias AnalysisPlugin = org.opensearch.plugins.AnalysisPlugin
 
 typealias Plugin = org.opensearch.plugins.Plugin
 
+typealias ExtensiblePlugin = org.opensearch.plugins.ExtensiblePlugin
+
 typealias CacheBuilder<K, V> = org.opensearch.common.cache.CacheBuilder<K, V>
 
 fun parseStopWords(
