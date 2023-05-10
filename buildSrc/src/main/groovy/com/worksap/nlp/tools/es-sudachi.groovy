@@ -10,12 +10,22 @@ import org.slf4j.LoggerFactory
 import javax.inject.Inject
 
 class EsExtension {
-    Provider<? super EngineType> kind
+    Provider<ProjectKind> kind
 
     @Inject
     EsExtension(ProviderFactory providers) {
         var engineVersion = providers.gradleProperty("engineVersion")
         this.kind = engineVersion.map {new ProjectKind(it) }
+    }
+
+    boolean hasPluginSpiSupport() {
+        def kind = kind.get()
+        if (kind.engine == EngineType.ElasticSearch) {
+            def ver = kind.parsedVersion()
+            return ver.ge(8, 0)
+        } else {
+            return false
+        }
     }
 }
 
@@ -75,6 +85,7 @@ class EsSudachiPlugin implements Plugin<Project> {
                 testImplementation("org.opensearch.test:framework:$verString") {
                     exclude(group: 'junit', module: 'junit')
                 }
+                testImplementation("org.opensearch:opensearch-plugin-classloader:$verString")
             }
         }
     }

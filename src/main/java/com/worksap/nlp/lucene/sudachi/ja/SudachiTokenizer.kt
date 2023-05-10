@@ -19,6 +19,7 @@ package com.worksap.nlp.lucene.sudachi.ja
 import com.worksap.nlp.lucene.sudachi.ja.attributes.MorphemeAttribute
 import com.worksap.nlp.lucene.sudachi.ja.attributes.MorphemeConsumerAttribute
 import com.worksap.nlp.lucene.sudachi.ja.attributes.SudachiAttribute
+import com.worksap.nlp.lucene.sudachi.ja.attributes.SudachiAttributeFactory
 import org.apache.lucene.analysis.Tokenizer
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute
@@ -30,8 +31,7 @@ class SudachiTokenizer(
     private val tokenizer: CachingTokenizer,
     private val discardPunctuation: Boolean,
     factory: AttributeFactory = AttributeFactory.DEFAULT_ATTRIBUTE_FACTORY
-) : Tokenizer(factory) {
-
+) : Tokenizer(SudachiAttributeFactory(factory)) {
   private val termAtt = addAttribute<CharTermAttribute>()
   private val morphemeAtt = addAttribute<MorphemeAttribute>()
   private val offsetAtt = addAttribute<OffsetAttribute>()

@@ -45,9 +45,9 @@ dependencies {
 }
 
 def embedVersion = tasks.register('embedVersion', Copy) {
-    from 'src/main/extras/plugin-descriptor.properties'
-    into "build/package/${version}"
     var esKind = sudachiEs.kind.get()
+    from 'src/main/extras/plugin-descriptor.properties'
+    into "build/package/${version}/${esKind.engine.kind}-${esKind.version}"
     expand([
             version: version,
             engineVersion: esKind.version,
@@ -57,23 +57,30 @@ def embedVersion = tasks.register('embedVersion', Copy) {
     inputs.property("elasticSearchVersion", esKind.version)
 }
 
-def copyRuntimeJars = tasks.register('copyDependencies', Copy) {
+def packageJars = tasks.register('packageJars', Copy) {
     from configurations.runtimeClasspath
     from tasks.jar.outputs
-    into "build/package/${version}"
+    var esKind = sudachiEs.kind.get()
+    into "build/package/${version}/${esKind.engine.kind}-${esKind.version}"
     dependsOn tasks.jar
 }
 
-def copySpiJars = tasks.register('copySpiDependencis', Copy) {
+def packageSpiJars = tasks.register('packageSpiJars', Copy) {
     from configurations.spi
-    into "build/package/${version}/spi"
+    var esKind = sudachiEs.kind.get()
+    if (sudachiEs.hasPluginSpiSupport()) {
+        into "build/package/${version}/${esKind.engine.kind}-${esKind.version}/spi"
+    } else {
+        into "build/package/${version}/${esKind.engine.kind}-${esKind.version}"
+    }
+
 }
 
 def distZip = tasks.register('distZip', Zip) {
     var esKind = sudachiEs.kind.get()
-    dependsOn embedVersion, copyRuntimeJars, copySpiJars
+    dependsOn embedVersion, packageJars, packageSpiJars
     archiveBaseName.set("${esKind.engine.kind}-${esKind.version}-$archivesBaseName")
-    from("build/package/${version}", 'LICENSE', 'README.md')
+    from("build/package/${version}/${esKind.engine.kind}-${esKind.version}", 'LICENSE', 'README.md')
 }
 
 artifacts {
