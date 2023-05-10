@@ -103,7 +103,7 @@ public class SudachiSplitFilter extends TokenFilter {
         posLengthAtt = addAttribute(PositionLengthAttribute.class);
         morphemeAtt = addAttribute(MorphemeAttribute.class);
         consumerAttribute = addAttribute(MorphemeConsumerAttribute.class);
-        consumerAttribute.setInstance(this);
+        consumerAttribute.setCurrentConsumer(this);
     }
 
     @Override

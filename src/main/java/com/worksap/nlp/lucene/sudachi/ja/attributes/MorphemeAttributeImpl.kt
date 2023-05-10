@@ -18,17 +18,11 @@ package com.worksap.nlp.lucene.sudachi.ja.attributes
 
 import com.worksap.nlp.lucene.sudachi.ja.reflect
 import com.worksap.nlp.sudachi.Morpheme
-import org.apache.lucene.util.Attribute
 import org.apache.lucene.util.AttributeImpl
 import org.apache.lucene.util.AttributeReflector
 
-/** Communicate the current Sudachi morpheme to the token stream */
-interface MorphemeAttribute : Attribute {
-  var morpheme: Morpheme?
-}
-
 class MorphemeAttributeImpl : AttributeImpl(), MorphemeAttribute {
-  override var morpheme: Morpheme? = null
+  private var morpheme: Morpheme? = null
 
   override fun clear() {
     morpheme = null
@@ -39,6 +33,14 @@ class MorphemeAttributeImpl : AttributeImpl(), MorphemeAttribute {
   }
 
   override fun copyTo(target: AttributeImpl?) {
-    (target as? MorphemeAttributeImpl)?.let { it.morpheme = morpheme }
+    (target as? MorphemeAttributeImpl)?.let { it.morpheme = target.morpheme }
+  }
+
+  override fun getMorpheme(): Morpheme? {
+    return morpheme
+  }
+
+  override fun setMorpheme(morpheme: Morpheme?) {
+    this.morpheme = morpheme
   }
 }

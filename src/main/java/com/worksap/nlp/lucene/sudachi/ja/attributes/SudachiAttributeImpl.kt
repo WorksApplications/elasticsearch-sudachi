@@ -17,13 +17,9 @@
 package com.worksap.nlp.lucene.sudachi.ja.attributes
 
 import com.worksap.nlp.elasticsearch.sudachi.plugin.ReloadableDictionary
-import org.apache.lucene.util.Attribute
+import com.worksap.nlp.lucene.sudachi.ja.CurrentDictionary
 import org.apache.lucene.util.AttributeImpl
 import org.apache.lucene.util.AttributeReflector
-
-interface SudachiAttribute : Attribute {
-  var dictionary: ReloadableDictionary
-}
 
 class SudachiAttributeImpl : AttributeImpl(), SudachiAttribute {
   override fun clear() {}
@@ -32,5 +28,17 @@ class SudachiAttributeImpl : AttributeImpl(), SudachiAttribute {
 
   override fun copyTo(target: AttributeImpl?) {}
 
-  override lateinit var dictionary: ReloadableDictionary
+  private var dictionary: ReloadableDictionary? = null
+
+  override fun getDictionary(): ReloadableDictionary {
+    return dictionary ?: throw NullPointerException("Dictionary was not initialized")
+  }
+
+  override fun setDictionary(dictionary: CurrentDictionary?) {
+    if (dictionary is ReloadableDictionary) {
+      this.dictionary = dictionary
+    } else {
+      throw IllegalArgumentException("dictionary was of unsupported type: ${dictionary?.javaClass}")
+    }
+  }
 }

@@ -16,7 +16,6 @@
 
 package com.worksap.nlp.elasticsearch.sudachi.index
 
-import com.worksap.nlp.elasticsearch.sudachi.plugin.ReloadableDictionary
 import com.worksap.nlp.lucene.sudachi.ja.SudachiPartOfSpeechStopFilter
 import com.worksap.nlp.lucene.sudachi.ja.attributes.SudachiAttribute
 import com.worksap.nlp.lucene.sudachi.ja.existingAttribute
@@ -45,7 +44,7 @@ class SudachiPartOfSpeechFilterFactory(
       tokenStream
     } else {
       val sudachi = tokenStream.existingAttribute<SudachiAttribute>()
-      val dic: ReloadableDictionary = sudachi.dictionary
+      val dic = sudachi.dictionary
       val matcher = dic.reloadable { it.posMatcher(stopTags) }
       SudachiPartOfSpeechStopFilter(tokenStream, matcher)
     }

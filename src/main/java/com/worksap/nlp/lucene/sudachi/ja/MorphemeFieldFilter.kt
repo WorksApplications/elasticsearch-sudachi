@@ -39,7 +39,8 @@ abstract class MorphemeFieldFilter(input: TokenStream) : TokenFilter(input) {
   @JvmField protected val morpheme = existingAttribute<MorphemeAttribute>()
   @JvmField protected val keywordAtt = addAttribute<KeywordAttribute>()
   @JvmField protected val termAtt = addAttribute<CharTermAttribute>()
-  @JvmField protected val consumer = addAttribute<MorphemeConsumerAttribute> { it.instance = this }
+  @JvmField
+  protected val consumer = addAttribute<MorphemeConsumerAttribute> { it.currentConsumer = this }
 
   /**
    * Override this method to customize returned value. This method will not be called if
@@ -69,7 +70,7 @@ abstract class MorphemeFieldFilter(input: TokenStream) : TokenFilter(input) {
   override fun reset() {
     super.reset()
     if (!consumer.shouldConsume(this)) {
-      logger.warn("consumer")
+      logger.warn("MorphemeFieldFilter does nothing, it is not the current consumer")
     }
   }
 

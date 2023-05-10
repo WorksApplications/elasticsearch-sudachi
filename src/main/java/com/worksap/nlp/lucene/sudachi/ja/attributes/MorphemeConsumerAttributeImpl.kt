@@ -17,7 +17,6 @@
 package com.worksap.nlp.lucene.sudachi.ja.attributes
 
 import com.worksap.nlp.lucene.sudachi.ja.reflect
-import org.apache.lucene.util.Attribute
 import org.apache.lucene.util.AttributeImpl
 import org.apache.lucene.util.AttributeReflector
 
@@ -27,13 +26,8 @@ import org.apache.lucene.util.AttributeReflector
  *
  * This is not a token-based attribute, so impl's clear/copyTo do nothing
  */
-interface MorphemeConsumerAttribute : Attribute {
-  fun shouldConsume(check: Any): Boolean = check === instance
-  var instance: Any
-}
-
 class MorphemeConsumerAttributeImpl : AttributeImpl(), MorphemeConsumerAttribute {
-  override var instance: Any = Companion
+  private var instance: Any = Companion
   // does nothing
   override fun clear() {}
 
@@ -42,6 +36,12 @@ class MorphemeConsumerAttributeImpl : AttributeImpl(), MorphemeConsumerAttribute
   }
 
   override fun copyTo(target: AttributeImpl?) {}
+
+  override fun getCurrentConsumer(): Any = instance
+
+  override fun setCurrentConsumer(consumer: Any?) {
+    instance = consumer!!
+  }
 
   // need something to use as initial value of [instance] variable
   private companion object

@@ -50,9 +50,13 @@ class EsSudachiPlugin implements Plugin<Project> {
 
         logger.warn("Compatibility for version $verString is $version, using additional directories src/{test,main}/ext/{${tags.join(",")}}")
 
+
         project.sourceSets {
-            main.kotlin.srcDirs += tags.collect {"src/main/ext/$it" }
-            test.kotlin.srcDirs += tags.collect {"src/test/ext/$it" }
+            if (project.plugins.hasPlugin('org.jetbrains.kotlin.jvm')) {
+                main.kotlin.srcDirs += tags.collect {"src/main/ext/$it" }
+                test.kotlin.srcDirs += tags.collect {"src/test/ext/$it" }
+            }
+
             main.java.srcDirs += tags.collect {"src/main/ext/$it" }
             test.java.srcDirs += tags.collect {"src/test/ext/$it" }
         }

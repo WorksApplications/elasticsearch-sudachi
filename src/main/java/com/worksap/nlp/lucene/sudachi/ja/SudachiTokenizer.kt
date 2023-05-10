@@ -26,7 +26,6 @@ import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute
 import org.apache.lucene.analysis.tokenattributes.PositionLengthAttribute
 import org.apache.lucene.util.AttributeFactory
 
-@Suppress("jol")
 class SudachiTokenizer(
     private val tokenizer: CachingTokenizer,
     private val discardPunctuation: Boolean,
@@ -38,7 +37,7 @@ class SudachiTokenizer(
   private val offsetAtt = addAttribute<OffsetAttribute>()
   private val posIncAtt = addAttribute<PositionIncrementAttribute>()
   private val posLenAtt = addAttribute<PositionLengthAttribute>()
-  private val consumer = addAttribute<MorphemeConsumerAttribute> { it.instance = this }
+  private val consumer = addAttribute<MorphemeConsumerAttribute> { it.currentConsumer = this }
 
   init {
     addAttribute<SudachiAttribute> { it.dictionary = tokenizer.dictionary }

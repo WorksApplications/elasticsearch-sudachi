@@ -16,6 +16,9 @@
 
 package com.worksap.nlp.elasticsearch.sudachi.plugin
 
+import com.worksap.nlp.lucene.sudachi.ja.CurrentDictionary
+import com.worksap.nlp.lucene.sudachi.ja.CurrentTokenizer
+import com.worksap.nlp.lucene.sudachi.ja.ReloadAware
 import com.worksap.nlp.sudachi.Config
 import com.worksap.nlp.sudachi.Dictionary
 import com.worksap.nlp.sudachi.DictionaryFactory
@@ -35,7 +38,7 @@ class UnboundedCache<K : Any, V>(private val factory: Function<K, V>) {
 }
 
 // Actual reloading logic will be implemented later
-class ReloadableDictionary(private val config: Config) {
+class ReloadableDictionary(private val config: Config) : CurrentDictionary {
   class Holder(val version: Long, val dictionary: Dictionary) {
     internal fun create() = Pair(dictionary.create(), version)
   }
@@ -56,25 +59,44 @@ class ReloadableDictionary(private val config: Config) {
 
   internal fun holder(): Holder = current
 
-  fun newTokenizer(): ReloadableTokenizer = ReloadableTokenizer(this)
+  override fun newTokenizer(): CurrentTokenizer = ReloadableTokenizer(this)
 
-  fun <T> reloadable(fn: (Dictionary) -> T): ReloadAware<T> {
-    return ReloadAware(this, fn)
+  override fun <T> reloadable(fn: Function<Dictionary, T>): ReloadAware<T> {
+    return ReloadAwareImpl(this, fn)
+  }
+
+  override fun maybeReload(newDictionary: CurrentDictionary?): Dictionary {
+    if (newDictionary is ReloadableDictionary) {
+      val holder = newDictionary.current
+      current = Holder(holder.version + 1, holder.dictionary)
+    }
+    return get()
+  }
+
+  override fun get(): Dictionary {
+    return current.dictionary
+  }
+
+  override fun dictionary(): ReloadableDictionary {
+    return this
   }
 }
 
 /** Smart reference for objects which need to be aware of reloadable dictionary */
-class ReloadAware<T>(private val factory: Function<Dictionary, T>) {
+class ReloadAwareImpl<T>(private val factory: Function<Dictionary, T>) : ReloadAware<T> {
   private var version: Long = Long.MIN_VALUE
   private var instance: T? = null
   private var lastDic: ReloadableDictionary? = null
 
-  constructor(dic: ReloadableDictionary, factory: Function<Dictionary, T>) : this(factory) {
+  internal constructor(
+      dic: ReloadableDictionary,
+      factory: Function<Dictionary, T>
+  ) : this(factory) {
     maybeReload(dic)
   }
 
-  fun maybeReload(dic: ReloadableDictionary? = null): T {
-    val dicInstance = (dic ?: lastDic)!!
+  override fun maybeReload(dic: CurrentDictionary?): T {
+    val dicInstance = ((dic as? ReloadableDictionary) ?: lastDic)!!
     val cur = dicInstance.holder()
     if (cur.version != version) {
       instance = factory.apply(cur.dictionary)!!
@@ -84,14 +106,18 @@ class ReloadAware<T>(private val factory: Function<Dictionary, T>) {
     return get()
   }
 
-  fun get(): T {
+  override fun get(): T {
     return instance ?: throw NullPointerException("maybeReload function was not called")
+  }
+
+  override fun dictionary(): ReloadableDictionary {
+    return lastDic!!
   }
 }
 
 /**
  */
-class ReloadableTokenizer(val dictionary: ReloadableDictionary) {
+class ReloadableTokenizer(private val dictionary: ReloadableDictionary) : CurrentTokenizer {
   private var version = 0L
   private var tokenizer = run {
     val pair = dictionary.newTokenizerInternal()
@@ -100,7 +126,7 @@ class ReloadableTokenizer(val dictionary: ReloadableDictionary) {
   }
 
   /** Instances returned from this function should not be cached */
-  fun get(): Tokenizer {
+  override fun get(): Tokenizer {
     val instance = tokenizer.get()
     val dicVersion = dictionary.version
     if (version != dicVersion || instance == null) {
@@ -110,6 +136,13 @@ class ReloadableTokenizer(val dictionary: ReloadableDictionary) {
       return pair.first
     }
     return instance
+  }
+
+  override fun dictionary(): ReloadableDictionary = dictionary
+
+  override fun maybeReload(newDictionary: CurrentDictionary?): Tokenizer {
+    dictionary.maybeReload(newDictionary)
+    return get()
   }
 }
 

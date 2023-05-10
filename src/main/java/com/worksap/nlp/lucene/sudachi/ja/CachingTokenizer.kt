@@ -18,14 +18,12 @@ package com.worksap.nlp.lucene.sudachi.ja
 
 import com.worksap.nlp.elasticsearch.sudachi.plugin.AnalysisCache
 import com.worksap.nlp.elasticsearch.sudachi.plugin.AnalysisCacheStats
-import com.worksap.nlp.elasticsearch.sudachi.plugin.ReloadableDictionary
-import com.worksap.nlp.elasticsearch.sudachi.plugin.ReloadableTokenizer
 import com.worksap.nlp.sudachi.Tokenizer.SplitMode
 import java.io.Reader
 
 /** Objective of this class is to combine reloadable tokenizer with analysis cache. */
 class CachingTokenizer(
-    val tokenizer: ReloadableTokenizer,
+    val tokenizer: CurrentTokenizer,
     private val splitMode: SplitMode,
     private val cache: AnalysisCache
 ) {
@@ -33,8 +31,8 @@ class CachingTokenizer(
     return cache.analyze(tokenizer.get(), splitMode, input)
   }
 
-  val dictionary: ReloadableDictionary
-    get() = tokenizer.dictionary
+  val dictionary: CurrentDictionary
+    get() = tokenizer.dictionary()
 
   fun cacheStats(): AnalysisCacheStats = cache.stats()
 }
