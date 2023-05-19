@@ -2,6 +2,7 @@ package com.worksap.nlp.tools
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.Transformer
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Provider
@@ -120,12 +121,16 @@ class EsTestEnvPlugin implements Plugin<Project> {
             task.systemProperty("gradle.dist.lib", gradleRtDir.resolve("lib").toString())
             task.systemProperty("gradle.worker.jar", gradleCacheDir.resolve("workerMain/gradle-worker.jar").toString())
             task.systemProperty("java.io.tmpdir", envRoot)
+        }
 
+        target.gradle.taskGraph.whenReady {
+            boolean shouldRun = false
             if (target.plugins.findPlugin(EsSudachiPlugin.class) != null) {
-                enabled = shouldTestsRun(target.extensions.getByType(EsExtension).kind.get())
+                shouldRun = shouldTestsRun(target.extensions.getByType(EsExtension).kind.get())
             }
-
-
+            target.tasks.findAll().forEach { Task task ->
+                task.onlyIf { shouldRun }
+            }
         }
     }
 
@@ -134,7 +139,9 @@ class EsTestEnvPlugin implements Plugin<Project> {
         if (kind.engine == EngineType.OpenSearch) {
             return v.ge(2, 6)
         } else if (kind.engine == EngineType.ElasticSearch) {
-            return (v.ge(7, 14) && v.lt(8, 0)) || v.ge(8, 5)
+            return (v.ge(7, 14) && v.lt(7, 99)) || v.ge(8, 5)
+        } else {
+            throw new IllegalArgumentException("not supported version ${kind}")
         }
     }
 
