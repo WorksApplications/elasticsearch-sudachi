@@ -6,7 +6,7 @@ import org.junit.Test
 class VersionTest {
     @Test
     void ge() {
-        var v = new Version(3, 4)
+        var v = new Version(3, 4, "3.4")
         Assert.assertTrue(v.ge(2, 10))
         Assert.assertTrue(v.ge(3, 3))
         Assert.assertTrue(v.ge(3, 4))
@@ -17,7 +17,7 @@ class VersionTest {
 
     @Test
     void lt() {
-        var v = new Version(3, 4)
+        var v = new Version(3, 4, "3.4")
         Assert.assertFalse(v.lt(2, 10))
         Assert.assertFalse(v.lt(3, 3))
         Assert.assertFalse(v.lt(3, 4))

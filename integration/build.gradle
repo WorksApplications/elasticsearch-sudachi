@@ -4,25 +4,69 @@ plugins {
     id 'java-library'
     id 'com.worksap.nlp.sudachi.es'
     id 'com.worksap.nlp.sudachi.esc'
+    id 'com.worksap.nlp.sudachi.es.testenv'
     id 'com.diffplug.spotless'
+    id 'org.jetbrains.kotlin.jvm'
 }
 
 version = properties["pluginVersion"]
 
+compileKotlin {
+    compilerOptions.jvmTarget.set(JvmTarget.JVM_11)
+}
+
+compileTestKotlin {
+    compilerOptions.jvmTarget.set(JvmTarget.JVM_11)
+}
+
 dependencies {
     compileOnly(project(':'))
     compileOnly(project(':spi'))
-    testCompileOnly('junit:junit:4.13.1')
+    testCompileOnly(project(':testlib'))
+    testImplementation('junit:junit:4.13.1') {
+        transitive = false
+    }
     testImplementation('org.apache.logging.log4j:log4j-core:2.17.2')
+    testImplementation('org.jetbrains.kotlin:kotlin-test-junit') {
+        transitive = false
+    }
+}
+
+def compileSystemDictionary = tasks.register("compileTestDictionary", JavaExec) {
+    classpath = project(":spi").sourceSets.main.compileClasspath
+    mainClass = "com.worksap.nlp.sudachi.dictionary.DictionaryBuilder"
+    defaultCharacterEncoding = "utf-8"
+    def dictRoot = rootProject.file("src/test/resources/dict").toPath()
+    def matrixFile = dictRoot.resolve("matrix.def")
+    def dataFile = dictRoot.resolve("lex.csv")
+    def resultFile = buildDir.toPath().resolve("generated/dict/system.dict")
+    args("-d", "test dictionary", "-m", matrixFile, "-o", resultFile, dataFile)
+    inputs.file(matrixFile)
+    inputs.file(dataFile)
+    outputs.file(resultFile)
+}
+
+esTestEnv {
+    def esKind = sudachiEs.kind.get()
+    def packageDir = rootDir.toPath().resolve("build/package/${version}/${esKind.engine.kind}-${esKind.version}")
+    bundlePath = packageDir
+    systemDic = compileSystemDictionary.get().outputs.files.singleFile.toPath()
+    configFile = rootProject.rootDir.toPath().resolve("src/test/resources/com/worksap/nlp/lucene/sudachi/ja/sudachi.json")
+    additionalJars.add(project(":testlib").getTasksByName('jar', false).first().outputs.files.singleFile.toPath())
 }
 
 test {
-    dependsOn(rootProject.tasks["packageJars"], rootProject.tasks["packageSpiJars"], rootProject.tasks["embedVersion"])
-    def esKind = sudachiEs.kind.get()
-    def packageDir = rootDir.toPath().resolve("build/package/${version}/${esKind.engine.kind}-${esKind.version}")
-    systemProperty("sudachi.es.bundle", packageDir.toString())
-    systemProperty("tests.gradle", "true")
-    systemProperty("tests.security.manager", "false")
+    dependsOn(
+            ':packageJars',
+            ':packageSpiJars',
+            ':embedVersion',
+            ':spi:jar',
+            compileSystemDictionary,
+            ':testlib:jar'
+    )
+    systemProperty("tests.security.manager", true)
+    systemProperty("java.security.debug", "true")
+    defaultCharacterEncoding = 'utf-8'
 }
 
 spotless {
@@ -43,6 +87,11 @@ spotless {
         // version list: https://github.com/diffplug/spotless/tree/main/lib-extra/src/main/resources/com/diffplug/spotless/extra/eclipse_jdt_formatter
 
         eclipse('4.21.0').configFile(formatter.resolve('eclipse-formatter.xml'))
+        licenseHeaderFile(formatter.resolve('license-header'))
+    }
+    kotlin {
+        // by default the target is every '.kt' and '.kts` file in the java sourcesets
+        ktfmt('0.39')
         licenseHeaderFile(formatter.resolve('license-header'))
     }
 }
