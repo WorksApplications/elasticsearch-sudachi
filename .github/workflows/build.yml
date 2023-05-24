@@ -53,7 +53,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Analyze with sonarqube
-      if: env.mainJob
+      if: env.mainJob == 'true'
       uses: eskatos/gradle-command-action@v2
       with:
         arguments: -PengineVersion=${{ matrix.es-version }} --info sonarqube
@@ -113,8 +113,8 @@ jobs:
           build/distributions/*.zip
     - uses: actions/upload-artifact@v3
       name: Upload SPI jar
-      if: env.mainJob
+      if: env.mainJob == 'true'
       with:
         name: build-artifacts
         path: |
-          spi/build/*.jar
+          spi/build/libs/sudachi-*.jar
