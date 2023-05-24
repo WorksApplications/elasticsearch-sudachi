@@ -5,7 +5,7 @@ plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.8.0'
     id 'com.diffplug.spotless' version '6.16.0'
     id 'org.sonarqube' version '4.0.0.2929'
-    id("org.jetbrains.kotlinx.kover") version "0.7.0-Alpha"
+    id("org.jetbrains.kotlinx.kover") version "0.7.0"
     id 'com.worksap.nlp.sudachi.esc'
     id 'com.worksap.nlp.sudachi.es'
 }
@@ -43,6 +43,8 @@ dependencies {
     testImplementation('org.jetbrains.kotlin:kotlin-test-junit') {
         exclude(group: 'org.hamcrest')
     }
+    kover(project(':integration'))
+    kover(project(':testlib'))
 }
 
 def embedVersion = tasks.register('embedVersion', Copy) {
@@ -88,14 +90,11 @@ artifacts {
     archives distZip
 }
 
-kover {
-    disabledForProject = false
-    useKoverTool()
-}
-
 koverReport {
-    xml {
-        setReportFile(layout.buildDirectory.file("reports/jacoco/test/jacocoTestReport.xml"))
+    defaults {
+        xml {
+            setReportFile(layout.buildDirectory.file("reports/jacoco/test/jacocoTestReport.xml"))
+        }
     }
 }
 

@@ -39,9 +39,7 @@ class UnboundedCache<K : Any, V>(private val factory: Function<K, V>) {
 
 // Actual reloading logic will be implemented later
 class ReloadableDictionary(private val config: Config) : CurrentDictionary {
-  class Holder(val version: Long, val dictionary: Dictionary) {
-    internal fun create() = Pair(dictionary.create(), version)
-  }
+  internal data class Holder(val version: Long, val dictionary: Dictionary)
 
   @Volatile private var current = create(0L)
 
@@ -53,13 +51,9 @@ class ReloadableDictionary(private val config: Config) : CurrentDictionary {
   val version: Long
     get() = current.version
 
-  internal fun newTokenizerInternal(): Pair<Tokenizer, Long> {
-    return current.create()
-  }
-
   internal fun holder(): Holder = current
 
-  override fun newTokenizer(): CurrentTokenizer = ReloadableTokenizer(this)
+  override fun newTokenizer(): ReloadableTokenizer = ReloadableTokenizer(this)
 
   override fun <T> reloadable(fn: Function<Dictionary, T>): ReloadAware<T> {
     return ReloadAwareImpl(this, fn)
@@ -68,7 +62,9 @@ class ReloadableDictionary(private val config: Config) : CurrentDictionary {
   override fun maybeReload(newDictionary: CurrentDictionary?): Dictionary {
     if (newDictionary is ReloadableDictionary) {
       val holder = newDictionary.current
-      current = Holder(holder.version + 1, holder.dictionary)
+      val newHolder = Holder(holder.version + 1, holder.dictionary)
+      current = newHolder
+      newDictionary.current = newHolder
     }
     return get()
   }
@@ -120,22 +116,22 @@ class ReloadAwareImpl<T>(private val factory: Function<Dictionary, T>) : ReloadA
 class ReloadableTokenizer(private val dictionary: ReloadableDictionary) : CurrentTokenizer {
   private var version = 0L
   private var tokenizer = run {
-    val pair = dictionary.newTokenizerInternal()
-    version = pair.second
-    SoftReference(pair.first)
+    val tok = dictionary.get().create()
+    version = dictionary.version
+    SoftReference(tok)
   }
 
   /** Instances returned from this function should not be cached */
   override fun get(): Tokenizer {
     val instance = tokenizer.get()
     val dicVersion = dictionary.version
-    if (version != dicVersion || instance == null) {
-      val pair = dictionary.newTokenizerInternal()
-      version = pair.second
-      tokenizer = SoftReference(pair.first)
-      return pair.first
+    return if (version != dicVersion || instance == null) {
+      val tok = dictionary.get().create()
+      tokenizer = SoftReference(tok)
+      tok
+    } else {
+      instance
     }
-    return instance
   }
 
   override fun dictionary(): ReloadableDictionary = dictionary

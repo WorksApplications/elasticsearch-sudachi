@@ -170,7 +170,9 @@ class InMemoryDictionary {
     base.systemDictionary(BinaryDictionary(dic))
   }
 
-  val dic = ReloadableDictionary(config)
+  val dic = newDictionary()
+
+  fun newDictionary() = ReloadableDictionary(config)
 
   @JvmOverloads
   fun tokenizer(
