@@ -6,6 +6,7 @@ plugins {
     id 'com.worksap.nlp.sudachi.esc'
     id 'com.diffplug.spotless'
     id 'org.jetbrains.kotlin.jvm'
+    id 'org.sonarqube'
 }
 
 version = properties["pluginVersion"]
@@ -49,4 +50,7 @@ spotless {
     }
 }
 
-jar {}
+sonar {
+    // this project is only for tests, do not analyze it
+    skipProject = true
+}

@@ -35,6 +35,7 @@ jobs:
         java-version: 17
         distribution: 'temurin'
     - name: Cache SonarCloud packages
+      if: env.mainJob == 'true'
       uses: actions/cache@v3
       with:
         path: ~/.sonar/cache
