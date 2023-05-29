@@ -52,6 +52,7 @@ publishing {
             from(components.java)
 
             pom {
+                artifactId = 'sudachi-search-spi'
                 url = "https://github.com/WorksApplications/elasticsearch-sudachi"
                 name = 'sudachi-search-spi'
                 description = project.description
