@@ -1,19 +1,18 @@
 plugins {
     id 'java-library'
+    id 'com.diffplug.spotless'
+    id 'signing'
+    id 'maven-publish'
     id 'com.worksap.nlp.sudachi.es'
     id 'com.worksap.nlp.sudachi.esc'
-    id 'com.diffplug.spotless'
 }
 
 group = 'com.worksap.nlp'
 version = properties["pluginVersion"]
+description = "Plugin interface for Sudachi search engine integrations (ElasticSearch and OpenSearch)"
 
 dependencies {
     api('com.worksap.nlp:sudachi:0.7.1')
-}
-
-jar {
-    archiveBaseName = "sudachi-search-spi"
 }
 
 spotless {
@@ -36,4 +35,62 @@ spotless {
         eclipse('4.21.0').configFile(formatter.resolve('eclipse-formatter.xml'))
         licenseHeaderFile(formatter.resolve('license-header'))
     }
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+tasks.withType(org.gradle.jvm.tasks.Jar.class).configureEach {
+    it.archiveBaseName.set("sudachi-search-spi")
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from(components.java)
+
+            pom {
+                url = "https://github.com/WorksApplications/elasticsearch-sudachi"
+                name = 'sudachi-search-spi'
+                description = project.description
+
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = 'kazuma-t'
+                        name = 'Kazuma TAKAOKA'
+                        email = 'takaoka_k@worksap.co.jp'
+                        timezone = 'Asia/Tokyo'
+                    }
+                }
+
+                scm {
+                    connection = 'scm:git:https://github.com/WorksApplications/elasticsearch-sudachi.git'
+                    developerConnection = 'scm:git:ssh://git@github.com:WorksApplications/elasticsearch-sudachi.git'
+                    url = 'https://github.com/WorksApplications/elasticsearch-sudachi'
+                }
+
+                issueManagement {
+                    system = 'Github Issues'
+                    url = 'https://github.com/WorksApplications/elasticsearch-sudachi/issues'
+                }
+            }
+        }
+    }
+}
+
+signing {
+    def signingKey = project.findProperty("gpg.key") ?: System.getenv("MAVEN_GPG_PRIVATE_KEY")
+    def signingPassword = project.findProperty("gpg.password") ?: System.getenv("MAVEN_GPG_PASSPHRASE")
+    useInMemoryPgpKeys(signingKey, signingPassword)
+    required { !project.version.endsWith("-SNAPSHOT") }
+    sign publishing.publications.maven
 }
