@@ -22,6 +22,8 @@ import java.util.function.Function;
 
 /**
  * Sudachi {@link Dictionary} object wrapped in reload-aware facade.
+ *
+ * @see ReloadAware
  */
 public interface CurrentDictionary extends ReloadAware<Dictionary> {
     /**

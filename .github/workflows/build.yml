@@ -57,7 +57,7 @@ jobs:
       if: env.mainJob == 'true'
       uses: eskatos/gradle-command-action@v2
       with:
-        arguments: -PengineVersion=${{ matrix.es-version }} --info sonarqube
+        arguments: -PengineVersion=${{ matrix.es-version }} --info sonar
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -119,3 +119,15 @@ jobs:
         name: build-artifacts
         path: |
           spi/build/libs/sudachi-*.jar
+    - name: 'Publish SPI jar to maven central'
+      uses: eskatos/gradle-command-action@v2
+      if: env.mainJob == 'true' && success() && startsWith(github.ref, 'refs/branch/develop')
+      with:
+        arguments: -PengineVersion=${{ matrix.es-version }} --info publishToSonatype closeAndReleaseSonatypeStagingRepository
+      env:
+        GITHUB_USERNAME: GITHUB_ACTOR
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+        MAVEN_USER_PASSWORD: ${{ secrets.MAVEN_USER_PASSWORD }}
+        MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+        MAVEN_GPG_PRIVATE_KEY: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
