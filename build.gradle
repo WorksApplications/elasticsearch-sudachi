@@ -5,18 +5,14 @@ plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.8.0'
     id 'com.diffplug.spotless' version '6.16.0'
     id 'org.sonarqube' version '4.0.0.2929'
-    id("org.jetbrains.kotlinx.kover") version "0.7.0-Alpha"
+    id("org.jetbrains.kotlinx.kover") version "0.7.0"
+    id 'com.worksap.nlp.sudachi.esc'
     id 'com.worksap.nlp.sudachi.es'
 }
 
 group = 'com.worksap.nlp'
 archivesBaseName = 'analysis-sudachi'
-version = '3.0.2-SNAPSHOT'
-
-tasks.withType(JavaCompile).configureEach {
-    options.release.set(11)
-    options.encoding = 'UTF-8'
-}
+version = properties["pluginVersion"]
 
 compileKotlin {
     compilerOptions.jvmTarget.set(JvmTarget.JVM_11)
@@ -26,28 +22,35 @@ compileTestKotlin {
     compilerOptions.jvmTarget.set(JvmTarget.JVM_11)
 }
 
-repositories {
-    mavenLocal()
-    mavenCentral()
-    if (project.version.endsWith("-SNAPSHOT")) {
-        maven {
-            url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
-        }
+configurations {
+    spi
+}
+
+sourceSets {
+    test {
+        compileClasspath += configurations.spi
+        runtimeClasspath += configurations.spi
+    }
+    main {
+        compileClasspath += configurations.spi
     }
 }
 
 dependencies {
-    implementation('com.worksap.nlp:sudachi:0.7.1')
+    spi(project(':spi'))
+    testImplementation(project(':testlib'))
     testImplementation('org.apache.logging.log4j:log4j-core:2.17.2')
     testImplementation('org.jetbrains.kotlin:kotlin-test-junit') {
         exclude(group: 'org.hamcrest')
     }
+    kover(project(':integration'))
+    kover(project(':testlib'))
 }
 
 def embedVersion = tasks.register('embedVersion', Copy) {
-    from 'src/main/extras/plugin-descriptor.properties'
-    into 'build/descriptor'
     var esKind = sudachiEs.kind.get()
+    from 'src/main/extras/plugin-descriptor.properties'
+    into "build/package/${version}/${esKind.engine.kind}-${esKind.version}"
     expand([
             version: version,
             engineVersion: esKind.version,
@@ -57,20 +60,42 @@ def embedVersion = tasks.register('embedVersion', Copy) {
     inputs.property("elasticSearchVersion", esKind.version)
 }
 
-def copyDependencies = tasks.register('copyDependencies', Copy) {
+def packageJars = tasks.register('packageJars', Copy) {
     from configurations.runtimeClasspath
-    into 'build/libs'
+    from tasks.jar.outputs
+    var esKind = sudachiEs.kind.get()
+    into "build/package/${version}/${esKind.engine.kind}-${esKind.version}"
+    dependsOn tasks.jar
+}
+
+def packageSpiJars = tasks.register('packageSpiJars', Copy) {
+    from configurations.spi
+    var esKind = sudachiEs.kind.get()
+    // FIXME: remove false after https://github.com/WorksApplications/Sudachi/issues/209
+    if (false && sudachiEs.hasPluginSpiSupport()) {
+        into "build/package/${version}/${esKind.engine.kind}-${esKind.version}/spi"
+    } else {
+        into "build/package/${version}/${esKind.engine.kind}-${esKind.version}"
+    }
 }
 
 def distZip = tasks.register('distZip', Zip) {
     var esKind = sudachiEs.kind.get()
-    dependsOn tasks.jar, embedVersion, copyDependencies
+    dependsOn embedVersion, packageJars, packageSpiJars
     archiveBaseName.set("${esKind.engine.kind}-${esKind.version}-$archivesBaseName")
-    from 'build/libs/', 'build/descriptor', 'LICENSE', 'README.md'
+    from("build/package/${version}/${esKind.engine.kind}-${esKind.version}", 'LICENSE', 'README.md')
 }
 
 artifacts {
     archives distZip
+}
+
+koverReport {
+    defaults {
+        xml {
+            setReportFile(layout.buildDirectory.file("reports/jacoco/test/jacocoTestReport.xml"))
+        }
+    }
 }
 
 // See https://github.com/diffplug/spotless/tree/main/plugin-gradle
@@ -104,17 +129,6 @@ sonarqube {
         property "sonar.projectKey", "WorksApplications_elasticsearch-sudachi"
         property "sonar.organization", "worksapplications"
         property "sonar.host.url", "https://sonarcloud.io"
-    }
-}
-
-kover {
-    disabledForProject = false
-    useKoverTool()
-}
-
-koverReport {
-    xml {
-        setReportFile(layout.buildDirectory.file("reports/jacoco/test/jacocoTestReport.xml"))
     }
 }
 

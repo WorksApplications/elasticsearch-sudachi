@@ -16,7 +16,6 @@
 
 package com.worksap.nlp.lucene.sudachi.ja
 
-import com.worksap.nlp.elasticsearch.sudachi.plugin.ReloadAware
 import com.worksap.nlp.lucene.sudachi.ja.attributes.MorphemeAttribute
 import com.worksap.nlp.sudachi.PosMatcher
 import org.apache.lucene.analysis.FilteringTokenFilter

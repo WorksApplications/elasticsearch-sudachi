@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.worksap.nlp.elasticsearch.sudachi.plugin.ReloadAware;
 import com.worksap.nlp.elasticsearch.sudachi.plugin.ReloadableDictionary;
 import com.worksap.nlp.lucene.sudachi.ja.util.Stopwords;
 import com.worksap.nlp.elasticsearch.sudachi.plugin.AnalysisCache;
@@ -104,7 +103,7 @@ public class SudachiAnalyzer extends StopwordAnalyzerBase {
         TokenStream stream = tokenizer;
         stream = new SudachiBaseFormFilter(stream);
         if (!stoptags.isEmpty()) {
-            ReloadAware<PosMatcher> matcher = new ReloadAware<>(dictionary, dic -> dic.posMatcher(stoptags));
+            ReloadAware<PosMatcher> matcher = dictionary.reloadable(dic -> dic.posMatcher(stoptags));
             stream = new SudachiPartOfSpeechStopFilter(stream, matcher);
         }
         stream = new StopFilter(stream, stopwords);

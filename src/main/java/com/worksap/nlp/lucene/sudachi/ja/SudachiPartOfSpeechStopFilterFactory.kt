@@ -16,7 +16,6 @@
 
 package com.worksap.nlp.lucene.sudachi.ja
 
-import com.worksap.nlp.elasticsearch.sudachi.plugin.ReloadAware
 import com.worksap.nlp.lucene.aliases.ResourceLoaderArgument
 import com.worksap.nlp.lucene.aliases.ResourceLoaderAware
 import com.worksap.nlp.lucene.aliases.TokenFilterFactory
@@ -56,9 +55,8 @@ class SudachiPartOfSpeechStopFilterFactory(args: MutableMap<String, String>) :
       val sudachi =
           stream.getAttribute<SudachiAttribute>()
               ?: throw IllegalArgumentException(
-                  "Sudachi Tokenizer does not present in the filter chain")
-      val matcher = ReloadAware { it.posMatcher(stopTags) }
-      matcher.maybeReload(sudachi.dictionary)
+                  "Sudachi Tokenizer was not present in the filter chain")
+      val matcher = sudachi.dictionary.reloadable { it.posMatcher(stopTags) }
       SudachiPartOfSpeechStopFilter(stream, matcher)
     } else {
       stream

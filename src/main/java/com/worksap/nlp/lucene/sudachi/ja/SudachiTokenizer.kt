@@ -19,6 +19,7 @@ package com.worksap.nlp.lucene.sudachi.ja
 import com.worksap.nlp.lucene.sudachi.ja.attributes.MorphemeAttribute
 import com.worksap.nlp.lucene.sudachi.ja.attributes.MorphemeConsumerAttribute
 import com.worksap.nlp.lucene.sudachi.ja.attributes.SudachiAttribute
+import com.worksap.nlp.lucene.sudachi.ja.attributes.SudachiAttributeFactory
 import org.apache.lucene.analysis.Tokenizer
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute
@@ -26,19 +27,17 @@ import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute
 import org.apache.lucene.analysis.tokenattributes.PositionLengthAttribute
 import org.apache.lucene.util.AttributeFactory
 
-@Suppress("jol")
 class SudachiTokenizer(
     private val tokenizer: CachingTokenizer,
     private val discardPunctuation: Boolean,
     factory: AttributeFactory = AttributeFactory.DEFAULT_ATTRIBUTE_FACTORY
-) : Tokenizer(factory) {
-
+) : Tokenizer(SudachiAttributeFactory(factory)) {
   private val termAtt = addAttribute<CharTermAttribute>()
   private val morphemeAtt = addAttribute<MorphemeAttribute>()
   private val offsetAtt = addAttribute<OffsetAttribute>()
   private val posIncAtt = addAttribute<PositionIncrementAttribute>()
   private val posLenAtt = addAttribute<PositionLengthAttribute>()
-  private val consumer = addAttribute<MorphemeConsumerAttribute> { it.instance = this }
+  private val consumer = addAttribute<MorphemeConsumerAttribute> { it.currentConsumer = this }
 
   init {
     addAttribute<SudachiAttribute> { it.dictionary = tokenizer.dictionary }

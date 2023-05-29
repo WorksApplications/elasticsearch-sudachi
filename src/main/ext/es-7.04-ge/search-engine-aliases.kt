@@ -47,6 +47,8 @@ typealias Plugin = org.elasticsearch.plugins.Plugin
 
 typealias CacheBuilder<K, V> = org.elasticsearch.common.cache.CacheBuilder<K, V>
 
+typealias ExtensiblePlugin = org.elasticsearch.plugins.ExtensiblePlugin
+
 fun parseStopWords(
     environment: Environment?,
     settings: Settings?,

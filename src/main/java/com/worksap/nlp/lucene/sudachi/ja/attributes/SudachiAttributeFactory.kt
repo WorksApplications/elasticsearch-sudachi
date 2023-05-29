@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Works Applications Co., Ltd.
+ * Copyright (c) 2023 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,18 @@
 
 package com.worksap.nlp.lucene.sudachi.ja.attributes
 
-import com.worksap.nlp.elasticsearch.sudachi.plugin.ReloadableDictionary
 import org.apache.lucene.util.Attribute
+import org.apache.lucene.util.AttributeFactory
 import org.apache.lucene.util.AttributeImpl
-import org.apache.lucene.util.AttributeReflector
 
-interface SudachiAttribute : Attribute {
-  var dictionary: ReloadableDictionary
-}
-
-class SudachiAttributeImpl : AttributeImpl(), SudachiAttribute {
-  override fun clear() {}
-
-  override fun reflectWith(reflector: AttributeReflector?) {}
-
-  override fun copyTo(target: AttributeImpl?) {}
-
-  override lateinit var dictionary: ReloadableDictionary
+// simply hardcore all our attributes without doing smart things
+class SudachiAttributeFactory(private val parent: AttributeFactory) : AttributeFactory() {
+  override fun createAttributeInstance(attClass: Class<out Attribute>?): AttributeImpl {
+    return when (attClass) {
+      MorphemeAttribute::class.java -> MorphemeAttributeImpl()
+      MorphemeConsumerAttribute::class.java -> MorphemeConsumerAttributeImpl()
+      SudachiAttribute::class.java -> SudachiAttributeImpl()
+      else -> parent.createAttributeInstance(attClass)
+    }
+  }
 }

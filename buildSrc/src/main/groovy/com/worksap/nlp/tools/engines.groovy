@@ -150,4 +150,8 @@ class ProjectKind {
         Version version = Version.fromRaw(rawVersion)
         return engine.supportVersion(version)
     }
+
+    Version parsedVersion() {
+        return Version.fromRaw(version)
+    }
 }

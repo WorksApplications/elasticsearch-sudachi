@@ -22,6 +22,8 @@ jobs:
           - 'es:7.14.2'
           - 'es:7.10.2'
           - 'os:2.6.0'
+    env:
+      mainJob: ${{ matrix.es-version == 'es:8.5.3' }}
     continue-on-error: true
     steps:
     - uses: actions/checkout@v3
@@ -33,6 +35,7 @@ jobs:
         java-version: 17
         distribution: 'temurin'
     - name: Cache SonarCloud packages
+      if: env.mainJob == 'true'
       uses: actions/cache@v3
       with:
         path: ~/.sonar/cache
@@ -51,7 +54,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Analyze with sonarqube
-      if: matrix.es-version == 'es:8.5.3'
+      if: env.mainJob == 'true'
       uses: eskatos/gradle-command-action@v2
       with:
         arguments: -PengineVersion=${{ matrix.es-version }} --info sonarqube
@@ -95,9 +98,24 @@ jobs:
         python3 test-scripts/30-test-docs.py
         bash test-scripts/80-delete-index.sh
     - uses: actions/upload-artifact@v3
+      name: Upload reports when failed
       if: failure()
       with:
-        name: failure reports
+        name: failure-reports
         path: |
           build/reports
           build/integration/elasticsearch-*/logs
+    - uses: actions/upload-artifact@v3
+      name: Upload built packages
+      if: success()
+      with:
+        name: build-artifacts
+        path: |
+          build/distributions/*.zip
+    - uses: actions/upload-artifact@v3
+      name: Upload SPI jar
+      if: env.mainJob == 'true'
+      with:
+        name: build-artifacts
+        path: |
+          spi/build/libs/sudachi-*.jar

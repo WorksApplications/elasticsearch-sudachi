@@ -10,12 +10,22 @@ import org.slf4j.LoggerFactory
 import javax.inject.Inject
 
 class EsExtension {
-    Provider<? super EngineType> kind
+    Provider<ProjectKind> kind
 
     @Inject
     EsExtension(ProviderFactory providers) {
         var engineVersion = providers.gradleProperty("engineVersion")
         this.kind = engineVersion.map {new ProjectKind(it) }
+    }
+
+    boolean hasPluginSpiSupport() {
+        def kind = kind.get()
+        if (kind.engine == EngineType.ElasticSearch) {
+            def ver = kind.parsedVersion()
+            return ver.ge(8, 0)
+        } else {
+            return false
+        }
     }
 }
 
@@ -50,9 +60,13 @@ class EsSudachiPlugin implements Plugin<Project> {
 
         logger.warn("Compatibility for version $verString is $version, using additional directories src/{test,main}/ext/{${tags.join(",")}}")
 
+
         project.sourceSets {
-            main.kotlin.srcDirs += tags.collect {"src/main/ext/$it" }
-            test.kotlin.srcDirs += tags.collect {"src/test/ext/$it" }
+            if (project.plugins.hasPlugin('org.jetbrains.kotlin.jvm')) {
+                main.kotlin.srcDirs += tags.collect {"src/main/ext/$it" }
+                test.kotlin.srcDirs += tags.collect {"src/test/ext/$it" }
+            }
+
             main.java.srcDirs += tags.collect {"src/main/ext/$it" }
             test.java.srcDirs += tags.collect {"src/test/ext/$it" }
         }
@@ -71,6 +85,7 @@ class EsSudachiPlugin implements Plugin<Project> {
                 testImplementation("org.opensearch.test:framework:$verString") {
                     exclude(group: 'junit', module: 'junit')
                 }
+                testImplementation("org.opensearch:opensearch-plugin-classloader:$verString")
             }
         }
     }
