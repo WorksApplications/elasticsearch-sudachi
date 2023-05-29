@@ -121,7 +121,7 @@ jobs:
           spi/build/libs/sudachi-*.jar
     - name: 'Publish SPI jar to maven central'
       uses: eskatos/gradle-command-action@v2
-      if: env.mainJob == 'true' && success()
+      if: env.mainJob == 'true' && success() && startsWith(github.ref, 'refs/branch/develop')
       with:
         arguments: -PengineVersion=${{ matrix.es-version }} --info publishToSonatype closeAndReleaseSonatypeStagingRepository
       env:
