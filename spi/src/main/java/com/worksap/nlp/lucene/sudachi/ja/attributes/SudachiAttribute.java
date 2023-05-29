@@ -25,7 +25,19 @@ import org.apache.lucene.util.Attribute;
  * dictionary hot reloading (reload itself is not implemented yet).
  */
 public interface SudachiAttribute extends Attribute {
+    /**
+     * Get current dictionary instance
+     * 
+     * @return reloadable facade for the current dictionary
+     */
     CurrentDictionary getDictionary();
 
+    /**
+     * Set the current dictionary for the token stream. Use this method only if you
+     * really know what you are doing.
+     * 
+     * @param dictionary
+     *            new instance of the dictionary
+     */
     void setDictionary(CurrentDictionary dictionary);
 }

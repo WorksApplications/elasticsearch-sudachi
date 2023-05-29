@@ -18,6 +18,11 @@ package com.worksap.nlp.lucene.sudachi.ja;
 
 import com.worksap.nlp.sudachi.Tokenizer;
 
+/**
+ * Current instance of Sudachi tokenizer.
+ *
+ * @see ReloadAware
+ */
 public interface CurrentTokenizer extends ReloadAware<Tokenizer> {
 
 }
