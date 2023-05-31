@@ -54,8 +54,8 @@ def downloadIcuPlugin = tasks.register('downloadIcuPlugin', Download.class) {
         src("https://artifacts.elastic.co/downloads/elasticsearch-plugins/analysis-icu/analysis-icu-${version}.zip")
         dest(new File(project.buildDir, "cache/analysis-icu-elasticsearch-${version}.zip"))
     } else {
-        src(null)
-        dest(null)
+        src("https://artifacts.opensearch.org/releases/plugins/analysis-icu/${version}/analysis-icu-${version}.zip")
+        dest(new File(project.buildDir, "cache/analysis-icu-opensearch-${version}.zip"))
     }
 
     overwrite(false)
