@@ -24,7 +24,7 @@ class BasicTest : SudachiEnvTest() {
   fun canLoadPlugin() {
     val plugins = sudachiEnv.makePluginService()
     val analysisPlugins = plugins.filterPlugins(AnalysisPluginAlias::class.java)
-    Assert.assertEquals(1, analysisPlugins.size)
+    Assert.assertEquals(2, analysisPlugins.size)
     Assert.assertEquals(
         analysisPlugins[0].javaClass.name,
         "com.worksap.nlp.elasticsearch.sudachi.plugin.AnalysisSudachiPlugin",

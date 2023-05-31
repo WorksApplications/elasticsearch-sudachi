@@ -6,6 +6,7 @@ import org.gradle.api.Task
 import org.gradle.api.Transformer
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.testing.Test
 
 import javax.inject.Inject
@@ -19,12 +20,23 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.function.BiFunction
 import java.util.function.Predicate
+import java.util.zip.ZipFile
 
 class EsTestEnvExtension {
     Path bundlePath = null
     Path systemDic = null
     Path configFile = null
     List<Path> additionalJars = new ArrayList<>()
+    List<PluginDescriptor> additionalPlugins = new ArrayList<>()
+
+    void addPlugin(String name, Object value) {
+        additionalPlugins.add(new PluginDescriptor(name: name, value: value))
+    }
+}
+
+class PluginDescriptor {
+    String name
+    Object value
 }
 
 class StringProvider implements Provider<String>, Serializable {
@@ -110,6 +122,11 @@ class EsTestEnvPlugin implements Plugin<Project> {
                 envRoot.setValue(prepareEnvironment(target, task, esHomePath, ext).toString())
             }
             task.doLast { cleanupEnvironment(esHomePath) }
+            ext.additionalPlugins.forEach {
+                if (it.value instanceof TaskProvider || it.value instanceof Task) {
+                    dependsOn(it.value)
+                }
+            }
 
             def gradle = target.getGradle()
             def userHomeDir = target.getGradle().getGradleUserHomeDir().toPath()
@@ -145,7 +162,7 @@ class EsTestEnvPlugin implements Plugin<Project> {
         }
     }
 
-    private Path prepareEnvironment(Project project, Test task, Path basePath, EsTestEnvExtension ext) {
+    private Path prepareEnvironment(Project project, Test testTask, Path basePath, EsTestEnvExtension ext) {
         def formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HH-mm-ss", Locale.ROOT)
         def now = Instant.now().atZone(ZoneId.of("UTC"))
         def timepart = formatter.format(now)
@@ -166,6 +183,12 @@ class EsTestEnvPlugin implements Plugin<Project> {
             Path name = jar.getFileName()
             Files.copy(jar, sudachiPluginDir.resolve(name))
         }
+        for (plugin in ext.additionalPlugins) {
+            def provider = plugin.value as TaskProvider<Task>
+            def extractedPath = pluginDir.resolve(plugin.name)
+            // unfortunately, we can't make this a Copy plugin because it outputs to a different directory each execution
+            extractZipArchive(provider.get().outputs.files.singleFile.toPath(), extractedPath)
+        }
 
         def sudachiConfigDir = configPath.resolve("sudachi")
         Files.createDirectories(sudachiConfigDir)
@@ -179,7 +202,8 @@ class EsTestEnvPlugin implements Plugin<Project> {
 
     }
 
-    void copyTree(Path source, Path destination, Predicate<Path> filter) {
+
+    static void copyTree(Path source, Path destination, Predicate<Path> filter) {
         Files.createDirectories(destination)
         Files.walkFileTree(source, new SimpleFileVisitor<Path>() {
             @Override
@@ -203,6 +227,40 @@ class EsTestEnvPlugin implements Plugin<Project> {
                 return FileVisitResult.CONTINUE
             }
         })
+    }
+
+    static void extractZipArchive(Path zip, Path result) {
+        Files.createDirectories(result)
+        try (def descr = new ZipFile(zip.toFile())) {
+            def entries = descr.entries()
+            while (entries.hasMoreElements()) {
+                def entry = entries.nextElement()
+                def fsPath = result.resolve(entry.name)
+                if (entry.isDirectory() && Files.notExists(fsPath)) {
+                    Files.createDirectory(fsPath)
+                } else {
+                    Files.createDirectories(fsPath.parent)
+                    try (def stream = descr.getInputStream(entry)) {
+                        if (entry.name.endsWith("plugin-descriptor.properties")) {
+                            try (def ostream = Files.newOutputStream(fsPath)) {
+                                filterPluginDescriptor(stream, ostream)
+                            }
+                        } else {
+                            Files.copy(stream, fsPath)
+                        }
+                    }
+
+
+                    Files.setLastModifiedTime(fsPath, entry.lastModifiedTime)
+                }
+            }
+        }
+
+    }
+
+    static void filterPluginDescriptor(InputStream inputStream, OutputStream outputStream) {
+        inputStream.filterLine('utf-8') { !it.startsWith("modulename=") }
+                .writeTo(outputStream.newWriter('utf-8'))
     }
 }
 

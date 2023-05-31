@@ -61,21 +61,22 @@ class CopyingInputExtractor(private val maxSize: Int) : InputExtractor {
   private val bufferLocal = ThreadLocal<SoftReference<CharArray>>()
   override fun extract(input: Reader): ExtractionResult {
     val buf = getBuffer()
-    val sz1 = input.read(buf)
-    if (sz1 == -1) {
+    var offset = input.read(buf)
+    if (offset == -1) {
       return ExtractionResult.EMPTY_NO_REMAINING
     }
-    if (sz1 == maxSize) {
-      val data = String(buf, 0, sz1)
-      return ExtractionResult(data, remaining = true)
+    var toRead = maxSize - offset
+    while (toRead > 0) {
+      val nread = input.read(buf, offset, toRead)
+      if (nread < 0) { // end of stream mark
+        val data = String(buf, 0, offset)
+        return ExtractionResult(data, remaining = false)
+      }
+      offset += nread
+      toRead -= nread
     }
-    val sz2 = input.read(buf, sz1, maxSize - sz1)
-    if (sz2 == -1) {
-      val data = String(buf, 0, sz1)
-      return ExtractionResult(data, remaining = false)
-    }
-    val data = String(buf, 0, sz1 + sz2)
-    return ExtractionResult(data, true)
+    val data = String(buf, 0, offset)
+    return ExtractionResult(data, remaining = true)
   }
 
   private fun getBuffer(): CharArray {

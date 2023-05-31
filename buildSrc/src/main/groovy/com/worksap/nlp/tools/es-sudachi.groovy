@@ -27,6 +27,14 @@ class EsExtension {
             return false
         }
     }
+
+    boolean isEs() {
+        return kind.get().engine == EngineType.ElasticSearch
+    }
+
+    String version() {
+        return kind.get().version
+    }
 }
 
 
