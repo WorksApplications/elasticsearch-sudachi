@@ -33,7 +33,12 @@ class ConcatenatingReader(private val data: String, private val remaining: Reade
       }
       len -= toRead
       off += toRead
-      return toRead + remaining.read(cbuf, off, len)
+      val nread = remaining.read(cbuf, off, len)
+      return if (nread < 0) { // if the second stream is finished
+        toRead
+      } else {
+        toRead + nread
+      }
     }
     return remaining.read(cbuf, off, len)
   }
