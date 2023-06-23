@@ -32,7 +32,7 @@ class ConfigAdapter(anchor: PathAnchor, settings: Settings, env: Environment) {
   val compiled: Config = run {
     val base = settingsFile(settings)
     val additional = settingsInlineString(basePath, settings)
-    additional.withFallback(base)
+    additional.withFallback(base).anchoredWith(fullAnchor)
   }
 
   val discardPunctuation: Boolean = settings.getAsBoolean(PARAM_DISCARD_PUNCTUATION, true)
@@ -42,7 +42,7 @@ class ConfigAdapter(anchor: PathAnchor, settings: Settings, env: Environment) {
   private fun settingsFile(settings: Settings): Config {
     val settingsPath = settings.get(PARAM_SETTINGS_PATH)
     return if (settingsPath == null) {
-      readDefaultConfig(basePath)
+      readDefaultConfig(basePath, fullAnchor)
     } else {
       val configObject = fullAnchor.resource<Any>(settingsPath)
       Config.fromResource(configObject, fullAnchor)
@@ -71,8 +71,8 @@ class ConfigAdapter(anchor: PathAnchor, settings: Settings, env: Environment) {
       return env.configFile().resolve(settings.get("resources_path", "sudachi"))
     }
 
-    private fun readDefaultConfig(root: Path): Config {
-      val anchor = PathAnchor.filesystem(root).andThen(PathAnchor.classpath())
+    private fun readDefaultConfig(root: Path, baseAnchor: PathAnchor): Config {
+      val anchor = PathAnchor.filesystem(root).andThen(baseAnchor)
       val resolved = root.resolve("sudachi.json")
       val exists =
           try {
