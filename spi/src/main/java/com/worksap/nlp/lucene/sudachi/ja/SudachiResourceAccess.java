@@ -21,8 +21,20 @@ package com.worksap.nlp.lucene.sudachi.ja;
  * SudachiAnalysisPlugin. If an ES plugin contains Sudachi plugins or
  * configurations in the classpath, it must provide an implementation of this
  * interface. The implementation must have a single public no-argument
- * constructor.
+ * constructor. <br>
+ * The implementation must be registered using ServiceLoader functionality
+ * within the ElasticSearch/OpenSearch plugin JAR.
+ *
+ * @see java.util.ServiceLoader
  */
 public interface SudachiResourceAccess {
+    /**
+     * Implementation must provide the classloader which could load the Sudachi
+     * plugin classes. Because of SecurityManager limitations, the implementation
+     * code must reside in the subplugin jar and can not be default method here.
+     * Usual implementation can be simple {@code getClass().getClassloader()}.
+     * 
+     * @return classloader which can be used to load Sudachi plugins
+     */
     ClassLoader getClassloader();
 }
