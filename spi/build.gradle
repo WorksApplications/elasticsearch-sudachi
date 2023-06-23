@@ -12,7 +12,7 @@ version = properties["pluginVersion"]
 description = "Plugin interface for Sudachi search engine integrations (ElasticSearch and OpenSearch)"
 
 dependencies {
-    api('com.worksap.nlp:sudachi:0.7.1')
+    api('com.worksap.nlp:sudachi:0.7.3')
 }
 
 spotless {

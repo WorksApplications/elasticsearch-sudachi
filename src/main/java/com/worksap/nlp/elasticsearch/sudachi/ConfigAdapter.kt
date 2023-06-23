@@ -17,7 +17,6 @@
 package com.worksap.nlp.elasticsearch.sudachi
 
 import com.worksap.nlp.search.aliases.Environment
-import com.worksap.nlp.search.aliases.IndexSettings
 import com.worksap.nlp.search.aliases.Settings
 import com.worksap.nlp.sudachi.Config
 import com.worksap.nlp.sudachi.PathAnchor
@@ -26,12 +25,12 @@ import com.worksap.nlp.tools.EnumFlag
 import java.nio.file.Path
 import kotlin.io.path.exists
 
-@Suppress("UNUSED_PARAMETER")
-class ConfigAdapter(index: IndexSettings, name: String, settings: Settings, env: Environment) {
+class ConfigAdapter(anchor: PathAnchor, settings: Settings, env: Environment) {
   private val basePath = resourcesPath(env, settings)
+  private val fullAnchor = PathAnchor.filesystem(basePath).andThen(anchor)
 
   val compiled: Config = run {
-    val base = settingsFile(basePath, settings)
+    val base = settingsFile(settings)
     val additional = settingsInlineString(basePath, settings)
     additional.withFallback(base)
   }
@@ -39,6 +38,16 @@ class ConfigAdapter(index: IndexSettings, name: String, settings: Settings, env:
   val discardPunctuation: Boolean = settings.getAsBoolean(PARAM_DISCARD_PUNCTUATION, true)
 
   val mode = splitMode(settings)
+
+  private fun settingsFile(settings: Settings): Config {
+    val settingsPath = settings.get(PARAM_SETTINGS_PATH)
+    return if (settingsPath == null) {
+      readDefaultConfig(basePath)
+    } else {
+      val configObject = fullAnchor.resource<Any>(settingsPath)
+      Config.fromResource(configObject, fullAnchor)
+    }
+  }
 
   companion object {
     const val PARAM_SPLIT_MODE_DEPRECATED = "mode"
@@ -75,17 +84,6 @@ class ConfigAdapter(index: IndexSettings, name: String, settings: Settings, env:
         Config.fromFile(resolved, anchor)
       } else {
         Config.defaultConfig(anchor)
-      }
-    }
-
-    @JvmStatic
-    fun settingsFile(root: Path, settings: Settings): Config {
-      val settingsPath = settings.get(PARAM_SETTINGS_PATH)
-      return if (settingsPath == null) {
-        readDefaultConfig(root)
-      } else {
-        val resolved = root.resolve(settingsPath)
-        Config.fromFile(resolved)
       }
     }
 

@@ -17,9 +17,11 @@
 package com.worksap.nlp.elasticsearch.sudachi.plugin
 
 import com.worksap.nlp.elasticsearch.sudachi.index.*
+import com.worksap.nlp.lucene.sudachi.ja.SudachiResourceAccess
 import com.worksap.nlp.search.aliases.*
 import java.io.IOException
 import java.util.*
+import kotlin.collections.ArrayList
 import org.apache.logging.log4j.LogManager
 import org.apache.lucene.analysis.Analyzer
 
@@ -30,11 +32,20 @@ private inline fun <reified T> provider(
 }
 
 class AnalysisSudachiPlugin(settings: Settings?) : Plugin(), AnalysisPlugin, ExtensiblePlugin {
-  private val dictionaryService = DictionaryService()
   private val cacheService = AnalysisCacheService()
+  private val classloaders = ArrayList<ClassLoader>()
+  private val dictionaryService by lazy { DictionaryService(classloaders) }
 
   init {
+    // for separated SPI we need to add plugin classloader to the classloader pile
+    classloaders.add(javaClass.classLoader)
     logger.info("loaded Sudachi plugin")
+  }
+  // this method is guaranteed to run before any other methods
+  override fun loadExtensions(loader: ExtensionLoader) {
+    loader.loadExtensions(SudachiResourceAccess::class.java).forEach {
+      classloaders.add(it.classloader)
+    }
   }
 
   override fun getTokenFilters(): Map<String, AnalysisProvider<TokenFilterFactory>> {

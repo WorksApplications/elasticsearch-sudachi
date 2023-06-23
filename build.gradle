@@ -72,8 +72,7 @@ def packageJars = tasks.register('packageJars', Copy) {
 def packageSpiJars = tasks.register('packageSpiJars', Copy) {
     from configurations.spi
     var esKind = sudachiEs.kind.get()
-    // FIXME: remove false after https://github.com/WorksApplications/Sudachi/issues/209
-    if (false && sudachiEs.hasPluginSpiSupport()) {
+    if (sudachiEs.hasPluginSpiSupport()) {
         into "build/package/${version}/${esKind.engine.kind}-${esKind.version}/spi"
     } else {
         into "build/package/${version}/${esKind.engine.kind}-${esKind.version}"

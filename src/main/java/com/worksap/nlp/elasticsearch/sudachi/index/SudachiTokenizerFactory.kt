@@ -52,7 +52,7 @@ class SudachiTokenizerFactory(
 
   private val mode = ConfigAdapter.splitMode(settings)
 
-  private val config = ConfigAdapter(indexSettings, name, settings, env)
+  private val config = ConfigAdapter(service.anchor, settings, env)
 
   private val dictionary by lazy { service.forConfig(config.compiled) }
 
