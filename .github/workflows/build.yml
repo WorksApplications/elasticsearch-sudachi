@@ -28,6 +28,7 @@ jobs:
           - 'os:2.6.0'
     env:
       mainJob: ${{ matrix.es-version == 'es:8.8.1' }}
+      githubRef: ${{ github.ref }}
     continue-on-error: true
     steps:
     - uses: actions/checkout@v3
@@ -125,7 +126,7 @@ jobs:
           spi/build/libs/sudachi-*.jar
     - name: 'Publish SPI jar to maven central'
       uses: eskatos/gradle-command-action@v2
-      if: env.mainJob == 'true' && success() && startsWith(github.ref, 'refs/branch/develop')
+      if: env.mainJob == 'true' && success() && startsWith(github.ref, 'refs/remotes/origin/develop')
       with:
         arguments: -PengineVersion=${{ matrix.es-version }} --info publishToSonatype closeAndReleaseSonatypeStagingRepository
       env:
