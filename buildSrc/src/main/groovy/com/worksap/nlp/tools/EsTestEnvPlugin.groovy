@@ -37,6 +37,16 @@ class EsTestEnvExtension {
 class PluginDescriptor {
     String name
     Object value
+
+    Task task() {
+        if (value instanceof Task) {
+            return value
+        }
+        if (value instanceof TaskProvider<Task>) {
+            return value.get()
+        }
+        throw new IllegalStateException("$value must be a Task or TaskProvider")
+    }
 }
 
 class StringProvider implements Provider<String>, Serializable {
@@ -184,10 +194,10 @@ class EsTestEnvPlugin implements Plugin<Project> {
             Files.copy(jar, sudachiPluginDir.resolve(name))
         }
         for (plugin in ext.additionalPlugins) {
-            def provider = plugin.value as TaskProvider<Task>
+            def task = plugin.task()
             def extractedPath = pluginDir.resolve(plugin.name)
             // unfortunately, we can't make this a Copy plugin because it outputs to a different directory each execution
-            extractZipArchive(provider.get().outputs.files.singleFile.toPath(), extractedPath)
+            extractZipArchive(task.outputs.files.singleFile.toPath(), extractedPath)
         }
 
         def sudachiConfigDir = configPath.resolve("sudachi")

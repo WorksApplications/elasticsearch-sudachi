@@ -38,7 +38,7 @@ class SudachiAnalyzerProvider(
   init {
     val stopWords: Set<*> =
         parseStopWords(env, settings, SudachiAnalyzer.getDefaultStopSet(), false)
-    val configs = ConfigAdapter(indexSettings, name!!, settings!!, env!!)
+    val configs = ConfigAdapter(dictionaryService.anchor, settings!!, env!!)
     val dictionary = dictionaryService.forConfig(configs.compiled)
     val cache = analysisCache.analysisCache(indexSettings.index.name, configs.mode, settings)
     analyzer =

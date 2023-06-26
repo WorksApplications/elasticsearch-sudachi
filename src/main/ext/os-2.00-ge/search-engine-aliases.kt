@@ -48,6 +48,8 @@ typealias ExtensiblePlugin = org.opensearch.plugins.ExtensiblePlugin
 
 typealias CacheBuilder<K, V> = org.opensearch.common.cache.CacheBuilder<K, V>
 
+typealias ExtensionLoader = org.opensearch.plugins.ExtensiblePlugin.ExtensionLoader
+
 fun parseStopWords(
     environment: Environment?,
     settings: Settings?,

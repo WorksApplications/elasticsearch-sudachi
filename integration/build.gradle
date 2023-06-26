@@ -25,6 +25,7 @@ dependencies {
     compileOnly(project(':'))
     compileOnly(project(':spi'))
     testCompileOnly(project(':testlib'))
+    testCompileOnly(project(':subplugin'))
     testImplementation('junit:junit:4.13.1') {
         transitive = false
     }
@@ -69,6 +70,7 @@ esTestEnv {
     configFile = rootProject.rootDir.toPath().resolve("src/test/resources/com/worksap/nlp/lucene/sudachi/ja/sudachi.json")
     additionalJars.add(project(":testlib").getTasksByName('jar', false).first().outputs.files.singleFile.toPath())
     addPlugin("analysis-icu", downloadIcuPlugin)
+    addPlugin('sudachi-sub', project(':subplugin').getTasksByName('distZip', false).first())
 }
 
 test {
@@ -79,10 +81,10 @@ test {
             ':spi:jar',
             compileSystemDictionary,
             ':testlib:jar',
-            downloadIcuPlugin
+            downloadIcuPlugin,
+            ':subplugin:distZip'
     )
     systemProperty("tests.security.manager", true)
-    systemProperty("java.security.debug", "true")
     defaultCharacterEncoding = 'utf-8'
 }
 

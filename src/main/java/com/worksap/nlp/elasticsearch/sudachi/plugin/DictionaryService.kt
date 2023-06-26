@@ -22,6 +22,7 @@ import com.worksap.nlp.lucene.sudachi.ja.ReloadAware
 import com.worksap.nlp.sudachi.Config
 import com.worksap.nlp.sudachi.Dictionary
 import com.worksap.nlp.sudachi.DictionaryFactory
+import com.worksap.nlp.sudachi.PathAnchor
 import com.worksap.nlp.sudachi.Tokenizer
 import java.lang.ref.SoftReference
 import java.util.concurrent.ConcurrentHashMap
@@ -142,7 +143,15 @@ class ReloadableTokenizer(private val dictionary: ReloadableDictionary) : Curren
   }
 }
 
-class DictionaryService {
+class DictionaryService(additionalClassloaders: List<ClassLoader> = emptyList()) {
+  val anchor: PathAnchor = run {
+    val anchor =
+        additionalClassloaders
+            .map { PathAnchor.classpath(it) }
+            .reduceOrNull { a, b -> a.andThen(b) }
+    anchor ?: PathAnchor.none()
+  }
+
   companion object {
     private val logger = LogManager.getLogger(DictionaryService::class.java)
   }
