@@ -8,7 +8,8 @@ analysis-sudachi is an Elasticsearch plugin for tokenization of Japanese text us
 # What's new?
 
 - version 3.1.0
-    - support OpenSearch 2.6.0 in addition to ElasticSearch
+    - support OpenSearch 2.6.0+ in addition to ElasticSearch
+    - analysis-sudachi plugin is now can be extended by other plugins. Loading sudachi plugins from extending plugins is supported as well
 - version 3.0.0
     - Plugin is now implemented in Kotlin
 - version 2.1.0
