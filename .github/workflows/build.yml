@@ -14,16 +14,20 @@ jobs:
     strategy:
       matrix:
         es-version:
+          - 'es:8.8.1'
+          - 'es:8.7.1'
           - 'es:8.6.2'
           - 'es:8.5.3'
           - 'es:8.4.3'
           - 'es:8.2.3'
-          - 'es:7.17.9'
+          - 'es:7.17.10'
           - 'es:7.14.2'
           - 'es:7.10.2'
+          - 'os:2.8.0'
+          - 'os:2.7.0'
           - 'os:2.6.0'
     env:
-      mainJob: ${{ matrix.es-version == 'es:8.5.3' }}
+      mainJob: ${{ matrix.es-version == 'es:8.8.1' }}
     continue-on-error: true
     steps:
     - uses: actions/checkout@v3
