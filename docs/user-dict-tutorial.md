@@ -48,8 +48,8 @@ User dictionary has the following columns:
 19. List of synonym groups (used by chikkar plugin)
 
 Sudachi uses [RFC 4180](https://datatracker.ietf.org/doc/html/rfc4180) format for CSV with an extension
-that strings can contain escaped unicode characters in `\U000a` form (must have exactly 4 hexadecimal characters)
-or `\U{12345}` form (can contain any unicode codepoint in hex, zeros are optional).
+that strings can contain escaped unicode characters in `\u000a` form (must have exactly 4 hexadecimal characters)
+or `\{12345}` form (can contain any unicode codepoint in hex, zeros are optional).
 Use this extension if you would need to form a reference to `"`, `,` or `/` characters.
 
 ### Word references
