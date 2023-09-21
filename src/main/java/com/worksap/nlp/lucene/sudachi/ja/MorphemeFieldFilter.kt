@@ -70,7 +70,7 @@ abstract class MorphemeFieldFilter(input: TokenStream) : TokenFilter(input) {
   override fun reset() {
     super.reset()
     if (!consumer.shouldConsume(this)) {
-      logger.warn("MorphemeFieldFilter does nothing, it is not the current consumer")
+      logger.warn("an instance of ${javaClass.name} is a no-op, it is not a filter which produces terms in one of your filter chains")
     }
   }
 
