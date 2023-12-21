@@ -25,8 +25,8 @@ import org.junit.rules.ExternalResource
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
 
-class SearchEngineEnv(vararg comonents: String = arrayOf("system")) : ExternalResource() {
-  private val testDic = TestDictionary(*comonents)
+class SearchEngineEnv(vararg components: String = arrayOf("system")) : ExternalResource() {
+  private val testDic = TestDictionary(*components)
   init {
     SearchEngineLogging.touch()
   }

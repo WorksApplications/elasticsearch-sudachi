@@ -21,7 +21,7 @@ import org.junit.Rule
 import org.junit.Test
 
 open class TestSudachiAnalysis : SearchEngineTestBase {
-  @JvmField @Rule var env = SearchEngineEnv("system")
+  @JvmField @Rule var env = SearchEngineEnv("system", "user0.dic")
 
   @Test
   fun tokenizer() {
@@ -64,5 +64,36 @@ open class TestSudachiAnalysis : SearchEngineTestBase {
 
     val sudachi = env.indexAnalyzers(settings)["sudachi"]
     sudachi.assertTerms("東京へ行く。", "東京", "行く")
+  }
+
+  @Test
+  fun twoAnalyzersWithDifferentSettingsWorkCorrectly() {
+    val settings =
+        """{
+      "index.analysis": {
+        "analyzer": {
+          "sudachi_1_a": {
+            "type": "custom",
+            "tokenizer": "sudachi_1_t"
+          },
+          "sudachi_2_a": {
+            "type": "custom",
+            "tokenizer": "sudachi_2_t"
+          }
+        },
+        "tokenizer": {
+          "sudachi_1_t": {
+            "type": "sudachi_tokenizer"
+          },
+          "sudachi_2_t": {
+            "type": "sudachi_tokenizer",
+            "additional_settings": "{\"userDict\":[\"user0.dic\"]}"
+          }
+        }
+      }
+    }""".jsonSettings()
+    val analyzers = env.indexAnalyzers(settings)
+    analyzers["sudachi_1_a"].assertTerms("にアイ都に行く", "に", "アイ", "都", "に", "行く")
+    analyzers["sudachi_2_a"].assertTerms("にアイ都に行く", "にアイ都", "に", "行く")
   }
 }

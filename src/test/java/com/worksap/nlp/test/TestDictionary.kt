@@ -97,6 +97,7 @@ class InMemoryByteChannel(size: Int = 4096) : SeekableByteChannel {
 
   fun view(): ByteBuffer {
     val bb = ByteBuffer.wrap(data)
+    bb.order(ByteOrder.LITTLE_ENDIAN)
     bb.position(pointer)
     bb.limit(end)
     return bb
@@ -139,11 +140,20 @@ constructor(
     if (resources.contains("system_core.dic")) {
       writeSystemDic(sudachiFolder.toPath().resolve("system_core.dic"))
     }
+    if (resources.contains("user0.dic")) {
+      writeUser0Dic(sudachiFolder.toPath().resolve("user0.dic"))
+    }
   }
 
   private fun writeSystemDic(path: Path) {
     Files.newByteChannel(path, OO.WRITE, OO.TRUNCATE_EXISTING, OO.CREATE).use {
       it.write(inMemorySystemData.duplicate())
+    }
+  }
+
+  private fun writeUser0Dic(path: Path) {
+    Files.newByteChannel(path, OO.WRITE, OO.TRUNCATE_EXISTING, OO.CREATE).use {
+      it.write(inMemoryUser0Data.duplicate())
     }
   }
 
@@ -158,6 +168,16 @@ constructor(
       view.flip()
       view
     }
+  }
+
+  val inMemoryUser0Data by lazy {
+    val buf = InMemoryByteChannel()
+    DicBuilder.user(BinaryDictionary(inMemorySystemData.duplicate().order(ByteOrder.LITTLE_ENDIAN)))
+        .lexicon(resource("dict/user0.csv"))
+        .build(buf)
+    val view = buf.view()
+    view.flip()
+    view
   }
 }
 
