@@ -67,6 +67,27 @@ open class TestSudachiAnalysis : SearchEngineTestBase {
   }
 
   @Test
+  fun withoutCache() {
+    val settings =
+        """
+      {
+        "index.analysis": {          
+          "analyzer": {
+            "sudachi": {
+              "type": "sudachi",
+              "settings_path": "sudachi.json",
+              "cache-size": 0
+            }
+          }
+        }
+      }
+    """.jsonSettings()
+
+    val sudachi = env.indexAnalyzers(settings)["sudachi"]
+    sudachi.assertTerms("東京へ行く。", "東京", "行く")
+  }
+
+  @Test
   fun twoAnalyzersWithDifferentSettingsWorkCorrectly() {
     val settings =
         """{

@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentHashMap
 import org.apache.logging.log4j.LogManager
 
 class AnalysisCacheService {
-  data class Key(val indexName: String, val config: Config)
+  data class Key(val indexName: String, val config: Config, val capacity: Int)
   // we use WeakReference here because the main reference will reside in per-index factories
   private val caches = ConcurrentHashMap<Key, WeakReference<AnalysisCache>>()
 
@@ -39,14 +39,17 @@ class AnalysisCacheService {
       mode: SplitMode,
       settings: Settings
   ): AnalysisCache {
-    val key = Key(indexName, config)
+    val capacity = settings.getAsInt("cache-size", 32)
+    val key = Key(indexName, config, capacity)
     val entry =
-        caches.computeIfAbsent(key) {
-          val capacity = settings.getAsInt("cache-size", 32)
+        caches.computeIfAbsent(key) { k ->
           val extractor = InputExtractor.make(settings)
           logger.debug(
-              "creating new cache service for {}, size={}, extractor={}", key, capacity, extractor)
-          val x = AnalysisCache(capacity, extractor)
+              "creating new cache service for {}, size={}, extractor={}",
+              key,
+              k.capacity,
+              extractor)
+          val x = AnalysisCache(k.capacity, extractor)
           WeakReference(x)
         }
     val result = entry.get()
