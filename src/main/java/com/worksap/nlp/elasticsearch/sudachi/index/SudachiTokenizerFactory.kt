@@ -56,7 +56,9 @@ class SudachiTokenizerFactory(
 
   private val dictionary by lazy { service.forConfig(config.compiled) }
 
-  private val cache by lazy { caches.analysisCache(indexSettings.index.name, mode, settings) }
+  private val cache by lazy {
+    caches.analysisCache(indexSettings.index.name, config.compiled, mode, settings)
+  }
 
   override fun create(): Tokenizer {
     val tok = CachingTokenizer(dictionary.newTokenizer(), mode, cache)

@@ -18,13 +18,14 @@ package com.worksap.nlp.elasticsearch.sudachi.plugin
 
 import com.worksap.nlp.lucene.sudachi.ja.input.InputExtractor
 import com.worksap.nlp.search.aliases.Settings
+import com.worksap.nlp.sudachi.Config
 import com.worksap.nlp.sudachi.Tokenizer.SplitMode
 import java.lang.ref.WeakReference
 import java.util.concurrent.ConcurrentHashMap
 import org.apache.logging.log4j.LogManager
 
 class AnalysisCacheService {
-  data class Key(val name: String)
+  data class Key(val indexName: String, val config: Config, val capacity: Int)
   // we use WeakReference here because the main reference will reside in per-index factories
   private val caches = ConcurrentHashMap<Key, WeakReference<AnalysisCache>>()
 
@@ -32,22 +33,30 @@ class AnalysisCacheService {
     private val logger = LogManager.getLogger(AnalysisCacheService::class.java)
   }
 
-  fun analysisCache(indexName: String, mode: SplitMode, settings: Settings): AnalysisCache {
-    val key = Key(indexName)
+  fun analysisCache(
+      indexName: String,
+      config: Config,
+      mode: SplitMode,
+      settings: Settings
+  ): AnalysisCache {
+    val capacity = settings.getAsInt("cache-size", 32)
+    val key = Key(indexName, config, capacity)
     val entry =
-        caches.computeIfAbsent(key) {
-          val capacity = settings.getAsInt("cache-size", 32)
+        caches.computeIfAbsent(key) { k ->
           val extractor = InputExtractor.make(settings)
           logger.debug(
-              "creating new cache service for {}, size={}, extractor={}", key, capacity, extractor)
-          val x = AnalysisCache(capacity, extractor)
+              "creating new cache service for {}, size={}, extractor={}",
+              key,
+              k.capacity,
+              extractor)
+          val x = AnalysisCache(k.capacity, extractor)
           WeakReference(x)
         }
     val result = entry.get()
     if (result == null) {
       caches.remove(key)
       // retry creation via recursion
-      return analysisCache(indexName, mode, settings)
+      return analysisCache(indexName, config, mode, settings)
     }
     return result
   }

@@ -31,7 +31,7 @@ class ConfigAdapter(anchor: PathAnchor, settings: Settings, env: Environment) {
 
   val compiled: Config = run {
     val base = settingsFile(settings)
-    val additional = settingsInlineString(basePath, settings)
+    val additional = settingsInlineString(settings, fullAnchor)
     additional.withFallback(base).anchoredWith(fullAnchor)
   }
 
@@ -61,7 +61,8 @@ class ConfigAdapter(anchor: PathAnchor, settings: Settings, env: Environment) {
     fun splitMode(settings: Settings): SplitMode {
       if (settings.get(PARAM_SPLIT_MODE_DEPRECATED, null) != null) {
         throw IllegalArgumentException(
-            "Setting $PARAM_SPLIT_MODE_DEPRECATED is deprecated, use SudachiSplitFilter instead")
+            "Setting $PARAM_SPLIT_MODE_DEPRECATED is deprecated, use SudachiSplitFilter instead",
+        )
       }
       return SplitModeFlag.get(settings)
     }
@@ -88,13 +89,15 @@ class ConfigAdapter(anchor: PathAnchor, settings: Settings, env: Environment) {
     }
 
     @JvmStatic
-    fun settingsInlineString(root: Path, settings: Settings): Config {
+    fun settingsInlineString(settings: Settings, anchor: PathAnchor): Config {
       val settingsString = settings.get(PARAM_ADDITIONAL_SETTINGS)
       return if (settingsString == null) {
         Config.empty()
       } else {
         Config.fromJsonString(
-            settingsString, PathAnchor.filesystem(root).andThen(PathAnchor.classpath()))
+            settingsString,
+            anchor,
+        )
       }
     }
   }
