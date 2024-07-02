@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [3.2.2] - 2024-07-02
+
+### Fixed
+
+- Use `lazyTokenizeSentences` for the analysis (#137)
+  - This fixes the problem of input chunking (#131).
+
 ## [3.2.1] - 2024-06-14
 
 ### Fixed

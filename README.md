@@ -7,11 +7,8 @@ analysis-sudachi is an Elasticsearch plugin for tokenization of Japanese text us
 
 # What's new?
 
-- [3.2.1]
-  - Fix OOM error with a huge document (#132)
-      - Plugin now handles huge documents splitting into relatively small (1M char) chunks.
-      - Analysis may be broken around the edge of chunks (open issue, see #131)
-  - Add tutorial to use [Sudachi synonym dictionary](https://github.com/WorksApplications/SudachiDict/blob/develop/docs/synonyms.md) (#65)
+- [3.2.2]
+  - Use `lazyTokenizeSentences` for the analysis to fix the problem of input chunking (#137).
 
 Check [changelog](./CHANGELOG.md) for more.
 
