@@ -8,8 +8,18 @@ on:
     branches: [ develop ]
 
 jobs:
+  release:
+    name: Create release draft
+    runs-on: ubuntu-latest
+    steps:
+    - name: Create release draft
+      uses: softprops/action-gh-release@v2
+      with:
+        draft: true
+
   build:
-    name: Build
+    name: Build and upload to assets
+    needs: [release]
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -60,34 +70,12 @@ jobs:
       run: ./gradlew -PengineVersion=${{ matrix.es-version }} --info clean build koverXmlReport
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - uses: actions/upload-artifact@v4
-      name: Upload built packages
-      with:
-        name: artifact-${{ env.ENGINE_KIND }}-${{ env.ENGINE_VERSION }}
-        path: |
-          build/distributions/*.zip
-    - uses: actions/upload-artifact@v4
-      name: Upload SPI jar
-      if: env.mainJob == 'true'
-      with:
-        name: artifact-spi
-        path: |
-          spi/build/libs/sudachi-*.jar
-  release:
-    name: draft release
-    needs: [build]
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/download-artifact@v4
-      name: Download all artifacts
-      with:
-        path: assets/
-        pattern: artifact-*
-        merge-multiple: true
-    - name: Create draft release with assets
+    - name: Upload built package
       uses: softprops/action-gh-release@v2
       with:
-        draft: true
-        files: |
-            assets/*
-
+        files: build/distributions/*.zip
+    - name: Upload SPI jar
+      if: env.mainJob == 'true'
+      uses: softprops/action-gh-release@v2
+      with:
+        files: spi/build/libs/sudachi-*.jar
