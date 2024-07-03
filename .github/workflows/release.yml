@@ -73,9 +73,11 @@ jobs:
     - name: Upload built package
       uses: softprops/action-gh-release@v2
       with:
+        draft: true
         files: build/distributions/*.zip
     - name: Upload SPI jar
       if: env.mainJob == 'true'
       uses: softprops/action-gh-release@v2
       with:
+        draft: true
         files: spi/build/libs/sudachi-*.jar
