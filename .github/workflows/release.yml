@@ -4,8 +4,8 @@ on:
   push:
     tags:
       - "v*.*.*"
-  pull_request:  # This is for test and must be commented out before merging.
-    branches: [ develop ]
+  # pull_request:  # This is for test and must be commented out before merging.
+  #   branches: [ develop ]
 
 jobs:
   release:
