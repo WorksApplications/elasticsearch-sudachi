@@ -14,6 +14,8 @@ jobs:
     strategy:
       matrix:
         es-version:
+          - 'es:8.15.2'
+          - 'es:8.14.3'
           - 'es:8.13.4'
           - 'es:8.12.2'
           - 'es:8.11.4'
@@ -26,10 +28,13 @@ jobs:
           - 'es:8.4.3'
           - 'es:8.3.3'
           - 'es:8.2.3'
-          - 'es:7.17.21'
+          - 'es:7.17.24'
           - 'es:7.17.8'
           - 'es:7.14.2'
           - 'es:7.10.2'
+          - 'os:2.17.1'
+          - 'os:2.16.0'
+          - 'os:2.15.0'
           - 'os:2.14.0'
           - 'os:2.13.0'
           - 'os:2.12.0'
@@ -40,7 +45,7 @@ jobs:
           - 'os:2.7.0'
           - 'os:2.6.0'
     env:
-      mainJob: ${{ matrix.es-version == 'es:8.13.4' }}
+      mainJob: ${{ matrix.es-version == 'es:8.15.2' }}
     continue-on-error: true
 
     steps:

@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Added
+
+- Sopport latest elasticsearch / opensearch
+  - es: 8.14.3, 8.15.2, 7.17.24
+  - os: 2.15.0, 2.16.0, 2.17.1
+
 ## [3.2.2] - 2024-07-02
 
 ### Fixed
