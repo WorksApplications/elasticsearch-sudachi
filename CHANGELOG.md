@@ -2,9 +2,11 @@
 
 ## [Unreleased]
 
+## [3.2.3] - 2024-10-16
+
 ### Added
 
-- Sopport latest elasticsearch / opensearch
+- Sopport latest elasticsearch / opensearch (#144)
   - es: 8.14.3, 8.15.2, 7.17.24
   - os: 2.15.0, 2.16.0, 2.17.1
 

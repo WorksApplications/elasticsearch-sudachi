@@ -7,8 +7,8 @@ analysis-sudachi is an Elasticsearch plugin for tokenization of Japanese text us
 
 # What's new?
 
-- [3.2.2]
-  - Use `lazyTokenizeSentences` for the analysis to fix the problem of input chunking (#137).
+- [3.2.3]
+  - Add support for es ~v8.15.2 and os ~v2.17.1
 
 Check [changelog](./CHANGELOG.md) for more.
 
@@ -16,14 +16,14 @@ Check [changelog](./CHANGELOG.md) for more.
 
 1. Build analysis-sudachi.
 ```
-   $ ./gradlew -PengineVersion=es:8.13.4 build
+   $ ./gradlew -PengineVersion=es:8.15.2 build
 ```
 
-Use `-PengineVersion=os:2.14.0` for OpenSearch.
+Use `-PengineVersion=os:2.17.1` for OpenSearch.
 
 ## Supported ElasticSearch versions
 
-1. 8.0.* until 8.13.* supported, integration tests in CI
+1. 8.0.* until 8.15.* supported, integration tests in CI
 2. 7.17.* (latest patch version) - supported, integration tests in CI
 3. 7.11.* until 7.16.* - best effort support, not tested in CI
 4. 7.10.* integration tests for the latest patch version
@@ -32,7 +32,7 @@ Use `-PengineVersion=os:2.14.0` for OpenSearch.
 
 ## Supported OpenSearch versions
 
-1. 2.6.* until 2.14.* supported, integration tests in CI
+1. 2.6.* until 2.17.* supported, integration tests in CI
 
 # Installation
 
