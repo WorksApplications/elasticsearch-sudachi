@@ -8,18 +8,8 @@ on:
   #   branches: [ develop ]
 
 jobs:
-  release:
-    name: Create release draft
-    runs-on: ubuntu-latest
-    steps:
-    - name: Create release draft
-      uses: softprops/action-gh-release@v2
-      with:
-        draft: true
-
   build:
-    name: Build and upload to assets
-    needs: [release]
+    name: Build
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -67,6 +57,7 @@ jobs:
         distribution: 'temurin'
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v3
+
     - name: Extract version and set to github env
       run: ./gradlew -PengineVersion=${{ matrix.es-version }} printVersionForGithubActions
       env:
@@ -75,14 +66,34 @@ jobs:
       run: ./gradlew -PengineVersion=${{ matrix.es-version }} --info clean build koverXmlReport
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     - name: Upload built package
-      uses: softprops/action-gh-release@v2
+      uses: actions/upload-artifact@v4
       with:
-        draft: true
-        files: build/distributions/*.zip
+        name: artifact-${{ matrix.es-version }}
+        path: build/distributions/*.zip
     - name: Upload SPI jar
       if: env.mainJob == 'true'
+      uses: actions/upload-artifact@v4
+      with:
+        name: artifact-spi
+        path: spi/build/libs/sudachi-*.jar
+
+  release-draft:
+    name: Create release draft
+    needs: [ build ]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download artifacts
+      uses: actions/download-artifact@v4
+      with:
+        pattern: artifact-*
+        path: dist/
+        merge-multiple: true
+    - name: List files to upload
+      run: ls -R dist/
+    - name: Create release draft with assets
       uses: softprops/action-gh-release@v2
       with:
         draft: true
-        files: spi/build/libs/sudachi-*.jar
+        files: dist/*
