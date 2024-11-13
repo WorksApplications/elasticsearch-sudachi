@@ -7,8 +7,10 @@ analysis-sudachi is an Elasticsearch plugin for tokenization of Japanese text us
 
 # What's new?
 
-- [3.2.3]
-  - Add support for es ~v8.15.2 and os ~v2.17.1
+- [3.3.0]
+  - `allow_empty_morpheme` is added to the `sudachi_tokenizer` settings (#151)
+  - Offset correction of `SudachiSplitFilter` now works properly with char filters (#149)
+  - spi changed to implement #149
 
 Check [changelog](./CHANGELOG.md) for more.
 

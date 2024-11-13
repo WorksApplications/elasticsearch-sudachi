@@ -2,6 +2,22 @@
 
 ## [Unreleased]
 
+## [3.3.0](https://github.com/WorksApplications/elasticsearch-sudachi/releases/tag/v3.3.0) - 2024-11-13
+
+### Added
+
+- `allow_empty_morpheme` is added to the `sudachi_tokenizer` settings (#151)
+  - This allows morphemes to have an empty span (bool, default `false`)
+
+### Changed
+
+- spi changed to implement #149
+  - New methods are added to `MorphemeAttribute`
+
+### Fixed
+
+- Offset correction of `SudachiSplitFilter` now works properly with char filters (#149)
+
 ## [3.2.3] - 2024-10-16
 
 ### Added
