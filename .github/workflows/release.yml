@@ -70,7 +70,7 @@ jobs:
     - name: Upload built package
       uses: actions/upload-artifact@v4
       with:
-        name: artifact-${{ matrix.es-version }}
+        name: artifact-${{ env.ENGINE_KIND }}-${{ env.ENGINE_VERSION }}
         path: build/distributions/*.zip
     - name: Upload SPI jar
       if: env.mainJob == 'true'
