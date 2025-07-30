@@ -5,6 +5,7 @@
 ### Added
 
 - Support OpenSearch 2.18.0
+- Support OpenSearch 2.19.* ([#170](https://github.com/WorksApplications/elasticsearch-sudachi/pull/170))
 
 ## [3.3.0](https://github.com/WorksApplications/elasticsearch-sudachi/releases/tag/v3.3.0) - 2024-11-13
 
