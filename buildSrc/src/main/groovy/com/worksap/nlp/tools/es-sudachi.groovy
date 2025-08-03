@@ -41,7 +41,7 @@ class EsExtension {
 class EsSudachiPlugin implements Plugin<Project> {
     @Override
     void apply(Project project) {
-        var rawVersion = project.property("engineVersion")
+        var rawVersion = project.findProperty("engineVersion")
         if (rawVersion == null || !(rawVersion instanceof String)) {
             throw new IllegalArgumentException("elasticVersion property is not defined")
         }
