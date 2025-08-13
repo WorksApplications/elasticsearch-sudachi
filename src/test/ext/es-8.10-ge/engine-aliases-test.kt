@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Works Applications Co., Ltd.
+ * Copyright (c) 2023-2025 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,4 +18,18 @@
 
 package com.worksap.nlp.search.aliases
 
-typealias XContentType = org.elasticsearch.common.xcontent.XContentType
+typealias Version = org.elasticsearch.Version
+
+typealias LogConfigurator = org.elasticsearch.common.logging.LogConfigurator
+
+typealias TestEnvironment = org.elasticsearch.env.TestEnvironment
+
+typealias Index = org.elasticsearch.index.Index
+
+typealias AnalysisModule = org.elasticsearch.indices.analysis.AnalysisModule
+
+typealias IndexSettingsModule = org.elasticsearch.test.IndexSettingsModule
+
+typealias NamedAnalyzer = org.elasticsearch.index.analysis.NamedAnalyzer
+
+typealias IndexAnalyzers = org.elasticsearch.index.analysis.IndexAnalyzers

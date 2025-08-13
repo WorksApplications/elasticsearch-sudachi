@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Works Applications Co., Ltd.
+ * Copyright (c) 2022-2025 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,8 @@
  * limitations under the License.
  */
 
-@file:Suppress("PackageDirectoryMismatch")
+@file:Suppress("UNUSED_PARAMETER", "PackageDirectoryMismatch")
 
-package com.worksap.nlp.lucene.aliases
+package com.worksap.nlp.lucene.sudachi.aliases
 
-typealias ToXContent = org.elasticsearch.xcontent.ToXContent
-
-typealias ToXContentParams = org.elasticsearch.xcontent.ToXContent.Params
-
-typealias XContentBuilder = org.elasticsearch.xcontent.XContentBuilder
+abstract class BaseTokenStreamTestCase : org.apache.lucene.tests.analysis.BaseTokenStreamTestCase()

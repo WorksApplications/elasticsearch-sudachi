@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Works Applications Co., Ltd.
+ * Copyright (c) 2023-2025 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,8 @@
  * limitations under the License.
  */
 
-package com.worksap.nlp.lucene.sudachi.ja
+@file:Suppress("PackageDirectoryMismatch")
 
-import org.apache.lucene.document.Document
-import org.apache.lucene.search.IndexSearcher
+package com.worksap.nlp.search.aliases
 
-fun TestSudachiAnalyzer.getDocumentFromSearcher(searcher: IndexSearcher, docId: Int): Document {
-  return searcher.getIndexReader().storedFields().document(docId)
-}
+typealias XContentType = org.elasticsearch.xcontent.XContentType

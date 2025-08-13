@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Works Applications Co., Ltd.
+ * Copyright (c) 2024-2025 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
 
 package com.worksap.nlp.lucene.aliases
 
-typealias TokenFilterFactory = org.apache.lucene.analysis.util.TokenFilterFactory
+typealias ToXContent = org.elasticsearch.xcontent.ToXContent
 
-typealias ResourceLoaderArgument = org.apache.lucene.analysis.util.ResourceLoader
+typealias ToXContentParams = org.elasticsearch.xcontent.ToXContent.Params
 
-typealias ResourceLoaderAware = org.apache.lucene.analysis.util.ResourceLoaderAware
+typealias XContentBuilder = org.elasticsearch.xcontent.XContentBuilder

@@ -5,12 +5,6 @@ trait EngineSupport {
 }
 
 enum EsSupport implements EngineSupport {
-    Es74("es-7.04"),
-    Es78("es-7.08"),
-    Es715("es-7.15"),
-    Es80("es-8.00"),
-    Es83("es-8.03"),
-    Es84("es-8.04"),
     Es810("es-8.10"),
     Es812("es-8.12"),
 
@@ -23,20 +17,8 @@ enum EsSupport implements EngineSupport {
     }
 
     static EsSupport supportVersion(Version vers) {
-        if (vers.lt(7, 4)) {
-            throw new IllegalArgumentException("versions below 7.4 are not supported")
-        } else if (vers.ge(7, 4) && vers.lt(7, 8)) {
-            return Es74
-        } else if (vers.ge(7, 8) && vers.lt(7, 15)) {
-            return Es78
-        } else if (vers.ge(7, 15) && vers.lt(8, 0)) {
-            return Es715
-        } else if (vers.ge(8, 0) && vers.lt(8, 3)) {
-            return Es80
-        } else if (vers.ge(8, 3) && vers.lt(8, 4)) {
-            return Es83
-        } else if (vers.ge(8, 4) && vers.lt(8, 10)) {
-            return Es84
+        if (vers.lt(8, 10)) {
+            throw new IllegalArgumentException("versions below 8.10 are not supported")
         } else if (vers.ge(8, 10) && vers.lt(8, 12)) {
             return Es810
         } else if (vers.ge(8, 12) && vers.lt(9, 0)) {

@@ -25,12 +25,7 @@ Use `-PengineVersion=os:2.18.0` for OpenSearch.
 
 ## Supported ElasticSearch versions
 
-1. 8.0.* until 8.15.* supported, integration tests in CI
-2. 7.17.* (latest patch version) - supported, integration tests in CI
-3. 7.11.* until 7.16.* - best effort support, not tested in CI
-4. 7.10.* integration tests for the latest patch version
-5. 7.9.* and below - not tested in CI at all, may be broken
-6. 7.3.* and below - broken, not supported
+1. 8.10.* until 8.15.* supported, integration tests in CI
 
 ## Supported OpenSearch versions
 
