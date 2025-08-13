@@ -1,10 +1,14 @@
 # Change log
 
-## [Unreleased]
+## [3.4.0](https://github.com/WorksApplications/elasticsearch-sudachi/releases/tag/v3.4.0) - 2025-08-18
 
 ### Added
 
 - Support OpenSearch 2.18.0
+- Support Elasticsearch 8.16.6, 8.17.8, and 8.18.3
+
+### Removed
+- Elasticsearch 7.x and versions earlier than 8.10 will no longer be supported.$
 
 ## [3.3.0](https://github.com/WorksApplications/elasticsearch-sudachi/releases/tag/v3.3.0) - 2024-11-13
 

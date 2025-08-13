@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Works Applications Co., Ltd.
+ * Copyright (c) 2022-2025 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,11 +74,6 @@ class ConfigAdapter(anchor: PathAnchor, settings: Settings, env: Environment) {
         )
       }
       return SplitModeFlag.get(settings)
-    }
-
-    @JvmStatic
-    fun resourcesPath(env: Environment, settings: Settings): Path {
-      return env.configFile().resolve(settings.get(PARAM_RESOURCES_PATH, DEFAULT_RESOURCE_PATH))
     }
 
     private fun readDefaultConfig(root: Path, baseAnchor: PathAnchor): Config {

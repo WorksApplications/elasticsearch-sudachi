@@ -7,10 +7,9 @@ analysis-sudachi is an Elasticsearch plugin for tokenization of Japanese text us
 
 # What's new?
 
-- [3.3.0]
-  - `allow_empty_morpheme` is added to the `sudachi_tokenizer` settings (#151)
-  - Offset correction of `SudachiSplitFilter` now works properly with char filters (#149)
-  - spi changed to implement #149
+- [3.4.0]
+  - Support Elasticsearch 8.16.6 and 8.17.10.
+  - Elasticsearch 7.x and versions earlier than 8.10 will no longer be supported.
 
 Check [changelog](./CHANGELOG.md) for more.
 
@@ -18,14 +17,14 @@ Check [changelog](./CHANGELOG.md) for more.
 
 1. Build analysis-sudachi.
 ```
-   $ ./gradlew -PengineVersion=es:8.15.2 build
+   $ ./gradlew -PengineVersion=es:8.17.10 build
 ```
 
 Use `-PengineVersion=os:2.18.0` for OpenSearch.
 
 ## Supported ElasticSearch versions
 
-1. 8.10.* until 8.15.* supported, integration tests in CI
+1. 8.10.* until 8.17.* supported, integration tests in CI
 
 ## Supported OpenSearch versions
 

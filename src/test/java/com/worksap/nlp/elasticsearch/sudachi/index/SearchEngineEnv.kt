@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Works Applications Co., Ltd.
+ * Copyright (c) 2023-2025 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package com.worksap.nlp.elasticsearch.sudachi.index
 
-import com.worksap.nlp.elasticsearch.sudachi.aliases.MetadataConstants
 import com.worksap.nlp.elasticsearch.sudachi.plugin.AnalysisSudachiPlugin
 import com.worksap.nlp.search.aliases.*
 import com.worksap.nlp.test.TestDictionary
@@ -48,15 +47,6 @@ class SearchEngineEnv(vararg components: String = arrayOf("system")) : ExternalR
 
   val analysisRegistry
     get() = analysisModule.analysisRegistry
-
-  fun tokenizers(settings: Map<String, String>): Map<String, TokenizerFactory> {
-    val builder = Settings.builder()
-    settings.forEach { (key: String?, value: String?) -> builder.put(key, value) }
-    builder.put(MetadataConstants.SETTING_VERSION_CREATED, Version.CURRENT)
-    val indexSettings = builder.build()
-    return analysisRegistry.buildTokenizerFactories(
-        IndexSettingsModule.newIndexSettings(Index("test", "_na_"), indexSettings))
-  }
 
   /**
    * Reflection hack for instantiating AnalysisModule

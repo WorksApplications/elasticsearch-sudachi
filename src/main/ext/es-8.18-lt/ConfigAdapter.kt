@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Works Applications Co., Ltd.
+ * Copyright (c) 2025 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package com.worksap.nlp.elasticsearch.sudachi.index
+package com.worksap.nlp.elasticsearch.sudachi
 
-import com.worksap.nlp.search.aliases.*
+import com.worksap.nlp.search.aliases.Environment
+import com.worksap.nlp.search.aliases.Settings
+import java.nio.file.Path
 
-fun SearchEngineEnv.indexAnalyzers(settings: Settings): IndexAnalyzers {
-  val indexSettings = IndexSettingsModule.newIndexSettings(Index("test", "_na_"), settings)
-  val context = IndexCreationContext.RELOAD_ANALYZERS
-  return analysisRegistry.build(context, indexSettings)
+fun resourcesPath(env: Environment, settings: Settings): Path {
+  return env.configFile()
+      .resolve(
+          settings.get(ConfigAdapter.PARAM_RESOURCES_PATH, ConfigAdapter.DEFAULT_RESOURCE_PATH))
 }
