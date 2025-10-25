@@ -11,6 +11,11 @@ group = 'com.worksap.nlp'
 version = properties["pluginVersion"]
 description = "Plugin interface for Sudachi search engine integrations (ElasticSearch and OpenSearch)"
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
 dependencies {
     api('com.worksap.nlp:sudachi:0.7.4')
 }

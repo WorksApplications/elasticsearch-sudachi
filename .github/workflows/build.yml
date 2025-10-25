@@ -14,6 +14,7 @@ jobs:
     strategy:
       matrix:
         es-version:
+          - 'es:9.1.4'
           - 'es:8.15.2'
           - 'es:8.14.3'
           - 'es:8.13.4'
@@ -46,7 +47,7 @@ jobs:
           - 'os:2.7.0'
           - 'os:2.6.0'
     env:
-      mainJob: ${{ matrix.es-version == 'es:8.15.2' }}
+      mainJob: ${{ matrix.es-version == 'es:9.1.4' }}
       sudachiVersion: 20241021
       sudachiKind: core
     continue-on-error: true

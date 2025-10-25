@@ -13,22 +13,33 @@ plugins {
 
 version = properties["pluginVersion"]
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
 compileKotlin {
-    compilerOptions.jvmTarget.set(JvmTarget.JVM_11)
+    compilerOptions.jvmTarget.set(JvmTarget.JVM_21)
 }
 
 compileTestKotlin {
-    compilerOptions.jvmTarget.set(JvmTarget.JVM_11)
+    compilerOptions.jvmTarget.set(JvmTarget.JVM_21)
 }
 
 configurations { buildSudachiDict }
 
 dependencies {
     buildSudachiDict (project(':spi'))
-    compileOnly(project(':'))
-    compileOnly(project(':spi'))
-    testCompileOnly(project(':testlib'))
-    testCompileOnly(project(':subplugin'))
+    testImplementation(project(':'))
+    testImplementation(project(':spi'))
+    testImplementation(project(':testlib'))
+    testImplementation(project(':subplugin'))
+    // Add ICU plugin JARs for ES 9.x dynamic loading
+    testRuntimeOnly files({
+        fileTree(dir: new File(project.buildDir, "cache/icu-plugin-extracted"), include: '**/*.jar')
+    }) {
+        builtBy 'extractIcuPlugin'
+    }
     testImplementation('junit:junit:4.13.1') {
         transitive = false
     }
@@ -65,6 +76,12 @@ def downloadIcuPlugin = tasks.register('downloadIcuPlugin', Download.class) {
     overwrite(false)
 }
 
+def extractIcuPlugin = tasks.register('extractIcuPlugin', Copy) {
+    dependsOn downloadIcuPlugin
+    from zipTree(downloadIcuPlugin.get().dest)
+    into new File(project.buildDir, "cache/icu-plugin-extracted")
+}
+
 esTestEnv {
     def esKind = sudachiEs.kind.get()
     def packageDir = rootDir.toPath().resolve("build/package/${version}/${esKind.engine.kind}-${esKind.version}")
@@ -77,7 +94,6 @@ esTestEnv {
 }
 
 test {
-    onlyIf { ! (sudachiEs.isEs() && sudachiEs.kind.get().parsedVersion().ge(8, 9)) }
     dependsOn(
             ':packageJars',
             ':packageSpiJars',
@@ -86,6 +102,7 @@ test {
             compileSystemDictionary,
             ':testlib:jar',
             downloadIcuPlugin,
+            extractIcuPlugin,
             ':subplugin:distZip'
     )
     systemProperty("tests.security.manager", true)
@@ -94,7 +111,7 @@ test {
 
 def distZip = tasks.register('distZip', Zip) {
     var esKind = sudachiEs.kind.get()
-    archiveBaseName.set("${esKind.engine.kind}-${esKind.version}-$archivesBaseName")
+    archiveBaseName.set("${esKind.engine.kind}-${esKind.version}-${project.name}")
     from(
         project(':subplugin').packageJars.outputs.files,
         project(':subplugin').embedVersion.outputs.files,

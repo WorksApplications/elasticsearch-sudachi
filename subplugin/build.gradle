@@ -8,6 +8,11 @@ plugins {
 group = 'com.worksap.nlp'
 version = properties["pluginVersion"]
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
 dependencies {
     compileOnly(project(':spi'))
 }
@@ -36,7 +41,7 @@ def packageJars = tasks.register('packageJars', Copy) {
 def distZip = tasks.register('distZip', Zip) {
     var esKind = sudachiEs.kind.get()
     dependsOn embedVersion, packageJars
-    archiveBaseName.set("${esKind.engine.kind}-${esKind.version}-$archivesBaseName")
+    archiveBaseName.set("${esKind.engine.kind}-${esKind.version}-${project.name}")
     from("build/package/${version}/${esKind.engine.kind}-${esKind.version}")
 }
 

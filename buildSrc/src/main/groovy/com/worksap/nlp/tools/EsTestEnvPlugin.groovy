@@ -103,6 +103,10 @@ class StringProvider implements Provider<String>, Serializable {
         throw new IllegalStateException("not implemented")
     }
 
+    @Override
+    Provider<String> filter(org.gradle.api.specs.Spec<? super String> spec) {
+        throw new IllegalStateException("not implemented")
+    }
 
     @Override
     String toString() {
@@ -153,9 +157,10 @@ class EsTestEnvPlugin implements Plugin<Project> {
         target.gradle.taskGraph.whenReady {
             boolean shouldRun = false
             if (target.plugins.findPlugin(EsSudachiPlugin.class) != null) {
-                shouldRun = shouldTestsRun(target.extensions.getByType(EsExtension).kind.get())
+                def kind = target.extensions.getByType(EsExtension).kind.get()
+                shouldRun = shouldTestsRun(kind)
             }
-            target.tasks.findAll().forEach { Task task ->
+            target.tasks.withType(Test).forEach { Test task ->
                 task.onlyIf { shouldRun }
             }
         }

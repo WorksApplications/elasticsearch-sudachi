@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Works Applications Co., Ltd.
+ * Copyright (c) 2022-2025 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,3 +42,4 @@ abstract class AbstractIndexAnalyzerProvider<T : Analyzer>(
     name: String?,
     settings: Settings?
 ) : org.elasticsearch.index.analysis.AbstractIndexAnalyzerProvider<T>(name, settings)
+

@@ -18,19 +18,20 @@ Check [changelog](./CHANGELOG.md) for more.
 
 1. Build analysis-sudachi.
 ```
-   $ ./gradlew -PengineVersion=es:8.15.2 build
+   $ ./gradlew -PengineVersion=es:9.1.4 build
 ```
 
 Use `-PengineVersion=os:2.18.0` for OpenSearch.
 
 ## Supported ElasticSearch versions
 
-1. 8.0.* until 8.15.* supported, integration tests in CI
-2. 7.17.* (latest patch version) - supported, integration tests in CI
-3. 7.11.* until 7.16.* - best effort support, not tested in CI
-4. 7.10.* integration tests for the latest patch version
-5. 7.9.* and below - not tested in CI at all, may be broken
-6. 7.3.* and below - broken, not supported
+1. 9.0.* until 9.1.* supported, integration tests in CI
+2. 8.0.* until 8.15.* supported, integration tests in CI
+3. 7.17.* (latest patch version) - supported, integration tests in CI
+4. 7.11.* until 7.16.* - best effort support, not tested in CI
+5. 7.10.* integration tests for the latest patch version
+6. 7.9.* and below - not tested in CI at all, may be broken
+7. 7.3.* and below - broken, not supported
 
 ## Supported OpenSearch versions
 
@@ -43,11 +44,11 @@ Use `-PengineVersion=os:2.18.0` for OpenSearch.
 
    a. Using the release package
    ```
-   $ bin/elasticsearch-plugin install https://github.com/WorksApplications/elasticsearch-sudachi/releases/download/v3.1.1/analysis-sudachi-8.13.4-3.1.1.zip
+   $ bin/elasticsearch-plugin install https://github.com/WorksApplications/elasticsearch-sudachi/releases/download/v3.1.1/analysis-sudachi-9.1.4-3.1.1.zip
    ```
    b. Using self-build package
    ```
-   $ bin/elasticsearch-plugin install file:///path/to/analysis-sudachi-8.13.4-3.1.1.zip
+   $ bin/elasticsearch-plugin install file:///path/to/analysis-sudachi-9.1.4-3.1.1.zip
    ```
    (Specify the absolute path in URI format)
 3. Download sudachi dictionary archive from https://github.com/WorksApplications/SudachiDict
