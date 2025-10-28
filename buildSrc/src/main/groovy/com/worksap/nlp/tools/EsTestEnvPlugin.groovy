@@ -24,18 +24,17 @@ import java.util.zip.ZipFile
 
 class EsTestEnvExtension {
     Path bundlePath = null
-    Path systemDic = null
-    Path configFile = null
     List<Path> additionalJars = new ArrayList<>()
     List<PluginDescriptor> additionalPlugins = new ArrayList<>()
-    List<Path> additionalConfigFiles = new ArrayList<>()
+    List<ConfigFileDescriptor> configFiles = new ArrayList<>()
 
     void addPlugin(String name, Object value) {
         additionalPlugins.add(new PluginDescriptor(name: name, value: value))
     }
 
-    void addConfigFile(Path configFile) {
-        additionalConfigFiles.add(configFile)
+    void addConfigFile(Path sourcePath, String targetName = null) {
+        def target = targetName ?: sourcePath.fileName.toString()
+        configFiles.add(new ConfigFileDescriptor(source: sourcePath, target: target))
     }
 }
 
@@ -52,6 +51,11 @@ class PluginDescriptor {
         }
         throw new IllegalStateException("$value must be a Task or TaskProvider")
     }
+}
+
+class ConfigFileDescriptor {
+    Path source
+    String target
 }
 
 class StringProvider implements Provider<String>, Serializable {
@@ -212,10 +216,8 @@ class EsTestEnvPlugin implements Plugin<Project> {
 
         def sudachiConfigDir = configPath.resolve("sudachi")
         Files.createDirectories(sudachiConfigDir)
-        Files.copy(ext.systemDic, sudachiConfigDir.resolve("system_core.dic"))
-        Files.copy(ext.configFile, sudachiConfigDir.resolve("sudachi.json"))
-        for (Path additionalConfig in ext.additionalConfigFiles) {
-            Files.copy(additionalConfig, sudachiConfigDir.resolve(additionalConfig.fileName))
+        for (ConfigFileDescriptor config in ext.configFiles) {
+            Files.copy(config.source, sudachiConfigDir.resolve(config.target))
         }
 
         return rootPath
