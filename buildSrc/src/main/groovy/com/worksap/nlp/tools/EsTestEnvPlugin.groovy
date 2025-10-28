@@ -28,9 +28,14 @@ class EsTestEnvExtension {
     Path configFile = null
     List<Path> additionalJars = new ArrayList<>()
     List<PluginDescriptor> additionalPlugins = new ArrayList<>()
+    List<Path> additionalConfigFiles = new ArrayList<>()
 
     void addPlugin(String name, Object value) {
         additionalPlugins.add(new PluginDescriptor(name: name, value: value))
+    }
+
+    void addConfigFile(Path configFile) {
+        additionalConfigFiles.add(configFile)
     }
 }
 
@@ -209,6 +214,9 @@ class EsTestEnvPlugin implements Plugin<Project> {
         Files.createDirectories(sudachiConfigDir)
         Files.copy(ext.systemDic, sudachiConfigDir.resolve("system_core.dic"))
         Files.copy(ext.configFile, sudachiConfigDir.resolve("sudachi.json"))
+        for (Path additionalConfig in ext.additionalConfigFiles) {
+            Files.copy(additionalConfig, sudachiConfigDir.resolve(additionalConfig.fileName))
+        }
 
         return rootPath
     }

@@ -91,6 +91,7 @@ esTestEnv {
     additionalJars.add(project(":testlib").getTasksByName('jar', false).first().outputs.files.singleFile.toPath())
     addPlugin("analysis-icu", downloadIcuPlugin)
     addPlugin('sudachi-sub', project(':subplugin').getTasksByName('distZip', false).first())
+    addConfigFile(rootProject.rootDir.toPath().resolve("src/test/resources/com/worksap/nlp/lucene/sudachi/ja/sudachi_subplugin.json"))
 }
 
 test {
