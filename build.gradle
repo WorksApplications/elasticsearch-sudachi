@@ -44,7 +44,9 @@ sourceSets {
 }
 
 dependencies {
-    spi(project(':spi'))
+    implementation(project(':spi'))
+    implementation('com.worksap.nlp:sudachi:0.7.4')
+
     testImplementation(project(':testlib'))
     testImplementation('org.apache.logging.log4j:log4j-core:2.17.2')
     testImplementation('org.jetbrains.kotlin:kotlin-test-junit') {
@@ -57,13 +59,16 @@ dependencies {
 
 def embedVersion = tasks.register('embedVersion', Copy) {
     var esKind = sudachiEs.kind.get()
-    from 'src/main/extras/plugin-descriptor.properties'
+    from('src/main/extras/plugin-descriptor.properties') {
+        expand([
+                version: version,
+                engineVersion: esKind.version,
+                engineKind: esKind.engine.kind
+        ])
+    }
+    // Include entitlement policy for Elasticsearch 9+
+    from('src/main/extras/entitlement-policy.yaml')
     into "build/package/${version}/${esKind.engine.kind}-${esKind.version}"
-    expand([
-            version: version,
-            engineVersion: esKind.version,
-            engineKind: esKind.engine.kind
-    ])
     inputs.property("version", version)
     inputs.property("elasticSearchVersion", esKind.version)
 }
@@ -79,11 +84,7 @@ def packageJars = tasks.register('packageJars', Copy) {
 def packageSpiJars = tasks.register('packageSpiJars', Copy) {
     from configurations.spi
     var esKind = sudachiEs.kind.get()
-    if (sudachiEs.hasPluginSpiSupport()) {
-        into "build/package/${version}/${esKind.engine.kind}-${esKind.version}/spi"
-    } else {
-        into "build/package/${version}/${esKind.engine.kind}-${esKind.version}"
-    }
+    into "build/package/${version}/${esKind.engine.kind}-${esKind.version}"
 }
 
 def distZip = tasks.register('distZip', Zip) {

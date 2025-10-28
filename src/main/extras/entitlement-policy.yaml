@@ -1,0 +1,11 @@
+# Entitlement policy for analysis-sudachi plugin
+# This file declares the permissions required by the plugin to operate
+# See: https://www.elastic.co/guide/en/elasticsearch/plugins/current/_entitlements.html
+
+# Grant file read access for the plugin and its dependencies
+ALL-UNNAMED:
+  - files:
+    # Allow reading from the config directory for dictionaries
+    - relative_path: sudachi
+      relative_to: config
+      mode: read
