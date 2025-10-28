@@ -83,7 +83,6 @@ class ConfigAdapter(anchor: PathAnchor, settings: Settings, env: Environment) {
     }
 
     private fun readDefaultConfig(root: Path, baseAnchor: PathAnchor): Config {
-      val anchor = PathAnchor.filesystem(root)
       val resolved = root.resolve(DEFAULT_SETTINGS_FILENAME)
       val exists =
           try {
@@ -92,9 +91,9 @@ class ConfigAdapter(anchor: PathAnchor, settings: Settings, env: Environment) {
             false
           }
       return if (exists) {
-        Config.fromFile(resolved, anchor)
+        Config.fromFile(resolved, baseAnchor)
       } else {
-        Config.defaultConfig(anchor)
+        Config.defaultConfig(baseAnchor)
       }
     }
 
