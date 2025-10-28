@@ -27,8 +27,10 @@ import java.nio.file.Path
 import kotlin.io.path.exists
 
 class ConfigAdapter(anchor: PathAnchor, settings: Settings, env: Environment) {
+  // Try filesystem first (config/sudachi), then fallback to classpath (sudachi jar)
   private val basePath = resourcesPath(env, settings)
-  private val fullAnchor = PathAnchor.filesystem(basePath)
+  private val fullAnchor =
+      PathAnchor.filesystem(basePath).andThen(PathAnchor.classpath(ConfigAdapter::class.java))
 
   val discardPunctuation: Boolean = settings.getAsBoolean(PARAM_DISCARD_PUNCTUATION, true)
   // default false to let every morpheme have non-null span in the input text
