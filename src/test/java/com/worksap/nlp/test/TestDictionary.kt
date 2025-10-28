@@ -117,7 +117,6 @@ constructor(
       parts.add("system_core.dic")
       parts.add("sudachi.json")
       parts.add("unk.def")
-      parts.add("char.def")
     }
     parts
   }
@@ -137,9 +136,6 @@ constructor(
     }
     if (resources.contains("unk.def")) {
       ResourceUtil.copyResource("unk.def", sudachiFolder, false)
-    }
-    if (resources.contains("char.def")) {
-      ResourceUtil.copyResource("char.def", sudachiFolder, false)
     }
     if (resources.contains("system_core.dic")) {
       writeSystemDic(sudachiFolder.toPath().resolve("system_core.dic"))
