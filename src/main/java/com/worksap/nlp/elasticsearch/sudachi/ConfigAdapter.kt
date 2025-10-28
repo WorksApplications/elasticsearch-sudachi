@@ -28,7 +28,7 @@ import kotlin.io.path.exists
 
 class ConfigAdapter(anchor: PathAnchor, settings: Settings, env: Environment) {
   private val basePath = resourcesPath(env, settings)
-  private val fullAnchor = PathAnchor.filesystem(basePath).andThen(anchor)
+  private val fullAnchor = PathAnchor.filesystem(basePath)
 
   val discardPunctuation: Boolean = settings.getAsBoolean(PARAM_DISCARD_PUNCTUATION, true)
   // default false to let every morpheme have non-null span in the input text
@@ -83,7 +83,7 @@ class ConfigAdapter(anchor: PathAnchor, settings: Settings, env: Environment) {
     }
 
     private fun readDefaultConfig(root: Path, baseAnchor: PathAnchor): Config {
-      val anchor = PathAnchor.filesystem(root).andThen(baseAnchor)
+      val anchor = PathAnchor.filesystem(root)
       val resolved = root.resolve(DEFAULT_SETTINGS_FILENAME)
       val exists =
           try {
