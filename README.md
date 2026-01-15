@@ -20,7 +20,7 @@ Check [changelog](./CHANGELOG.md) for more.
    $ ./gradlew -PengineVersion=es:8.17.10 build
 ```
 
-Use `-PengineVersion=os:2.18.0` for OpenSearch.
+Use `-PengineVersion=os:2.19.3` for OpenSearch.
 
 ## Supported ElasticSearch versions
 
@@ -28,7 +28,7 @@ Use `-PengineVersion=os:2.18.0` for OpenSearch.
 
 ## Supported OpenSearch versions
 
-1. 2.6.* until 2.18.* supported, integration tests in CI
+1. 2.6.* until 2.19.* supported, integration tests in CI
 
 # Installation
 
