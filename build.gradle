@@ -17,11 +17,11 @@ archivesBaseName = 'analysis-sudachi'
 version = properties["pluginVersion"]
 
 compileKotlin {
-    compilerOptions.jvmTarget.set(JvmTarget.JVM_11)
+    compilerOptions.jvmTarget.set(JvmTarget.JVM_17)
 }
 
 compileTestKotlin {
-    compilerOptions.jvmTarget.set(JvmTarget.JVM_11)
+    compilerOptions.jvmTarget.set(JvmTarget.JVM_17)
 }
 
 configurations {
