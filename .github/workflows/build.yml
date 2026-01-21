@@ -40,7 +40,7 @@ jobs:
           # - 'os:2.7.0'
           # - 'os:2.6.0'
     env:
-      mainJob: ${{ matrix.es-version == 'es:8.15.2' }}
+      mainJob: ${{ matrix.es-version == 'es:8.17.10' }}
       sudachiVersion: 20241021
       sudachiKind: core
     continue-on-error: true
