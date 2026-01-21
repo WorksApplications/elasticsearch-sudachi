@@ -2,8 +2,8 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id 'java-library'
-    id 'org.jetbrains.kotlin.jvm' version '1.8.0'
-    id "org.jetbrains.kotlin.plugin.serialization" version "1.8.0"
+    id 'org.jetbrains.kotlin.jvm' version '1.9.22'
+    id "org.jetbrains.kotlin.plugin.serialization" version "1.9.22"
     id 'com.diffplug.spotless' version '6.16.0'
     id 'org.sonarqube' version '4.0.0.2929'
     id("org.jetbrains.kotlinx.kover") version "0.7.0"
@@ -17,12 +17,26 @@ archivesBaseName = 'analysis-sudachi'
 version = properties["pluginVersion"]
 
 // JVM target is determined by engine version (OpenSearch 3.0+ requires JVM 21)
-def jvmTargetVersion = sudachiEs.jvmVersion() == 21 ? JvmTarget.JVM_21 : JvmTarget.JVM_11
-def javaVersion = sudachiEs.jvmVersion() == 21 ? JavaVersion.VERSION_21 : JavaVersion.VERSION_11
+def jvmVersion = sudachiEs.jvmVersion()
+def jvmTargetVersion = jvmVersion == 21 ? JvmTarget.JVM_21 : JvmTarget.JVM_11
+def javaVersion = jvmVersion == 21 ? JavaVersion.VERSION_21 : JavaVersion.VERSION_11
 
 java {
     sourceCompatibility = javaVersion
     targetCompatibility = javaVersion
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.release = jvmVersion
+}
+
+// For OpenSearch 3.0+, we need to tell Gradle that JDK 21+ libraries are compatible
+if (jvmVersion >= 21) {
+    configurations.all {
+        attributes {
+            attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, jvmVersion)
+        }
+    }
 }
 
 compileKotlin {
