@@ -70,9 +70,6 @@ jobs:
       if: env.mainJob == 'true'
       run: |
         find -iname build -type d -exec tar -cf sonar.tar {} \+
-        echo ${{ github.event.number }} >> PR_EVENT.txt
-        echo ${{ github.event.pull_request.head.ref }} >> PR_EVENT.txt
-        echo ${{ github.event.pull_request.base.ref }} >> PR_EVENT.txt
     - name: Upload artifact for sonar analysis
       if: env.mainJob == 'true'
       uses: actions/upload-artifact@v4
@@ -80,7 +77,6 @@ jobs:
         name: sonar-artifact
         path: |
           sonar.tar
-          PR_EVENT.txt
 
     - name: Cache elasticsearch download
       uses: actions/cache@v4

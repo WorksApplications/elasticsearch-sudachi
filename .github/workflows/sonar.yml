@@ -47,9 +47,6 @@ jobs:
     - name: Extract sonar artifact
       run: |
         tar -xf sonar.tar
-        echo "PR_NUMBER=$(sed '1q;d' PR_EVENT.txt)" >> "$GITHUB_ENV"
-        echo "PR_HEAD_REF=$(sed '2q;d' PR_EVENT.txt)" >> "$GITHUB_ENV"
-        echo "PR_BASE_REF=$(sed '3q;d' PR_EVENT.txt)" >> "$GITHUB_ENV"
   
     - name: Analyze with sonarqube (push develop)
       if: github.event.workflow_run.event == 'push'
