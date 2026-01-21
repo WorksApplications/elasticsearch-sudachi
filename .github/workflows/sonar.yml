@@ -56,7 +56,8 @@ jobs:
     - name: Analyze with sonarqube (PR)
       if: github.event.workflow_run.event == 'pull_request'
       run: |
-        ./gradlew --info sonar \
+        ./gradlew --info --warning-mode all sonar \
+          -Dsonar.verbose=true \
           -Dsonar.scm.provider=git \
           -Dsonar.pullrequest.key=${{ env.PR_NUMBER }} \
           -Dsonar.pullrequest.branch=${{ env.PR_HEAD_REF }} \
