@@ -150,3 +150,53 @@ jobs:
         MAVEN_USER_PASSWORD: ${{ secrets.MAVEN_USER_PASSWORD }}
         MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
         MAVEN_GPG_PRIVATE_KEY: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
+
+  sonar:
+    name: Sonar
+    needs: [ build ]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+      checks: write
+
+    steps:
+    - name: Checkout develop or PR branch
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of Sonar analysis
+    - name: Setup JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: 17
+        distribution: 'temurin'
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v3
+
+    - name: Cache SonarCloud packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.sonar/cache
+        key: ${{ runner.os }}-sonar-${{ hashFiles('build.gradle') }}
+
+    - name: Download sonar artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: sonar-artifact
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        merge-multiple: true
+    - name: Extract sonar artifact
+      run: |
+        tar -xf sonar.tar
+    - name: Analyze with sonarqube (PR)
+      run: |
+        ./gradlew --stacktrace --warning-mode all sonar \
+          -Dsonar.verbose=true \
+          -Dsonar.scm.provider=git \
+          -Dsonar.pullrequest.key=${{ github.event.workflow_run.pull_requests[0].number }} \
+          -Dsonar.pullrequest.branch=${{ github.event.workflow_run.pull_requests[0].head.ref }} \
+          -Dsonar.pullrequest.base=${{ github.event.workflow_run.pull_requests[0].base.ref }} \
+          -Dsonar.scm.revision=${{ github.event.workflow_run.head_sha }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
