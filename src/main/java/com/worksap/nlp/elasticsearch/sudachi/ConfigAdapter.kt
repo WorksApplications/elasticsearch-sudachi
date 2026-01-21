@@ -18,6 +18,7 @@ package com.worksap.nlp.elasticsearch.sudachi
 
 import com.worksap.nlp.search.aliases.Environment
 import com.worksap.nlp.search.aliases.Settings
+import com.worksap.nlp.search.aliases.configPath
 import com.worksap.nlp.sudachi.Config
 import com.worksap.nlp.sudachi.PathAnchor
 import com.worksap.nlp.sudachi.Tokenizer.SplitMode
@@ -78,7 +79,7 @@ class ConfigAdapter(anchor: PathAnchor, settings: Settings, env: Environment) {
 
     @JvmStatic
     fun resourcesPath(env: Environment, settings: Settings): Path {
-      return env.configFile().resolve(settings.get(PARAM_RESOURCES_PATH, DEFAULT_RESOURCE_PATH))
+      return env.configPath().resolve(settings.get(PARAM_RESOURCES_PATH, DEFAULT_RESOURCE_PATH))
     }
 
     private fun readDefaultConfig(root: Path, baseAnchor: PathAnchor): Config {

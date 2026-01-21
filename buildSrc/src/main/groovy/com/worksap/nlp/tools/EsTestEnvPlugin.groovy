@@ -6,6 +6,7 @@ import org.gradle.api.Task
 import org.gradle.api.Transformer
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Provider
+import org.gradle.api.specs.Spec
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.testing.Test
 
@@ -103,6 +104,10 @@ class StringProvider implements Provider<String>, Serializable {
         throw new IllegalStateException("not implemented")
     }
 
+    @Override
+    Provider<String> filter(Spec<? super String> spec) {
+        throw new IllegalStateException("not implemented")
+    }
 
     @Override
     String toString() {
