@@ -109,6 +109,12 @@ class EsSudachiPlugin implements Plugin<Project> {
                     exclude(group: 'junit', module: 'junit')
                 }
                 testImplementation("org.opensearch:opensearch-plugin-classloader:$verString")
+                // OpenSearch 3.0+ requires the new Java agent security framework
+                def parsedVersion = Version.fromRaw(verString)
+                if (parsedVersion.ge(3, 0)) {
+                    testImplementation("org.opensearch:opensearch-agent-bootstrap:$verString")
+                    testRuntimeOnly("org.opensearch:opensearch-agent:$verString")
+                }
             }
         }
     }
