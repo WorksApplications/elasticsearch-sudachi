@@ -21,7 +21,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         repository: ${{ github.event.workflow_run.head_repository.full_name }}
-        ref: ${{ github.event.workflow_run.head_branch }}
+        ref: ${{ github.event.workflow_run.head_sha }}
         fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of Sonar analysis
     - name: Setup JDK 17
       uses: actions/setup-java@v4
@@ -62,7 +62,8 @@ jobs:
           -Dsonar.scm.provider=git \
           -Dsonar.pullrequest.key=${{ github.event.workflow_run.pull_requests[0].number }} \
           -Dsonar.pullrequest.branch=${{ github.event.workflow_run.pull_requests[0].head.ref }} \
-          -Dsonar.pullrequest.base=${{ github.event.workflow_run.pull_requests[0].base.ref }}
+          -Dsonar.pullrequest.base=${{ github.event.workflow_run.pull_requests[0].base.ref }} \
+          -Dsonar.scm.revision=${{ github.event.workflow_run.head_sha }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
