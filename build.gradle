@@ -16,12 +16,21 @@ group = 'com.worksap.nlp'
 archivesBaseName = 'analysis-sudachi'
 version = properties["pluginVersion"]
 
+// JVM target is determined by engine version (OpenSearch 3.0+ requires JVM 21)
+def jvmTargetVersion = sudachiEs.jvmVersion() == 21 ? JvmTarget.JVM_21 : JvmTarget.JVM_11
+def javaVersion = sudachiEs.jvmVersion() == 21 ? JavaVersion.VERSION_21 : JavaVersion.VERSION_11
+
+java {
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+}
+
 compileKotlin {
-    compilerOptions.jvmTarget.set(JvmTarget.JVM_11)
+    compilerOptions.jvmTarget.set(jvmTargetVersion)
 }
 
 compileTestKotlin {
-    compilerOptions.jvmTarget.set(JvmTarget.JVM_11)
+    compilerOptions.jvmTarget.set(jvmTargetVersion)
 }
 
 configurations {
