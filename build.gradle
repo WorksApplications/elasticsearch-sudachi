@@ -126,14 +126,6 @@ spotless {
     }
 }
 
-sonarqube {
-    properties {
-        property "sonar.projectKey", "WorksApplications_elasticsearch-sudachi"
-        property "sonar.organization", "worksapplications"
-        property "sonar.host.url", "https://sonarcloud.io"
-    }
-}
-
 tasks.register("printVersionForGithubActions") {
     doLast {
         // https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#environment-files
