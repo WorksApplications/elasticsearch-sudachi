@@ -38,7 +38,7 @@ class EsExtension {
 
     /**
      * Returns the required JVM version for the current engine.
-     * OpenSearch 3.0+ requires JVM 21, others use JVM 11.
+     * OpenSearch 3.0+ requires JVM 21, others use JVM 17.
      */
     int jvmVersion() {
         def k = kind.get()
@@ -48,7 +48,7 @@ class EsExtension {
                 return 21
             }
         }
-        return 11
+        return 17
     }
 }
 

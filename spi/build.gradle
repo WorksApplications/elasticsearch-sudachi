@@ -39,7 +39,7 @@ spotless {
 
 java {
     def jvmVer = sudachiEs.jvmVersion()
-    def javaVer = jvmVer == 21 ? JavaVersion.VERSION_21 : JavaVersion.VERSION_11
+    def javaVer = jvmVer == 21 ? JavaVersion.VERSION_21 : JavaVersion.VERSION_17
     sourceCompatibility = javaVer
     targetCompatibility = javaVer
     withJavadocJar()
