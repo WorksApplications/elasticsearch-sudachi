@@ -46,6 +46,7 @@ jobs:
           - 'os:2.7.0'
           - 'os:2.6.0'
         include:
+          # OpenSearch 3.x requires Java 21
           - es-version: 'os:3.0.0'
             java-version: '21'
     env:
