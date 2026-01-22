@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2024 Works Applications Co., Ltd.
+ * Copyright (c) 2017-2026 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,10 @@ import org.hamcrest.MatcherAssert
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+
+fun TestSudachiAnalyzer.getDocumentFromSearcher(searcher: IndexSearcher, docId: Int): Document {
+  return searcher.getIndexReader().storedFields().document(docId)
+}
 
 // Test of character segmentation using analyzer
 class TestSudachiAnalyzer {

@@ -21,7 +21,8 @@ import com.worksap.nlp.search.aliases.*
 
 fun SearchEngineEnv.indexAnalyzers(settings: Settings): IndexAnalyzers {
   val indexSettings = IndexSettingsModule.newIndexSettings(Index("test", "_na_"), settings)
-  return analysisRegistry.build(indexSettings)
+  val context = IndexCreationContext.RELOAD_ANALYZERS
+  return analysisRegistry.build(context, indexSettings)
 }
 
 fun SearchEngineEnv.tokenizers(settings: Map<String, String>): Map<String, TokenizerFactory> {
