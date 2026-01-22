@@ -190,6 +190,20 @@ jobs:
     - name: Extract sonar artifact
       run: |
         tar -xf sonar.tar
+    - name: debug info (github token)
+      run: |
+        if [ -n  ${{secrets.GITHUB_TOKEN}} ]; then
+          echo "github token provided"
+        else
+          echo "github token not provided"
+        fi
+    - name: debug info (sonar token)
+      run: |
+        if [ -n  ${{secrets.SONAR_TOKEN}} ]; then
+          echo "sonar token provided"
+        else
+          echo "sonar token not provided"
+        fi
     - name: Analyze with sonarqube (PR)
       run: |
         ./gradlew --stacktrace --warning-mode all sonar \
