@@ -70,7 +70,10 @@ class EsSudachiPlugin implements Plugin<Project> {
 
         var version = kind.supportVersion(verString)
 
-        var tags = kind.engine.allTags().collectMany { v ->
+        def parsed = kind.parsedVersion()
+        def allTags = kind.engine == EngineType.OpenSearch ? kind.engine.allTags(parsed) : kind.engine.allTags()
+
+        var tags = allTags.collectMany { v ->
             var comparison = v <=> version
             if (comparison < 0) {
                 return List.of("${v.tag}-gt", "${v.tag}-ge")
