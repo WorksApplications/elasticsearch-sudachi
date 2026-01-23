@@ -175,11 +175,11 @@ jobs:
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v3
 
-    - name: Cache SonarCloud packages
-      uses: actions/cache@v4
-      with:
-        path: ~/.sonar/cache
-        key: ${{ runner.os }}-sonar-${{ hashFiles('build.gradle') }}
+    # - name: Cache SonarCloud packages
+    #   uses: actions/cache@v4
+    #   with:
+    #     path: ~/.sonar/cache
+    #     key: ${{ runner.os }}-sonar-${{ hashFiles('build.gradle') }}
 
     - name: Download sonar artifact
       uses: actions/download-artifact@v4
