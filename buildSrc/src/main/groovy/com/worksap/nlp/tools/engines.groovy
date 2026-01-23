@@ -131,6 +131,9 @@ enum EngineType {
          */
         List<EngineSupport> allTags(Version targetVersion) {
             if (targetVersion != null && targetVersion.ge(3, 0)) {
+                // For OpenSearch 3.0+, do NOT include 2.x series here.
+                // Mixing os-2.* and os-3.* main sources can cause Kotlin top-level function
+                // signature conflicts (e.g. resourcesPath, parseWords) and API mismatches.
                 return List.of(OsSupport.Os30)
             }
             return List.of(OsSupport.Os20, OsSupport.Os27, OsSupport.Os210)
