@@ -8,6 +8,7 @@ plugins {
     id 'com.worksap.nlp.sudachi.es.testenv'
     id 'com.diffplug.spotless'
     id 'org.jetbrains.kotlin.jvm'
+    id 'org.jetbrains.kotlinx.kover'
     id 'de.undercouch.download' version '5.4.0'
 }
 
@@ -94,7 +95,7 @@ test {
 
 def distZip = tasks.register('distZip', Zip) {
     var esKind = sudachiEs.kind.get()
-    archiveBaseName.set("${esKind.engine.kind}-${esKind.version}-$archivesBaseName")
+    archiveBaseName.set("${esKind.engine.kind}-${esKind.version}-${project.name}")
     from(
         project(':subplugin').packageJars.outputs.files,
         project(':subplugin').embedVersion.outputs.files,
@@ -116,14 +117,14 @@ spotless {
         target '*.gradle', '*.md', '.gitignore', '*.txt', '*.csv'
 
         trimTrailingWhitespace()
-        indentWithSpaces(2)
+        leadingTabsToSpaces(2)
         endWithNewline()
     }
     java {
         // don't need to set target, it is inferred from java
         // version list: https://github.com/diffplug/spotless/tree/main/lib-extra/src/main/resources/com/diffplug/spotless/extra/eclipse_jdt_formatter
 
-        eclipse('4.21.0').configFile(formatter.resolve('eclipse-formatter.xml'))
+        eclipse('4.21').configFile(formatter.resolve('eclipse-formatter.xml'))
         licenseHeaderFile(formatter.resolve('license-header'))
     }
     kotlin {

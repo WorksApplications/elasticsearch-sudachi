@@ -36,7 +36,7 @@ def packageJars = tasks.register('packageJars', Copy) {
 def distZip = tasks.register('distZip', Zip) {
     var esKind = sudachiEs.kind.get()
     dependsOn embedVersion, packageJars
-    archiveBaseName.set("${esKind.engine.kind}-${esKind.version}-$archivesBaseName")
+    archiveBaseName.set("${esKind.engine.kind}-${esKind.version}-${project.name}")
     from("build/package/${version}/${esKind.engine.kind}-${esKind.version}")
 }
 
@@ -50,14 +50,14 @@ spotless {
         target '*.gradle', '*.md', '.gitignore', '*.txt', '*.csv'
 
         trimTrailingWhitespace()
-        indentWithSpaces(2)
+        leadingTabsToSpaces(2)
         endWithNewline()
     }
     java {
         // don't need to set target, it is inferred from java
         // version list: https://github.com/diffplug/spotless/tree/main/lib-extra/src/main/resources/com/diffplug/spotless/extra/eclipse_jdt_formatter
 
-        eclipse('4.21.0').configFile(formatter.resolve('eclipse-formatter.xml'))
+        eclipse('4.21').configFile(formatter.resolve('eclipse-formatter.xml'))
         licenseHeaderFile(formatter.resolve('license-header'))
     }
 }

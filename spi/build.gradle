@@ -25,14 +25,14 @@ spotless {
         target '*.gradle', '*.md', '.gitignore', '*.txt', '*.csv'
 
         trimTrailingWhitespace()
-        indentWithSpaces(2)
+        leadingTabsToSpaces(2)
         endWithNewline()
     }
     java {
         // don't need to set target, it is inferred from java
         // version list: https://github.com/diffplug/spotless/tree/main/lib-extra/src/main/resources/com/diffplug/spotless/extra/eclipse_jdt_formatter
 
-        eclipse('4.21.0').configFile(formatter.resolve('eclipse-formatter.xml'))
+        eclipse('4.21').configFile(formatter.resolve('eclipse-formatter.xml'))
         licenseHeaderFile(formatter.resolve('license-header'))
     }
 }
@@ -92,6 +92,6 @@ signing {
     def signingKey = project.findProperty("gpg.key") ?: System.getenv("MAVEN_GPG_PRIVATE_KEY")
     def signingPassword = project.findProperty("gpg.password") ?: System.getenv("MAVEN_GPG_PASSPHRASE")
     useInMemoryPgpKeys(signingKey, signingPassword)
-    required { !project.version.endsWith("-SNAPSHOT") }
+    required = !project.version.endsWith("-SNAPSHOT")
     sign publishing.publications.maven
 }
