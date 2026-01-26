@@ -24,18 +24,18 @@ jobs:
         ref: ${{ github.event.workflow_run.head_sha }}
         fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of Sonar analysis
     - name: Setup JDK 17
-      uses: actions/setup-java@v4
+      uses: actions/setup-java@v5
       with:
         java-version: 17
         distribution: 'temurin'
     - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v3
+      uses: gradle/actions/setup-gradle@v5
 
-    - name: Cache SonarCloud packages
-      uses: actions/cache@v4
-      with:
-        path: ~/.sonar/cache
-        key: ${{ runner.os }}-sonar-${{ hashFiles('build.gradle') }}
+    # - name: Cache SonarCloud packages
+    #   uses: actions/cache@v4
+    #   with:
+    #     path: ~/.sonar/cache
+    #     key: ${{ runner.os }}-sonar-${{ hashFiles('build.gradle') }}
 
     - name: Download sonar artifact
       uses: actions/download-artifact@v4
