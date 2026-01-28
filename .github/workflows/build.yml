@@ -16,16 +16,13 @@ jobs:
         es-version:
           - 'es:8.17.10'
           - 'es:8.16.6'
-          - 'es:8.15.2'
+          - 'es:8.15.5'
           - 'es:8.14.3'
           - 'es:8.13.4'
           - 'es:8.12.2'
           - 'es:8.11.4'
           - 'es:8.10.4'
-          - 'os:2.19.3'
-          - 'os:2.19.2'
-          - 'os:2.19.1'
-          - 'os:2.19.0'
+          - 'os:2.19.4'
           - 'os:2.18.0'
           - 'os:2.17.1'
           - 'os:2.16.0'
@@ -52,7 +49,7 @@ jobs:
           - es-version: 'os:3.0.0'
             java-version: '21'
     env:
-      mainJob: ${{ matrix.es-version == 'es:8.15.2' }}
+      mainJob: ${{ matrix.es-version == 'es:8.17.10' }}
       sudachiVersion: 20241021
       sudachiKind: core
     continue-on-error: true

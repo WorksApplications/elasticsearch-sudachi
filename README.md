@@ -9,7 +9,9 @@ analysis-sudachi is an Elasticsearch plugin for tokenization of Japanese text us
 
 - [3.4.0]
   - Support Elasticsearch 8.16.6 and 8.17.10.
+  - Support OpenSearch 2.18.0 and 2.19.4.
   - Elasticsearch 7.x and versions earlier than 8.10 will no longer be supported.
+  - Update Java version from 11 to 17
 
 Check [changelog](./CHANGELOG.md) for more.
 
