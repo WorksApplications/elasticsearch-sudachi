@@ -24,6 +24,20 @@ def should_run_test() -> bool:
         raise ValueError(f"not supported search engine: {es_kind}")
 
 
+def has_security_manager() -> bool:
+    """Check if the current environment uses Java Security Manager.
+    OpenSearch 3.0+ uses Java agent-based security instead of Security Manager."""
+    es_kind = os.environ.get("ES_KIND", "elasticsearch")
+    es_version = os.environ.get("ES_VERSION", "8.2.3")
+
+    if es_kind == "opensearch":
+        vers = list(map(int, es_version.split(".")))
+        # OpenSearch 3.0+ doesn't use Security Manager
+        if vers[0] >= 3:
+            return False
+    return True
+
+
 def parse_args():
     p = argparse.ArgumentParser(
         description="runs tests migrated from :integraion")
@@ -286,6 +300,11 @@ class TestSubplugin(unittest.TestCase):
 
 class TestSecurityManager(unittest.TestCase):
     def test_fail_loading_files_outside_configdir(self):
+        # Skip this test on OpenSearch 3.0+ which uses Java agent-based security
+        # instead of Security Manager
+        if not has_security_manager():
+            self.skipTest("Security Manager is not available (OpenSearch 3.0+ uses agent-based security)")
+
         test_sudachi_config = Path(__file__).parent / "sudachi.json"
         self.assertTrue(test_sudachi_config.exists(),
                         f"config file should exists: {test_sudachi_config}")

@@ -35,6 +35,21 @@ class EsExtension {
     String version() {
         return kind.get().version
     }
+
+    /**
+     * Returns the required JVM version for the current engine.
+     * OpenSearch 3.0+ requires JVM 21, others use JVM 17.
+     */
+    int jvmVersion() {
+        def k = kind.get()
+        if (k.engine == EngineType.OpenSearch) {
+            def ver = k.parsedVersion()
+            if (ver.ge(3, 0)) {
+                return 21
+            }
+        }
+        return 17
+    }
 }
 
 
@@ -55,7 +70,10 @@ class EsSudachiPlugin implements Plugin<Project> {
 
         var version = kind.supportVersion(verString)
 
-        var tags = kind.engine.allTags().collectMany { v ->
+        def parsed = kind.parsedVersion()
+        def allTags = kind.engine == EngineType.OpenSearch ? kind.engine.allTags(parsed) : kind.engine.allTags()
+
+        var tags = allTags.collectMany { v ->
             var comparison = v <=> version
             if (comparison < 0) {
                 return List.of("${v.tag}-gt", "${v.tag}-ge")
@@ -94,6 +112,12 @@ class EsSudachiPlugin implements Plugin<Project> {
                     exclude(group: 'junit', module: 'junit')
                 }
                 testImplementation("org.opensearch:opensearch-plugin-classloader:$verString")
+                // OpenSearch 3.0+ requires the new Java agent security framework
+                def parsedVersion = Version.fromRaw(verString)
+                if (parsedVersion.ge(3, 0)) {
+                    testImplementation("org.opensearch:opensearch-agent-bootstrap:$verString")
+                    testRuntimeOnly("org.opensearch:opensearch-agent:$verString")
+                }
             }
         }
     }

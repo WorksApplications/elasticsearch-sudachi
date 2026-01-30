@@ -80,3 +80,5 @@ fun parseWords(
   return org.elasticsearch.index.analysis.Analysis.parseWords(
       environment, settings, name, defaultWords, namedStopWords, ignoreCase)
 }
+
+fun Environment.configPath(): java.nio.file.Path = this.configFile()

@@ -36,16 +36,28 @@ jobs:
           - 'os:2.8.0'
           - 'os:2.7.0'
           - 'os:2.6.0'
+        include:
+          # OpenSearch 3.x requires Java 21
+          - es-version: 'os:3.4.0'
+            java-version: '21'
+          - es-version: 'os:3.3.2'
+            java-version: '21'
+          - es-version: 'os:3.2.0'
+            java-version: '21'
+          - es-version: 'os:3.1.0'
+            java-version: '21'
+          - es-version: 'os:3.0.0'
+            java-version: '21'
     env:
       mainJob: ${{ matrix.es-version == 'es:8.17.10' }}
     steps:
     - uses: actions/checkout@v4
       with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-    - name: Setup JDK 17
+    - name: Setup JDK
       uses: actions/setup-java@v4
       with:
-        java-version: 17
+        java-version: ${{ matrix.java-version || '17' }}
         distribution: 'temurin'
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v3
