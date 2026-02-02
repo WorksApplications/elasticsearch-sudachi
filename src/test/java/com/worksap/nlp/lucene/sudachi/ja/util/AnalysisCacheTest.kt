@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Works Applications Co., Ltd.
+ * Copyright (c) 2022-2026 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
 
 package com.worksap.nlp.lucene.sudachi.ja.util
 
-import com.worksap.nlp.elasticsearch.sudachi.plugin.AnalysisCache
-import com.worksap.nlp.elasticsearch.sudachi.plugin.AnalysisCacheStats
 import com.worksap.nlp.lucene.sudachi.ja.CachingTokenizer
 import com.worksap.nlp.lucene.sudachi.ja.MorphemeIterator
 import com.worksap.nlp.lucene.sudachi.ja.NonCachedAnalysis
 import com.worksap.nlp.lucene.sudachi.ja.input.CopyingInputExtractor
+import com.worksap.nlp.lucene.sudachi.ja.plugin.AnalysisCache
+import com.worksap.nlp.lucene.sudachi.ja.plugin.AnalysisCacheStats
 import com.worksap.nlp.sudachi.Tokenizer.SplitMode
 import com.worksap.nlp.test.InMemoryDictionary
 import java.io.StringReader

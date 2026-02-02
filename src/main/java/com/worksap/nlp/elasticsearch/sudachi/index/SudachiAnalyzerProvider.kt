@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2025 Works Applications Co., Ltd.
+ * Copyright (c) 2017-2026 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,16 +17,16 @@
 package com.worksap.nlp.elasticsearch.sudachi.index
 
 import com.worksap.nlp.elasticsearch.sudachi.ConfigAdapter
-import com.worksap.nlp.elasticsearch.sudachi.plugin.AnalysisCacheService
-import com.worksap.nlp.elasticsearch.sudachi.plugin.DictionaryService
 import com.worksap.nlp.lucene.sudachi.ja.SudachiAnalyzer
+import com.worksap.nlp.lucene.sudachi.ja.plugin.AnalysisCacheService
+import com.worksap.nlp.lucene.sudachi.ja.plugin.DictionaryService
 import com.worksap.nlp.search.aliases.*
 import com.worksap.nlp.search.aliases.AbstractIndexAnalyzerProvider
 import org.apache.lucene.analysis.Analyzer
 import org.apache.lucene.analysis.CharArraySet
 
 class SudachiAnalyzerProvider(
-    analysisCache: AnalysisCacheService,
+    cacheService: AnalysisCacheService,
     dictionaryService: DictionaryService,
     indexSettings: IndexSettings,
     env: Environment,
@@ -40,7 +40,7 @@ class SudachiAnalyzerProvider(
   private val configs by lazy { ConfigAdapter(dictionaryService.anchor, settings, env) }
   private val dictionary by lazy { dictionaryService.forConfig(configs.compiled) }
   private val cache by lazy {
-    analysisCache.analysisCache(indexSettings.index.name, configs.compiled, configs.mode, settings)
+    cacheService.analysisCache(indexSettings.index.name, configs.compiled, configs.mode, settings)
   }
 
   override fun get(): SudachiAnalyzer {

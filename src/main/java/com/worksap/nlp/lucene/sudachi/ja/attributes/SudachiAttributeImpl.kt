@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Works Applications Co., Ltd.
+ * Copyright (c) 2022-2026 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 
 package com.worksap.nlp.lucene.sudachi.ja.attributes
 
-import com.worksap.nlp.elasticsearch.sudachi.plugin.ReloadableDictionary
 import com.worksap.nlp.lucene.sudachi.ja.CurrentDictionary
+import com.worksap.nlp.lucene.sudachi.ja.plugin.ReloadableDictionary
 import org.apache.lucene.util.AttributeImpl
 import org.apache.lucene.util.AttributeReflector
 

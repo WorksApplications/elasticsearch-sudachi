@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2023 Works Applications Co., Ltd.
+ * Copyright (c) 2017-2026 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.worksap.nlp.elasticsearch.sudachi.plugin.ReloadableDictionary;
+import com.worksap.nlp.lucene.sudachi.ja.plugin.ReloadableDictionary;
 import com.worksap.nlp.lucene.sudachi.ja.util.Stopwords;
-import com.worksap.nlp.elasticsearch.sudachi.plugin.AnalysisCache;
+import com.worksap.nlp.lucene.sudachi.ja.plugin.AnalysisCache;
 import com.worksap.nlp.lucene.sudachi.ja.util.Stoptags;
 import com.worksap.nlp.sudachi.PartialPOS;
 import com.worksap.nlp.sudachi.PosMatcher;

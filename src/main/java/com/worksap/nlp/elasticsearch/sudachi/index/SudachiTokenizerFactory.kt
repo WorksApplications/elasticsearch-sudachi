@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Works Applications Co., Ltd.
+ * Copyright (c) 2022-2026 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,10 @@
 package com.worksap.nlp.elasticsearch.sudachi.index
 
 import com.worksap.nlp.elasticsearch.sudachi.ConfigAdapter
-import com.worksap.nlp.elasticsearch.sudachi.plugin.AnalysisCacheService
-import com.worksap.nlp.elasticsearch.sudachi.plugin.DictionaryService
 import com.worksap.nlp.lucene.sudachi.ja.CachingTokenizer
 import com.worksap.nlp.lucene.sudachi.ja.SudachiTokenizer
+import com.worksap.nlp.lucene.sudachi.ja.plugin.AnalysisCacheService
+import com.worksap.nlp.lucene.sudachi.ja.plugin.DictionaryService
 import com.worksap.nlp.search.aliases.AbstractTokenizerFactory
 import com.worksap.nlp.search.aliases.AnalysisProvider
 import com.worksap.nlp.search.aliases.Environment

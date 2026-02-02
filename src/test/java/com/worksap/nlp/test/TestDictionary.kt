@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Works Applications Co., Ltd.
+ * Copyright (c) 2022-2026 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
 
 package com.worksap.nlp.test
 
-import com.worksap.nlp.elasticsearch.sudachi.plugin.AnalysisCache
-import com.worksap.nlp.elasticsearch.sudachi.plugin.ReloadableDictionary
 import com.worksap.nlp.lucene.sudachi.ja.CachingTokenizer
 import com.worksap.nlp.lucene.sudachi.ja.ResourceUtil
 import com.worksap.nlp.lucene.sudachi.ja.SudachiTokenizer
 import com.worksap.nlp.lucene.sudachi.ja.input.NoopInputExtractor
+import com.worksap.nlp.lucene.sudachi.ja.plugin.AnalysisCache
+import com.worksap.nlp.lucene.sudachi.ja.plugin.ReloadableDictionary
 import com.worksap.nlp.sudachi.Config
 import com.worksap.nlp.sudachi.PathAnchor
 import com.worksap.nlp.sudachi.Tokenizer.SplitMode
