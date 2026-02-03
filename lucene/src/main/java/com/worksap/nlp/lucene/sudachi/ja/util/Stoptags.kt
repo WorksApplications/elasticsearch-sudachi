@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2026 Works Applications Co., Ltd.
+ * Copyright (c) 2022-2023 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,14 @@
  * limitations under the License.
  */
 
-package com.worksap.nlp.test;
+package com.worksap.nlp.lucene.sudachi.ja.util
 
-import com.worksap.nlp.lucene.sudachi.aliases.BaseTokenStreamTestCase;
+import com.worksap.nlp.sudachi.PartialPOS
 
-// This class needs to be written in Java, Kotlin does not work here
-public class AssertRunnerTest extends BaseTokenStreamTestCase {
+public object Stoptags {
+  @JvmStatic
+  fun parse(data: CharSequence): PartialPOS {
+    val parts = data.split(',').map { if (it == "*") null else it }
+    return PartialPOS(*parts.toTypedArray())
+  }
 }

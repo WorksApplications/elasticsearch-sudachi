@@ -49,20 +49,13 @@ compileTestKotlin {
 
 configurations {
     spi
-}
-
-sourceSets {
-    test {
-        compileClasspath += configurations.spi
-        runtimeClasspath += configurations.spi
-    }
-    main {
-        compileClasspath += configurations.spi
-    }
+    lucene
 }
 
 dependencies {
-    spi(project(':spi'))
+    api(project(':spi'))
+    api(project(':lucene'))
+    implementation('com.worksap.nlp:sudachi:0.7.4')
     testImplementation(project(':testlib'))
     testImplementation('org.apache.logging.log4j:log4j-core:2.17.2')
     testImplementation('org.jetbrains.kotlin:kotlin-test-junit') {
@@ -70,6 +63,7 @@ dependencies {
     }
     testImplementation('org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3')
     kover(project(':integration'))
+    kover(project(':lucene'))
     kover(project(':testlib'))
 }
 
@@ -104,9 +98,16 @@ def packageSpiJars = tasks.register('packageSpiJars', Copy) {
     }
 }
 
+def packageLuceneJars = tasks.register('packageLuceneJars', Copy) {
+    from configurations.lucene
+    var esKind = sudachiEs.kind.get()
+    into "build/package/${version}/${esKind.engine.kind}-${esKind.version}/lucene"
+}
+
+
 def distZip = tasks.register('distZip', Zip) {
     var esKind = sudachiEs.kind.get()
-    dependsOn embedVersion, packageJars, packageSpiJars
+    dependsOn embedVersion, packageJars, packageSpiJars, packageLuceneJars
     archiveBaseName.set("${esKind.engine.kind}-${esKind.version}-$archivesBaseName")
     from("build/package/${version}/${esKind.engine.kind}-${esKind.version}", 'LICENSE', 'README.md')
 }

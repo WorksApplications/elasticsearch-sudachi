@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2026 Works Applications Co., Ltd.
+ * Copyright (c) 2024 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,6 @@
  * limitations under the License.
  */
 
-package com.worksap.nlp.test;
+package com.worksap.nlp.search.aliases
 
-import com.worksap.nlp.lucene.sudachi.aliases.BaseTokenStreamTestCase;
-
-// This class needs to be written in Java, Kotlin does not work here
-public class AssertRunnerTest extends BaseTokenStreamTestCase {
-}
+typealias Index = org.opensearch.index.Index

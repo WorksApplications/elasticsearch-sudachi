@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package com.worksap.nlp.test;
+@file:Suppress("UNUSED_PARAMETER", "PackageDirectoryMismatch")
 
-import com.worksap.nlp.lucene.sudachi.aliases.BaseTokenStreamTestCase;
+package com.worksap.nlp.elasticsearch.sudachi.aliases
 
-// This class needs to be written in Java, Kotlin does not work here
-public class AssertRunnerTest extends BaseTokenStreamTestCase {
+import org.elasticsearch.cluster.metadata.IndexMetadata
+
+object MetadataConstants {
+  const val SETTING_VERSION_CREATED = IndexMetadata.SETTING_VERSION_CREATED
 }

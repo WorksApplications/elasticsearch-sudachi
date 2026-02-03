@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2026 Works Applications Co., Ltd.
+ * Copyright (c) 2023-2026 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,17 @@
  * limitations under the License.
  */
 
-package com.worksap.nlp.test;
+@file:Suppress("PackageDirectoryMismatch")
 
-import com.worksap.nlp.lucene.sudachi.aliases.BaseTokenStreamTestCase;
+package com.worksap.nlp.search.aliases
 
-// This class needs to be written in Java, Kotlin does not work here
-public class AssertRunnerTest extends BaseTokenStreamTestCase {
-}
+// /**
+//  * This file must not contain any imports to ElasticSearch/OpenSearch classes. For clarity, all
+//  * ElasticSearch/OpenSearch files must be fully-qualified on every use.
+//  *
+//  * Lucene classes can be imported.
+//  */
+
+typealias Settings = org.elasticsearch.common.settings.Settings
+
+typealias CacheBuilder<K, V> = org.elasticsearch.common.cache.CacheBuilder<K, V>
