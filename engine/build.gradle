@@ -46,15 +46,7 @@ compileTestKotlin {
     compilerOptions.jvmTarget.set(jvmTargetVersion)
 }
 
-configurations {
-    spi
-    lucene
-}
-
 dependencies {
-    spi(project(':spi'))
-    lucene(project(':lucene'))
-
     api(project(':spi'))
     api(project(':lucene'))
     implementation('com.worksap.nlp:sudachi:0.7.4')
@@ -67,55 +59,6 @@ dependencies {
     kover(project(':integration'))
     kover(project(':lucene'))
     kover(project(':testlib'))
-}
-
-def embedVersion = tasks.register('embedVersion', Copy) {
-    var esKind = sudachiEs.kind.get()
-    from 'src/main/extras/plugin-descriptor.properties'
-    into "build/package/${version}/${esKind.engine.kind}-${esKind.version}"
-    expand([
-            version: version,
-            engineVersion: esKind.version,
-            engineKind: esKind.engine.kind
-    ])
-    inputs.property("version", version)
-    inputs.property("elasticSearchVersion", esKind.version)
-}
-
-def packageJars = tasks.register('packageJars', Copy) {
-    from configurations.runtimeClasspath
-    from tasks.jar.outputs
-    var esKind = sudachiEs.kind.get()
-    into "build/package/${version}/${esKind.engine.kind}-${esKind.version}"
-    dependsOn tasks.jar
-}
-
-def packageSpiJars = tasks.register('packageSpiJars', Copy) {
-    from configurations.spi
-    var esKind = sudachiEs.kind.get()
-    if (sudachiEs.hasPluginSpiSupport()) {
-        into "build/package/${version}/${esKind.engine.kind}-${esKind.version}/spi"
-    } else {
-        into "build/package/${version}/${esKind.engine.kind}-${esKind.version}"
-    }
-}
-
-def packageLuceneJars = tasks.register('packageLuceneJars', Copy) {
-    from configurations.lucene
-    var esKind = sudachiEs.kind.get()
-    into "build/package/${version}/${esKind.engine.kind}-${esKind.version}/lucene"
-}
-
-
-def distZip = tasks.register('distZip', Zip) {
-    var esKind = sudachiEs.kind.get()
-    dependsOn embedVersion, packageJars, packageSpiJars, packageLuceneJars
-    archiveBaseName.set("${esKind.engine.kind}-${esKind.version}-$archivesBaseName")
-    from("build/package/${version}/${esKind.engine.kind}-${esKind.version}", 'LICENSE', 'README.md')
-}
-
-artifacts {
-    archives distZip
 }
 
 koverReport {
@@ -150,33 +93,5 @@ spotless {
         // by default the target is every '.kt' and '.kts` file in the java sourcesets
         ktfmt('0.39')
         licenseHeaderFile(formatter.resolve('license-header'))
-    }
-}
-
-sonarqube {
-    properties {
-        property "sonar.projectKey", "WorksApplications_elasticsearch-sudachi"
-        property "sonar.organization", "worksapplications"
-        property "sonar.host.url", "https://sonarcloud.io"
-    }
-}
-
-tasks.register("printVersionForGithubActions") {
-    doLast {
-        // https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#environment-files
-        var esKind = sudachiEs.kind.get()
-
-        file(System.getenv("GITHUB_ENV")).write(
-                "PROJ_VERSION=${project.version}\nENGINE_VERSION=${esKind.version}\nENGINE_KIND=${esKind.engine.kind}"
-        )
-    }
-}
-
-nexusPublishing {
-    repositories {
-        sonatype {
-            username = project.findProperty("maven.user") ?: System.getenv("MAVEN_USERNAME")
-            password = project.findProperty("maven.password") ?: System.getenv("MAVEN_USER_PASSWORD")
-        }
     }
 }
