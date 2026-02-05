@@ -73,7 +73,7 @@ class ConfigAdapter(anchor: PathAnchor, settings: Settings, env: Environment) {
             "Setting $PARAM_SPLIT_MODE_DEPRECATED is deprecated, use $PARAM_SPLIT_MODE instead",
         )
       }
-      return SplitModeFlag.get(settings)
+      return SplitModeFlag.from_string(settings.get(SplitModeFlag.name, null))
     }
 
     private fun readDefaultConfig(root: Path, baseAnchor: PathAnchor): Config {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Works Applications Co., Ltd.
+ * Copyright (c) 2022-2026 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,19 @@
 
 package com.worksap.nlp.tools
 
-import com.worksap.nlp.search.aliases.Settings
 import java.lang.IllegalArgumentException
 import java.lang.reflect.ParameterizedType
 
 /**
  * Helper for extracting converting enums from property values
  *
- * Usage is `object: EnumFlag<FooEnum>("foo", FooEnum.DEFAULT)`
+ * Usage:
+ * ```
+ *   object: EnumFlag<FooEnum>("foo", FooEnum.DEFAULT)
+ *   val mode = object.from_string(args.get(key, null))
+ * ```
  */
-public abstract class EnumFlag<T : Enum<T>>(private val name: String, private val default: T? = null) {
+public abstract class EnumFlag<T : Enum<T>>(val name: String, private val default: T? = null) {
   @Suppress("UNCHECKED_CAST")
   private val enumClazz = run {
     val superclazz = javaClass.annotatedSuperclass.type as ParameterizedType
@@ -34,19 +37,7 @@ public abstract class EnumFlag<T : Enum<T>>(private val name: String, private va
   }
   private val values: Array<T> = enumClazz.enumConstants
 
-  /** Extract value from Lucene settings */
-  fun extract(args: MutableMap<String, String>): T {
-    val raw = args.remove(name)
-    return convert(raw)
-  }
-
-  /** Extract value from ElasticSearch settings */
-  fun get(s: Settings): T {
-    val raw = s.get(name, null)
-    return convert(raw)
-  }
-
-  private fun convert(raw: String?): T {
+  fun from_string(raw: String?): T {
     if (raw == null) {
       if (default != null) {
         return default

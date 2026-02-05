@@ -22,8 +22,8 @@ import com.worksap.nlp.tools.EnumFlag
 import org.apache.lucene.analysis.TokenStream
 
 class SudachiSplitFilterFactory(args: MutableMap<String, String>) : TokenFilterFactory(args) {
-  private val mode = Mode.extract(args)
-  private val splitMode = SplitMode.extract(args)
+  private val mode = Mode.from_string(args.remove(Mode.name))
+  private val splitMode = SplitMode.from_string(args.remove(Mode.name))
 
   init {
     require(args.isEmpty()) { "Unknown parameters: $args" }

@@ -36,25 +36,25 @@ class EnumFlagTest {
   @Test
   fun worksWithMap() {
     val map = mutableMapOf("foo" to "baz")
-    assertEquals(Foo.BAZ, FooFlag1.extract(map))
+    assertEquals(Foo.BAZ, FooFlag1.from_string(map.remove(FooFlag1.name)))
   }
 
   @Test
   fun defaultValue() {
     val map = mutableMapOf<String, String>()
-    assertEquals(Foo.BAR, FooFlag2.extract(map))
+    assertEquals(Foo.BAR, FooFlag2.from_string(map.remove(FooFlag2.name)))
   }
 
   @Test
   fun invalidValue() {
     val map = mutableMapOf("foo" to "xxx")
-    val ex = assertFails { FooFlag1.extract(map) }
+    val ex = assertFails { FooFlag1.from_string(map.remove(FooFlag1.name)) }
     assertContains(ex.message!!, "[FOO, BAR, BAZ]")
   }
 
   @Test
   fun noDefaultValue() {
     val map = mutableMapOf<String, String>()
-    assertFailsWith<IllegalArgumentException> { FooFlag1.extract(map) }
+    assertFailsWith<IllegalArgumentException> { FooFlag1.from_string(map.remove(FooFlag1.name)) }
   }
 }
