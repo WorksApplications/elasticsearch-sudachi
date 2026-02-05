@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Works Applications Co., Ltd.
+ * Copyright (c) 2022-2026 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,6 @@
 
 package com.worksap.nlp.lucene.sudachi.ja.attributes
 
-import com.worksap.nlp.lucene.aliases.ToXContent
-import com.worksap.nlp.lucene.aliases.ToXContentParams
-import com.worksap.nlp.lucene.aliases.XContentBuilder
 import com.worksap.nlp.lucene.sudachi.ja.reflect
 import com.worksap.nlp.sudachi.Morpheme
 import org.apache.lucene.util.AttributeImpl
@@ -29,25 +26,6 @@ class MorphemeAttributeImpl : AttributeImpl(), MorphemeAttribute {
   // mapping from the character offset to the original reader offset
   private var offsetMap: List<Int> = listOf()
 
-  // wrapper class to convert data ToXContent-able
-  private class ToXContentWrapper(morpheme: Morpheme, offsetMap: List<Int>) : ToXContent {
-    private val morpheme = morpheme
-    private val offsetMap = offsetMap
-
-    override fun toXContent(builder: XContentBuilder, params: ToXContentParams): XContentBuilder {
-      builder.value(
-          mapOf(
-              "surface" to morpheme.surface(),
-              "dictionaryForm" to morpheme.dictionaryForm(),
-              "normalizedForm" to morpheme.normalizedForm(),
-              "readingForm" to morpheme.readingForm(),
-              "partOfSpeech" to morpheme.partOfSpeech(),
-              "offsetMap" to offsetMap,
-          ))
-      return builder
-    }
-  }
-
   override fun clear() {
     morpheme = null
     offsetMap = listOf()
@@ -56,7 +34,14 @@ class MorphemeAttributeImpl : AttributeImpl(), MorphemeAttribute {
   override fun reflectWith(reflector: AttributeReflector) {
     // show only when a morpheme is set
     reflector.reflect<MorphemeAttribute>(
-        "morpheme", morpheme?.let { m -> ToXContentWrapper(m, offsetMap) })
+        "morpheme", morpheme?.let { m -> mapOf(
+            "surface" to m.surface(),
+            "dictionaryForm" to m.dictionaryForm(),
+            "normalizedForm" to m.normalizedForm(),
+            "readingForm" to m.readingForm(),
+            "partOfSpeech" to m.partOfSpeech(),
+            "offsetMap" to offsetMap,
+        ) })
   }
 
   override fun copyTo(target: AttributeImpl?) {

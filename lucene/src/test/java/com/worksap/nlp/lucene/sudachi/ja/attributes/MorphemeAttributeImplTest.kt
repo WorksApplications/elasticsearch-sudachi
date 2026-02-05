@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Works Applications Co., Ltd.
+ * Copyright (c) 2026 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@
 
 package com.worksap.nlp.lucene.sudachi.ja.attributes
 
-import com.worksap.nlp.lucene.aliases.XContentBuilder
-import com.worksap.nlp.search.aliases.XContentType
 import com.worksap.nlp.sudachi.Config
 import com.worksap.nlp.sudachi.DictionaryFactory
 import com.worksap.nlp.sudachi.Morpheme
@@ -29,6 +27,11 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
 import org.junit.Before
 import org.junit.Rule
 
@@ -93,24 +96,22 @@ class MorphemeAttributeImplTest {
   }
 
   @Test
-  fun toXContent() {
+  fun reflectWith() {
     var morphemeAtt = MorphemeAttributeImpl()
     val morpheme = getFirstMorpheme("東京都")!!
     morphemeAtt.setMorpheme(morpheme)
     val offsets = listOf(0, 1, 2, 3)
     morphemeAtt.setOffsets(offsets)
 
-    val builder = XContentBuilder.builder(XContentType.JSON.xContent())
-    builder.startObject()
+    var map = mutableMapOf<String, JsonElement>()
     morphemeAtt.reflectWith(
         fun(attClass, key, value) {
           assertEquals(MorphemeAttribute::class.java, attClass)
-          builder.field(key, value)
-        })
-    builder.endObject()
-    builder.flush()
+          map[key] = toJsonElement(value)
+        }
+    )
 
-    val serialized = builder.getOutputStream().toString()
+    val serialized = JsonObject(map).toString()
     val deserialized = Json.decodeFromString<MorphemeHolder>(serialized)
 
     assertNotNull(deserialized.morpheme)
@@ -123,22 +124,32 @@ class MorphemeAttributeImplTest {
   }
 
   @Test
-  fun toXContentNullMorpheme() {
+  fun reflectWithNullMorpheme() {
     var morphemeAtt = MorphemeAttributeImpl()
 
-    val builder = XContentBuilder.builder(XContentType.JSON.xContent())
-    builder.startObject()
+    var map = mutableMapOf<String, JsonElement>()
     morphemeAtt.reflectWith(
         fun(attClass, key, value) {
           assertEquals(MorphemeAttribute::class.java, attClass)
-          builder.field(key, value)
-        })
-    builder.endObject()
-    builder.flush()
+          map[key] = toJsonElement(value)
+        }
+    )
 
-    val serialized = builder.getOutputStream().toString()
+    val serialized = JsonObject(map).toString()
     val deserialized = Json.decodeFromString<MorphemeHolder>(serialized)
     assertNull(deserialized.morpheme)
+  }
+}
+
+fun toJsonElement(value: Any?): JsonElement {
+  return when (value) {
+    null -> JsonNull
+    is String -> JsonPrimitive(value)
+    is Boolean -> JsonPrimitive(value)
+    is Number -> JsonPrimitive(value)
+    is Map<*, *> -> JsonObject(value.entries.associate {(k, v) -> k.toString() to toJsonElement(v)})
+    is Collection<*> -> JsonArray(value.map { toJsonElement(it) })
+    else -> JsonPrimitive(value.toString())
   }
 }
 
