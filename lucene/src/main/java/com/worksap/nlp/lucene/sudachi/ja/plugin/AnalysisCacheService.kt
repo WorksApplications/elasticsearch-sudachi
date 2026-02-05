@@ -17,7 +17,6 @@
 package com.worksap.nlp.lucene.sudachi.ja.plugin
 
 import com.worksap.nlp.lucene.sudachi.ja.input.InputExtractor
-import com.worksap.nlp.search.aliases.Settings
 import com.worksap.nlp.sudachi.Config
 import com.worksap.nlp.sudachi.Tokenizer.SplitMode
 import java.lang.ref.WeakReference
@@ -30,6 +29,9 @@ public class AnalysisCacheService {
   private val caches = ConcurrentHashMap<Key, WeakReference<AnalysisCache>>()
 
   companion object {
+    const val CACHE_SIZE_SETTING_KEY = "cache-size"
+    const val DEFAULT_CACHE_SIZE = 32
+    const val MAX_INPUT_SETTING_KEY = InputExtractor.MAX_INPUT_SETTING_KEY
     private val logger = LogManager.getLogger(AnalysisCacheService::class.java)
   }
 
@@ -37,13 +39,14 @@ public class AnalysisCacheService {
       indexName: String,
       config: Config,
       mode: SplitMode,
-      settings: Settings
+      capacity: Int?,
+      max_input_size: Int?,
   ): AnalysisCache {
-    val capacity = settings.getAsInt("cache-size", 32)
+    val capacity = capacity ?: DEFAULT_CACHE_SIZE
     val key = Key(indexName, config, capacity)
     val entry =
         caches.computeIfAbsent(key) { k ->
-          val extractor = InputExtractor.make(settings)
+          val extractor = InputExtractor.make(max_input_size)
           logger.debug(
               "creating new cache service for {}, size={}, extractor={}",
               key,
@@ -56,7 +59,7 @@ public class AnalysisCacheService {
     if (result == null) {
       caches.remove(key)
       // retry creation via recursion
-      return analysisCache(indexName, config, mode, settings)
+      return analysisCache(indexName, config, mode, capacity, max_input_size)
     }
     return result
   }

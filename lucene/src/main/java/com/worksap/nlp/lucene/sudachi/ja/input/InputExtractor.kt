@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Works Applications Co., Ltd.
+ * Copyright (c) 2022-2026 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package com.worksap.nlp.lucene.sudachi.ja.input
 
-import com.worksap.nlp.search.aliases.Settings
 import java.io.Reader
 import java.lang.ref.SoftReference
 import kotlin.text.StringBuilder
@@ -36,9 +35,12 @@ interface InputExtractor {
   fun canExtract(input: Reader): Boolean
 
   companion object {
+    const val MAX_INPUT_SETTING_KEY = "cache-max-input"
+    const val DEFAUlT_MAX_INPUT = Short.MAX_VALUE.toInt()
+
     @JvmStatic
-    fun make(settings: Settings): InputExtractor {
-      val maxSize = settings.getAsInt("cache-max-input", Short.MAX_VALUE.toInt())
+    fun make(maxSize: Int?): InputExtractor {
+      val maxSize = maxSize ?: DEFAUlT_MAX_INPUT
       return if (InputExtractorBootstrap.ZERO_COPY === NoopInputExtractor.INSTANCE) {
         CopyingInputExtractor(maxSize)
       } else {

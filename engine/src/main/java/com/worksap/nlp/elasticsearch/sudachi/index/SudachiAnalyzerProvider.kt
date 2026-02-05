@@ -40,7 +40,13 @@ class SudachiAnalyzerProvider(
   private val configs by lazy { ConfigAdapter(dictionaryService.anchor, settings, env) }
   private val dictionary by lazy { dictionaryService.forConfig(configs.compiled) }
   private val cache by lazy {
-    cacheService.analysisCache(indexSettings.index.name, configs.compiled, configs.mode, settings)
+    cacheService.analysisCache(
+        indexSettings.index.name,
+        configs.compiled,
+        configs.mode,
+        settings.getAsInt(AnalysisCacheService.CACHE_SIZE_SETTING_KEY, null),
+        settings.getAsInt(AnalysisCacheService.MAX_INPUT_SETTING_KEY, null),
+    )
   }
 
   override fun get(): SudachiAnalyzer {

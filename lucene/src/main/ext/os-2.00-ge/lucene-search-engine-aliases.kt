@@ -25,7 +25,5 @@ package com.worksap.nlp.search.aliases
  * Lucene classes can be imported.
  */
 
-typealias Settings = org.opensearch.common.settings.Settings
-
 typealias CacheBuilder<K, V> = org.opensearch.common.cache.CacheBuilder<K, V>
 
