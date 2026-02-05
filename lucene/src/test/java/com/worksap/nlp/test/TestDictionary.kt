@@ -200,7 +200,7 @@ class InMemoryDictionary {
       discardPunctuation: Boolean = true,
       mode: SplitMode = SplitMode.C
   ): SudachiTokenizer {
-    val cache = AnalysisCache(0, NoopInputExtractor.INSTANCE)
+    val cache = AnalysisCache(InnerCacheBuilderImpl().build(0), NoopInputExtractor.INSTANCE)
     val it = CachingTokenizer(dic.newTokenizer(), mode, cache)
     val tokenizer = SudachiTokenizer(it, discardPunctuation)
     if (data != null) {

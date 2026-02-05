@@ -22,6 +22,7 @@ import com.worksap.nlp.lucene.sudachi.ja.plugin.AnalysisCache
 import com.worksap.nlp.sudachi.Morpheme
 import com.worksap.nlp.sudachi.Tokenizer
 import com.worksap.nlp.test.InMemoryDictionary
+import com.worksap.nlp.test.InnerCacheBuilderImpl
 import java.io.Reader
 import java.io.StringReader
 import kotlin.math.min
@@ -84,7 +85,7 @@ class Len95CachedAnalysisTest : ExtractedAnalysisTest() {
           CachingTokenizer(
               tokenizer = dic.dic.newTokenizer(),
               splitMode = Tokenizer.SplitMode.C,
-              cache = AnalysisCache(4, CopyingInputExtractor(95)))
+              cache = AnalysisCache(InnerCacheBuilderImpl().build(4), CopyingInputExtractor(95)))
       override fun analyze(input: CharSequence): MorphemeIterator {
         return cache.tokenize(StringReader(input.toString()))
       }
@@ -100,7 +101,7 @@ class Len95CachedAnalysisTestBadInput : ExtractedAnalysisTest() {
           CachingTokenizer(
               tokenizer = dic.dic.newTokenizer(),
               splitMode = Tokenizer.SplitMode.C,
-              cache = AnalysisCache(4, CopyingInputExtractor(95)))
+              cache = AnalysisCache(InnerCacheBuilderImpl().build(4), CopyingInputExtractor(95)))
       override fun analyze(input: CharSequence): MorphemeIterator {
         return cache.tokenize(BadReader(StringReader(input.toString()), 16))
       }
@@ -116,7 +117,7 @@ class NonCachedAnalysisTest : ExtractedAnalysisTest() {
           CachingTokenizer(
               tokenizer = dic.dic.newTokenizer(),
               splitMode = Tokenizer.SplitMode.C,
-              cache = AnalysisCache(4, NoopInputExtractor.INSTANCE))
+              cache = AnalysisCache(InnerCacheBuilderImpl().build(4), NoopInputExtractor.INSTANCE))
       override fun analyze(input: CharSequence): MorphemeIterator {
         return cache.tokenize(StringReader(input.toString()))
       }
@@ -132,7 +133,7 @@ class NonCachedBadReaderAnalysisTest : ExtractedAnalysisTest() {
           CachingTokenizer(
               tokenizer = dic.dic.newTokenizer(),
               splitMode = Tokenizer.SplitMode.C,
-              cache = AnalysisCache(4, NoopInputExtractor.INSTANCE))
+              cache = AnalysisCache(InnerCacheBuilderImpl().build(4), NoopInputExtractor.INSTANCE))
       override fun analyze(input: CharSequence): MorphemeIterator {
         return cache.tokenize(BadReader(StringReader(input.toString()), 16))
       }

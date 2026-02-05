@@ -25,6 +25,7 @@ import com.worksap.nlp.lucene.sudachi.ja.plugin.ReloadableDictionary
 import com.worksap.nlp.sudachi.Config
 import com.worksap.nlp.sudachi.PathAnchor
 import com.worksap.nlp.sudachi.Tokenizer.SplitMode
+import com.worksap.nlp.test.InnerCacheBuilderImpl
 import com.worksap.nlp.test.TestDictionary
 import java.io.StringReader
 import org.apache.lucene.analysis.charfilter.MappingCharFilter
@@ -56,7 +57,7 @@ open class TestSudachiTokenizer : BaseTokenStreamTestCase() {
         } else {
           CopyingInputExtractor(Short.MAX_VALUE.toInt())
         }
-    val tok = CachingTokenizer(dict.newTokenizer(), mode, AnalysisCache(capacity, extractor))
+    val tok = CachingTokenizer(dict.newTokenizer(), mode, AnalysisCache(InnerCacheBuilderImpl().build(capacity), extractor))
     return SudachiTokenizer(tok, noPunctuation, AttributeFactory.DEFAULT_ATTRIBUTE_FACTORY)
   }
 

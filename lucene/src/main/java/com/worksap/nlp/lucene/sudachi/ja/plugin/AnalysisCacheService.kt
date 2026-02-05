@@ -23,7 +23,11 @@ import java.lang.ref.WeakReference
 import java.util.concurrent.ConcurrentHashMap
 import org.apache.logging.log4j.LogManager
 
-public class AnalysisCacheService {
+public interface InnerCacheBuilder {
+    fun build(capacity: Int): InnerCache
+}
+
+public class AnalysisCacheService(private val cacheBuilder: InnerCacheBuilder) {
   data class Key(val indexName: String, val config: Config, val capacity: Int)
   // we use WeakReference here because the main reference will reside in per-index factories
   private val caches = ConcurrentHashMap<Key, WeakReference<AnalysisCache>>()
@@ -42,8 +46,8 @@ public class AnalysisCacheService {
       capacity: Int?,
       max_input_size: Int?,
   ): AnalysisCache {
-    val capacity = capacity ?: DEFAULT_CACHE_SIZE
-    val key = Key(indexName, config, capacity)
+    val actualCapacity = capacity ?: DEFAULT_CACHE_SIZE
+    val key = Key(indexName, config, actualCapacity)
     val entry =
         caches.computeIfAbsent(key) { k ->
           val extractor = InputExtractor.make(max_input_size)
@@ -52,14 +56,14 @@ public class AnalysisCacheService {
               key,
               k.capacity,
               extractor)
-          val x = AnalysisCache(k.capacity, extractor)
+          val x = AnalysisCache(cacheBuilder.build(k.capacity), extractor)
           WeakReference(x)
         }
     val result = entry.get()
     if (result == null) {
       caches.remove(key)
       // retry creation via recursion
-      return analysisCache(indexName, config, mode, capacity, max_input_size)
+      return analysisCache(indexName, config, mode, actualCapacity, max_input_size)
     }
     return result
   }

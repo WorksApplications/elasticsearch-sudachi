@@ -21,11 +21,18 @@ import com.worksap.nlp.lucene.sudachi.ja.MorphemeIterator
 import com.worksap.nlp.lucene.sudachi.ja.NonCachedAnalysis
 import com.worksap.nlp.lucene.sudachi.ja.input.ConcatenatingReader
 import com.worksap.nlp.lucene.sudachi.ja.input.InputExtractor
-import com.worksap.nlp.search.aliases.CacheBuilder
 import com.worksap.nlp.sudachi.MorphemeList
 import com.worksap.nlp.sudachi.Tokenizer
 import com.worksap.nlp.sudachi.Tokenizer.SplitMode
 import java.io.Reader
+
+public interface InnerCache {
+  val capacity: Int
+  fun computeIfAbsent(input: String, lazyTokenize: (String) -> MorphemeList): MorphemeList
+  fun stats() : AnalysisCacheStats
+}
+
+data class AnalysisCacheStats(val hits: Long, val misses: Long, val evictions: Long)
 
 /**
  * Cache analysis results using ES-based cache logic.
@@ -33,16 +40,15 @@ import java.io.Reader
  * Analysis are always done in C mode and cached. Splitting is done after caching on-demand as it is
  * a relatively cheap operation.
  */
-public class AnalysisCache(private val capacity: Int, private val extractor: InputExtractor) {
-  private val cache =
-      CacheBuilder.builder<String, MorphemeList>()
-          .setMaximumWeight(capacity * 64 * 1024L)
-          .weigher { i, ml -> i.length * 4L + ml.size * 64L }
-          .build()
+public class AnalysisCache(private val cache: InnerCache, private val extractor: InputExtractor) {
+  companion object{
+    public fun calculateMaxWeight(capacity: Int):Long { return capacity * 64 * 1024L }
+    public val weigher: (String, MorphemeList) -> Long = { input, ml -> input.length * 4L + ml.size * 64L }
+  }
 
   /** Use [com.worksap.nlp.lucene.sudachi.ja.CachingTokenizer.tokenize] instead of this method. */
   internal fun analyze(tokenizer: Tokenizer, mode: SplitMode, input: Reader): MorphemeIterator {
-    if (capacity <= 0) {
+    if (cache.capacity <= 0) {
       return NonCachedAnalysis(tokenizer, input, mode)
     }
     if (extractor.canExtract(input)) {
@@ -62,14 +68,12 @@ public class AnalysisCache(private val capacity: Int, private val extractor: Inp
   }
 
   private fun cached(input: String, mode: SplitMode, tokenizer: Tokenizer): MorphemeIterator {
-    val list = cache.computeIfAbsent(input) { k -> tokenizer.tokenize(SplitMode.C, k) }
+    val list = cache.computeIfAbsent(input) { i -> tokenizer.tokenize(SplitMode.C, i) }
     return CachedAnalysis(list.split(mode))
   }
 
   fun stats(): AnalysisCacheStats {
-    val stats = cache.stats()
-    return AnalysisCacheStats(hits = stats.hits, misses = stats.misses, evictions = stats.evictions)
+    return cache.stats()
   }
 }
 
-data class AnalysisCacheStats(val hits: Long, val misses: Long, val evictions: Long)

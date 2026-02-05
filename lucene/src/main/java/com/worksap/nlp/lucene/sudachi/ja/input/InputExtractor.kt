@@ -40,11 +40,11 @@ interface InputExtractor {
 
     @JvmStatic
     fun make(maxSize: Int?): InputExtractor {
-      val maxSize = maxSize ?: DEFAUlT_MAX_INPUT
+      val actualMaxSize = maxSize ?: DEFAUlT_MAX_INPUT
       return if (InputExtractorBootstrap.ZERO_COPY === NoopInputExtractor.INSTANCE) {
-        CopyingInputExtractor(maxSize)
+        CopyingInputExtractor(actualMaxSize)
       } else {
-        ChainedExtractor(InputExtractorBootstrap.ZERO_COPY, CopyingInputExtractor(maxSize))
+        ChainedExtractor(InputExtractorBootstrap.ZERO_COPY, CopyingInputExtractor(actualMaxSize))
       }
     }
   }

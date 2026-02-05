@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.worksap.nlp.lucene.sudachi.ja.util
+package com.worksap.nlp.lucene.sudachi.ja.plugin
 
 import com.worksap.nlp.lucene.sudachi.ja.CachingTokenizer
 import com.worksap.nlp.lucene.sudachi.ja.MorphemeIterator
@@ -24,6 +24,7 @@ import com.worksap.nlp.lucene.sudachi.ja.plugin.AnalysisCache
 import com.worksap.nlp.lucene.sudachi.ja.plugin.AnalysisCacheStats
 import com.worksap.nlp.sudachi.Tokenizer.SplitMode
 import com.worksap.nlp.test.InMemoryDictionary
+import com.worksap.nlp.test.InnerCacheBuilderImpl
 import java.io.StringReader
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -37,7 +38,7 @@ class AnalysisCacheTest {
         CachingTokenizer(
             tokenizer = dic.dic.newTokenizer(),
             splitMode = mode,
-            cache = AnalysisCache(capacity, CopyingInputExtractor(128)))
+            cache = AnalysisCache(InnerCacheBuilderImpl().build(capacity), CopyingInputExtractor(128)))
     fun analyze(data: String): MorphemeIterator {
       val reader = StringReader(data)
       return cache.tokenize(reader)

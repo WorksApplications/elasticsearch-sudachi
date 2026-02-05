@@ -34,7 +34,7 @@ private inline fun <reified T> provider(
 }
 
 class AnalysisSudachiPlugin(settings: Settings?) : Plugin(), AnalysisPlugin, ExtensiblePlugin {
-  private val cacheService = AnalysisCacheService()
+  private val cacheService = AnalysisCacheService(InnerCacheBuilderImpl())
   private val classloaders = ArrayList<ClassLoader>()
   private val dictionaryService by lazy { DictionaryService(classloaders) }
 

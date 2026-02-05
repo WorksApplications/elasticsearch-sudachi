@@ -47,6 +47,8 @@ typealias Plugin = org.elasticsearch.plugins.Plugin
 
 typealias CacheBuilder<K, V> = org.elasticsearch.common.cache.CacheBuilder<K, V>
 
+typealias Cache<K, V> = org.elasticsearch.common.cache.Cache<K, V>
+
 typealias ExtensiblePlugin = org.elasticsearch.plugins.ExtensiblePlugin
 
 typealias ExtensionLoader = org.elasticsearch.plugins.ExtensiblePlugin.ExtensionLoader

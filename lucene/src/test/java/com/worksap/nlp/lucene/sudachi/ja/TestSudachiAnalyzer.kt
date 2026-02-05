@@ -20,6 +20,7 @@ import com.worksap.nlp.lucene.sudachi.ja.input.NoopInputExtractor
 import com.worksap.nlp.lucene.sudachi.ja.plugin.AnalysisCache
 import com.worksap.nlp.sudachi.Tokenizer
 import com.worksap.nlp.test.InMemoryDictionary
+import com.worksap.nlp.test.InnerCacheBuilderImpl
 import java.io.IOException
 import org.apache.lucene.document.Document
 import org.apache.lucene.document.Field
@@ -53,7 +54,7 @@ class TestSudachiAnalyzer {
     analyzer =
         SudachiAnalyzer(
             dic.dic,
-            AnalysisCache(0, NoopInputExtractor.INSTANCE),
+            AnalysisCache(InnerCacheBuilderImpl().build(0), NoopInputExtractor.INSTANCE),
             true,
             Tokenizer.SplitMode.C,
             SudachiAnalyzer.getDefaultStopSet(),
