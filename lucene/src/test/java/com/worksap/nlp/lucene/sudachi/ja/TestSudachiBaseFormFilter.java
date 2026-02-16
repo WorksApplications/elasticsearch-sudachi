@@ -16,9 +16,9 @@
 
 package com.worksap.nlp.lucene.sudachi.ja;
 
-import com.worksap.nlp.lucene.sudachi.aliases.BaseTokenStreamTestCase;
 import com.worksap.nlp.test.InMemoryDictionary;
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.tests.analysis.BaseTokenStreamTestCase;
 import org.junit.Test;
 
 import java.io.IOException;

@@ -16,7 +16,6 @@
 
 package com.worksap.nlp.lucene.sudachi.ja
 
-import com.worksap.nlp.lucene.sudachi.aliases.BaseTokenStreamTestCase
 import com.worksap.nlp.lucene.sudachi.ja.input.CopyingInputExtractor
 import com.worksap.nlp.lucene.sudachi.ja.input.NoopInputExtractor
 import com.worksap.nlp.lucene.sudachi.ja.plugin.AnalysisCache
@@ -32,6 +31,7 @@ import org.apache.lucene.analysis.charfilter.MappingCharFilter
 import org.apache.lucene.analysis.charfilter.NormalizeCharMap
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute
+import org.apache.lucene.tests.analysis.BaseTokenStreamTestCase
 import org.apache.lucene.util.AttributeFactory
 import org.junit.Assert
 import org.junit.Before

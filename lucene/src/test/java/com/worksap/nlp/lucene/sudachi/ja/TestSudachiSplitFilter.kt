@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Works Applications Co., Ltd.
+ * Copyright (c) 2022-2026 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@
 
 package com.worksap.nlp.lucene.sudachi.ja
 
-import com.worksap.nlp.lucene.sudachi.aliases.BaseTokenStreamTestCase
 import com.worksap.nlp.test.InMemoryDictionary
 import java.io.IOException
 import org.apache.lucene.analysis.TokenStream
+import org.apache.lucene.tests.analysis.BaseTokenStreamTestCase
 import org.junit.Test
 
 class TestSudachiSplitFilter : BaseTokenStreamTestCase() {

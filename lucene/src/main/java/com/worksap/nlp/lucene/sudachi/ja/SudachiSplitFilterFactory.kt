@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2023 Works Applications Co., Ltd.
+ * Copyright (c) 2020-2026 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 package com.worksap.nlp.lucene.sudachi.ja
 
-import com.worksap.nlp.lucene.aliases.TokenFilterFactory
 import com.worksap.nlp.sudachi.Tokenizer
 import com.worksap.nlp.tools.EnumFlag
+import org.apache.lucene.analysis.TokenFilterFactory
 import org.apache.lucene.analysis.TokenStream
 
 class SudachiSplitFilterFactory(args: MutableMap<String, String>) : TokenFilterFactory(args) {

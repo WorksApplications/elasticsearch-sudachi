@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2023 Works Applications Co., Ltd.
+ * Copyright (c) 2017-2026 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,14 @@
 
 package com.worksap.nlp.lucene.sudachi.ja
 
-import com.worksap.nlp.lucene.aliases.ResourceLoaderArgument
-import com.worksap.nlp.lucene.aliases.ResourceLoaderAware
-import com.worksap.nlp.lucene.aliases.TokenFilterFactory
 import com.worksap.nlp.lucene.sudachi.ja.attributes.SudachiAttribute
 import com.worksap.nlp.lucene.sudachi.ja.util.Stoptags
 import com.worksap.nlp.sudachi.PartialPOS
 import org.apache.lucene.analysis.CharArraySet
+import org.apache.lucene.analysis.TokenFilterFactory
 import org.apache.lucene.analysis.TokenStream
+import org.apache.lucene.util.ResourceLoader
+import org.apache.lucene.util.ResourceLoaderAware
 
 class SudachiPartOfSpeechStopFilterFactory(args: MutableMap<String, String>) :
     TokenFilterFactory(args), ResourceLoaderAware {
@@ -36,7 +36,7 @@ class SudachiPartOfSpeechStopFilterFactory(args: MutableMap<String, String>) :
     this.stopTagFiles = stopTagFiles
   }
 
-  override fun inform(loader: ResourceLoaderArgument?) {
+  override fun inform(loader: ResourceLoader?) {
     val cas: CharArraySet? = getWordSet(loader, stopTagFiles, false)
     if (cas != null) {
       val stopTags = ArrayList<PartialPOS>()

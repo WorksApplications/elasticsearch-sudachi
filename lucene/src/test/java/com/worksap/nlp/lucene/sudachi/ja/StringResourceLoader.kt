@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2023 Works Applications Co., Ltd.
+ * Copyright (c) 2018-2026 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,11 @@
 
 package com.worksap.nlp.lucene.sudachi.ja
 
-import com.worksap.nlp.lucene.aliases.ResourceLoaderArgument
 import java.io.ByteArrayInputStream
 import java.io.InputStream
+import org.apache.lucene.util.ResourceLoader
 
-internal class StringResourceLoader(private val text: String) : ResourceLoaderArgument {
+internal class StringResourceLoader(private val text: String) : ResourceLoader {
   override fun <T> findClass(cname: String?, expectedType: Class<T>?): Class<out T> {
     throw UnsupportedOperationException("not implemented")
   }
