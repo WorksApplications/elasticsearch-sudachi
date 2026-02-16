@@ -48,7 +48,7 @@ configurations { buildSudachiDict }
 
 dependencies {
     buildSudachiDict (project(':spi'))
-    compileOnly(project(':engine'))
+    compileOnly(project(':search'))
     compileOnly(project(':spi'))
     testCompileOnly(project(':testlib'))
     testCompileOnly(project(':subplugin'))
@@ -65,7 +65,7 @@ def compileSystemDictionary = tasks.register("compileTestDictionary", JavaExec) 
     classpath = configurations.buildSudachiDict
     mainClass = "com.worksap.nlp.sudachi.dictionary.DictionaryBuilder"
     defaultCharacterEncoding = "utf-8"
-    def dictRoot = rootProject.file("engine/src/test/resources/dict").toPath()
+    def dictRoot = rootProject.file("search/src/test/resources/dict").toPath()
     def matrixFile = dictRoot.resolve("matrix.def")
     def dataFile = dictRoot.resolve("lex.csv")
     def resultFile = buildDir.toPath().resolve("generated/dict/system.dict")

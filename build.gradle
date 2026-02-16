@@ -11,7 +11,7 @@ version = properties["pluginVersion"]
 
 def embedVersion = tasks.register('embedVersion', Copy) {
     var esKind = sudachiEs.kind.get()
-    from 'engine/src/main/extras/plugin-descriptor.properties'
+    from 'search/src/main/extras/plugin-descriptor.properties'
     into "build/package/${version}/${esKind.engine.kind}-${esKind.version}"
     expand([
             version: version,
@@ -22,8 +22,9 @@ def embedVersion = tasks.register('embedVersion', Copy) {
     inputs.property("elasticSearchVersion", esKind.version)
 }
 
+// list of projects that needs to be bundled beforehand.
 def distProjects = [
-    project('engine'),
+    project('search'),
     project('lucene'),
     project('spi'),
 ]
@@ -54,10 +55,10 @@ def distZip = tasks.register('distZip', Zip) {
     }
 
     // collect other projects removing spi jars.
-    // use :engine only, which is the root of dependency.
+    // collecting root project (:search) is enough to pick sub projects (:lucene).
     into('') {
-        from(project('engine').tasks.named('jar').flatMap { it.archiveFile })
-        def runtimeJars = new LinkedHashSet(runtimeJarfiles(project('engine')))
+        from(project('search').tasks.named('jar').flatMap { it.archiveFile })
+        def runtimeJars = new LinkedHashSet(runtimeJarfiles(project('search')))
         runtimeJars.removeAll(spiJars)
         from(runtimeJars)
     }
