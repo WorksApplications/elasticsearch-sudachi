@@ -93,7 +93,7 @@ esTestEnv {
     def packageDir = rootDir.toPath().resolve("build/package/${version}/${esKind.engine.kind}-${esKind.version}")
     bundlePath = packageDir
     systemDic = compileSystemDictionary.get().outputs.files.singleFile.toPath()
-    configFile = rootProject.rootDir.toPath().resolve("src/test/resources/com/worksap/nlp/lucene/sudachi/ja/sudachi.json")
+    configFile = rootProject.rootDir.toPath().resolve("lucene/src/test/resources/com/worksap/nlp/lucene/sudachi/ja/sudachi.json")
     additionalJars.add(project(":testlib").getTasksByName('jar', false).first().outputs.files.singleFile.toPath())
     addPlugin("analysis-icu", downloadIcuPlugin)
     addPlugin('sudachi-sub', project(':subplugin').getTasksByName('distZip', false).first())
