@@ -33,13 +33,13 @@ def runtimeJarfiles(Project p) {
     p.configurations.runtimeClasspath.resolve().findAll { it.name.endsWith('.jar') }
 }
 
-def distZip = tasks.register('distZip', Zip) {
+def stageBundle = tasks.register('stageBundle', Copy) {
     dependsOn distProjects.collect { it.tasks.named('jar') }
     dependsOn embedVersion
 
     var esKind = sudachiEs.kind.get()
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    archiveBaseName.set("${esKind.engine.kind}-${esKind.version}-$archivesBaseName")
+    into("build/package/${version}/${esKind.engine.kind}-${esKind.version}")
 
     // put spi to subdir if possible
     def spiJars = new LinkedHashSet(runtimeJarfiles(project('spi')))
@@ -54,7 +54,6 @@ def distZip = tasks.register('distZip', Zip) {
         }
     }
 
-    // collect other projects removing spi jars.
     // collecting root project (:search) is enough to pick sub projects (:lucene).
     into('') {
         from(project('search').tasks.named('jar').flatMap { it.archiveFile })
@@ -62,8 +61,16 @@ def distZip = tasks.register('distZip', Zip) {
         runtimeJars.removeAll(spiJars)
         from(runtimeJars)
     }
+}
 
-    from("build/package/${version}/${esKind.engine.kind}-${esKind.version}", 'LICENSE', 'README.md')
+def distZip = tasks.register('distZip', Zip) {
+    dependsOn stageBundle
+
+    var esKind = sudachiEs.kind.get()
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    archiveBaseName.set("${esKind.engine.kind}-${esKind.version}-$archivesBaseName")
+
+    from(stageBundle.map { it.destinationDir }, 'LICENSE', 'README.md')
 }
 
 artifacts {
