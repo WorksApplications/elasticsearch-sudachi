@@ -2,11 +2,10 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id 'java-library'
-    id 'org.jetbrains.kotlin.jvm' version '1.9.22'
-    id 'org.jetbrains.kotlin.plugin.serialization' version '1.9.22'
+    id 'org.jetbrains.kotlin.jvm'
+    id 'org.jetbrains.kotlin.plugin.serialization'
+    id 'org.jetbrains.kotlinx.kover'
     id 'com.diffplug.spotless'
-    id 'org.jetbrains.kotlinx.kover' version '0.7.0'
-
     id 'com.worksap.nlp.sudachi.es'
     id 'com.worksap.nlp.sudachi.esc'
 }

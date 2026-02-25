@@ -6,6 +6,7 @@ plugins {
     id 'com.worksap.nlp.sudachi.esc'
     id 'com.diffplug.spotless'
     id 'org.jetbrains.kotlin.jvm'
+    id 'org.jetbrains.kotlinx.kover'
     id 'org.sonarqube'
 }
 

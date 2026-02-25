@@ -1,7 +1,9 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.9.22'
+    id "org.jetbrains.kotlin.plugin.serialization" version "1.9.22"
     id 'com.diffplug.spotless' version '6.16.0'
     id 'org.sonarqube' version '4.0.0.2929'
+    id 'org.jetbrains.kotlinx.kover' version '0.9.7'
     id 'io.github.gradle-nexus.publish-plugin' version "1.3.0"
     id 'com.worksap.nlp.sudachi.esc'
     id 'com.worksap.nlp.sudachi.es'
@@ -9,6 +11,14 @@ plugins {
 
 archivesBaseName = 'analysis-sudachi'
 version = properties["pluginVersion"]
+
+// define dependencies for kover merged report
+dependencies {
+    kover(project(':search'))
+    kover(project(':lucene'))
+    kover(project(':integration'))
+    kover(project(':testlib'))
+}
 
 def embedVersion = tasks.register('embedVersion', Copy) {
     var esKind = sudachiEs.kind.get()
@@ -93,11 +103,29 @@ spotless {
     }
 }
 
+kover {
+    reports {
+        total {
+            xml {
+                xmlFile = file("$buildDir/reports/kover/xml/report.xml")
+            }
+        }
+    }
+}
+
+tasks.named("sonarqube") {
+    dependsOn("koverXmlReport")
+}
+
 sonarqube {
     properties {
         property "sonar.projectKey", "WorksApplications_elasticsearch-sudachi"
         property "sonar.organization", "worksapplications"
         property "sonar.host.url", "https://sonarcloud.io"
+
+        property("sonar.coverage.jacoco.xmlReportPaths",
+            "${project.rootDir}/build/reports/kover/xml/report.xml"
+        )
     }
 }
 

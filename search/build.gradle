@@ -2,11 +2,11 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id 'java-library'
-    id 'org.jetbrains.kotlin.jvm' version '1.9.22'
-    id "org.jetbrains.kotlin.plugin.serialization" version "1.9.22"
+    id 'org.jetbrains.kotlin.jvm'
+    id 'org.jetbrains.kotlin.plugin.serialization'
+    id 'org.jetbrains.kotlinx.kover'
     id 'com.diffplug.spotless'
-    id 'org.sonarqube' version '4.0.0.2929'
-    id("org.jetbrains.kotlinx.kover") version "0.7.0"
+    id 'org.sonarqube'
     id 'com.worksap.nlp.sudachi.esc'
     id 'com.worksap.nlp.sudachi.es'
 }
@@ -56,17 +56,6 @@ dependencies {
         exclude(group: 'org.hamcrest')
     }
     testImplementation('org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3')
-    kover(project(':integration'))
-    kover(project(':lucene'))
-    kover(project(':testlib'))
-}
-
-koverReport {
-    defaults {
-        xml {
-            setReportFile(layout.buildDirectory.file("reports/jacoco/test/jacocoTestReport.xml"))
-        }
-    }
 }
 
 // See https://github.com/diffplug/spotless/tree/main/plugin-gradle

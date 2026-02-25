@@ -8,6 +8,7 @@ plugins {
     id 'com.worksap.nlp.sudachi.es.testenv'
     id 'com.diffplug.spotless'
     id 'org.jetbrains.kotlin.jvm'
+    id 'org.jetbrains.kotlinx.kover'
     id 'de.undercouch.download' version '5.4.0'
 }
 
