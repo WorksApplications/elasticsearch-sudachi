@@ -1,11 +1,12 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
+    id 'com.diffplug.spotless'
     id 'java-library'
     id 'org.jetbrains.kotlin.jvm'
     id 'org.jetbrains.kotlin.plugin.serialization'
     id 'org.jetbrains.kotlinx.kover'
-    id 'com.diffplug.spotless'
+
     id 'com.worksap.nlp.sudachi.es'
     id 'com.worksap.nlp.sudachi.esc'
 }

@@ -70,6 +70,11 @@ class StringProvider implements Provider<String>, Serializable {
     }
 
     @Override
+    Provider<String> filter(Spec<String> spec) {
+        throw new IllegalStateException("not implemented")
+    }
+
+    @Override
     def <S> Provider<S> map(Transformer<? extends S, ? super String> transformer) {
         throw new IllegalStateException("not implemented")
     }
@@ -101,11 +106,6 @@ class StringProvider implements Provider<String>, Serializable {
 
     @Override
     def <U, R> Provider<R> zip(Provider<U> right, BiFunction<? super String, ? super U, ? extends R> combiner) {
-        throw new IllegalStateException("not implemented")
-    }
-
-    @Override
-    Provider<String> filter(Spec<? super String> spec) {
         throw new IllegalStateException("not implemented")
     }
 

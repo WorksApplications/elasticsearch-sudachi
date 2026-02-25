@@ -1,13 +1,14 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    id 'java-library'
-    id 'com.worksap.nlp.sudachi.es'
-    id 'com.worksap.nlp.sudachi.esc'
     id 'com.diffplug.spotless'
+    id 'java-library'
     id 'org.jetbrains.kotlin.jvm'
     id 'org.jetbrains.kotlinx.kover'
     id 'org.sonarqube'
+
+    id 'com.worksap.nlp.sudachi.es'
+    id 'com.worksap.nlp.sudachi.esc'
 }
 
 version = properties["pluginVersion"]
@@ -62,14 +63,14 @@ spotless {
         target '*.gradle', '*.md', '.gitignore', '*.txt', '*.csv'
 
         trimTrailingWhitespace()
-        indentWithSpaces(2)
+        leadingTabsToSpaces(2)
         endWithNewline()
     }
     java {
         // don't need to set target, it is inferred from java
         // version list: https://github.com/diffplug/spotless/tree/main/lib-extra/src/main/resources/com/diffplug/spotless/extra/eclipse_jdt_formatter
 
-        eclipse('4.21.0').configFile(formatter.resolve('eclipse-formatter.xml'))
+        eclipse('4.21').configFile(formatter.resolve('eclipse-formatter.xml'))
         licenseHeaderFile(formatter.resolve('license-header'))
     }
 }
