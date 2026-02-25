@@ -42,6 +42,7 @@ interface InputExtractor {
     fun make(maxSize: Int?): InputExtractor {
       val actualMaxSize = maxSize ?: DEFAUlT_MAX_INPUT
       return if (InputExtractorBootstrap.ZERO_COPY === NoopInputExtractor.INSTANCE) {
+        // skip chaining because the initialization of ZERO_COPY seems failed.
         CopyingInputExtractor(actualMaxSize)
       } else {
         ChainedExtractor(InputExtractorBootstrap.ZERO_COPY, CopyingInputExtractor(actualMaxSize))

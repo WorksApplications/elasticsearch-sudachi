@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Works Applications Co., Ltd.
+ * Copyright (c) 2022-2026 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 
 package com.worksap.nlp.lucene.sudachi.ja.input
 
+import java.io.Reader
+import java.io.StringReader
 import kotlin.test.*
 import org.apache.lucene.analysis.Analyzer
 import org.apache.lucene.analysis.Tokenizer
@@ -28,6 +30,33 @@ import org.apache.lucene.store.ByteBuffersDirectory
 import org.junit.Test
 
 class InputExtractorTest {
+  @Test
+  fun inputExtractorMakeUsesExpectedImplementation() {
+    val extractor = InputExtractor.make(16)
+    if (InputExtractorBootstrap.ZERO_COPY === NoopInputExtractor.INSTANCE) {
+      assertTrue(extractor is CopyingInputExtractor)
+    } else {
+      assertTrue(extractor is ChainedExtractor)
+    }
+  }
+
+  @Test
+  fun useCopyingInputExtractor() {
+    val extractor = CopyingInputExtractor(2);
+
+    val extracted = extractor.extract(StringReader("hello"))
+    val expected = ExtractionResult("he", true)
+    assertEquals(expected, extracted)
+    assertTrue(extractor.canExtract(StringReader("x")))
+  }
+
+  @Test
+  fun useReusableReaderVarHandleExtractor() {
+    val extracted = ReusableReaderVarHandleExtractor.INSTANCE.extract(StringReader("hello"))
+    assertSame(ExtractionResult.EMPTY_HAS_REMAINING, extracted)
+    assertFalse(ReusableReaderVarHandleExtractor.INSTANCE.canExtract(StringReader("x")))
+  }
+
   private val dir = ByteBuffersDirectory()
 
   private class ExtractorTextStream(
@@ -87,5 +116,44 @@ class InputExtractorTest {
     val extracted = extract(CopyingInputExtractor(512), "")
     assertEquals("", extracted.data)
     assertFalse(extracted.remaining)
+  }
+
+  private class StubExtractor(
+      private val name: String,
+      private val canExtractValue: Boolean,
+      private val result: ExtractionResult,
+  ) : InputExtractor {
+    override fun extract(input: Reader): ExtractionResult = result
+
+    override fun canExtract(input: Reader): Boolean = canExtractValue
+
+    override fun toString(): String = name
+  }
+
+  @Test
+  fun chainedExtractorUsesFirstAndDescribesChain() {
+    val first = StubExtractor("first", true, ExtractionResult("first", remaining = false))
+    val fallback = StubExtractor("fallback", true, ExtractionResult("fallback", remaining = true))
+    val chained = ChainedExtractor(first, fallback)
+    val extracted = chained.extract(StringReader("ignored"))
+    assertEquals("first", extracted.data)
+    assertFalse(extracted.remaining)
+    assertTrue(chained.canExtract(StringReader("ignored")))
+
+    val description = chained.toString()
+    assertTrue(description.startsWith("ChainedExtractor["))
+    assertTrue(description.contains("first"))
+    assertTrue(description.contains("fallback"))
+  }
+
+  @Test
+  fun chainedExtractorUsesFallback() {
+    val first = StubExtractor("first", false, ExtractionResult("first", remaining = false))
+    val fallback = StubExtractor("fallback", true, ExtractionResult("fallback", remaining = true))
+    val chained = ChainedExtractor(first, fallback)
+    val extracted = chained.extract(StringReader("ignored"))
+    assertEquals("fallback", extracted.data)
+    assertTrue(extracted.remaining)
+    assertTrue(chained.canExtract(StringReader("ignored")))
   }
 }
