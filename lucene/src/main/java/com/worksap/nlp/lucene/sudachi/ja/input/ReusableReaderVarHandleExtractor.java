@@ -23,9 +23,9 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
 
 public class ReusableReaderVarHandleExtractor implements InputExtractor {
-    private final static Class<? extends Reader> TARGET_CLASS;
-    private final static VarHandle S_FIELD;
-    public final static ReusableReaderVarHandleExtractor INSTANCE = new ReusableReaderVarHandleExtractor();
+    private static final Class<? extends Reader> TARGET_CLASS;
+    private static final VarHandle S_FIELD;
+    public static final ReusableReaderVarHandleExtractor INSTANCE = new ReusableReaderVarHandleExtractor();
 
     static {
         try {

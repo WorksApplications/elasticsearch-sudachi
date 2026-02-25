@@ -112,8 +112,6 @@ class ReloadAwareImpl<T>(private val factory: Function<Dictionary, T>) : ReloadA
   }
 }
 
-/**
- */
 public class ReloadableTokenizer(private val dictionary: ReloadableDictionary) : CurrentTokenizer {
   private var version = 0L
   private var tokenizer = run {

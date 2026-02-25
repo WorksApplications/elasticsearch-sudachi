@@ -68,12 +68,10 @@ class ConfigAdapter(anchor: PathAnchor, settings: Settings, env: Environment) {
 
     @JvmStatic
     fun splitMode(settings: Settings): SplitMode {
-      if (settings.get(PARAM_SPLIT_MODE_DEPRECATED, null) != null) {
-        throw IllegalArgumentException(
-            "Setting $PARAM_SPLIT_MODE_DEPRECATED is deprecated, use $PARAM_SPLIT_MODE instead",
-        )
+      require(settings.get(PARAM_SPLIT_MODE_DEPRECATED, null) == null) {
+        "Setting $PARAM_SPLIT_MODE_DEPRECATED is deprecated, use $PARAM_SPLIT_MODE instead"
       }
-      return SplitModeFlag.from_string(settings.get(SplitModeFlag.name, null))
+      return SplitModeFlag.fromString(settings.get(SplitModeFlag.name, null))
     }
 
     private fun readDefaultConfig(root: Path, baseAnchor: PathAnchor): Config {

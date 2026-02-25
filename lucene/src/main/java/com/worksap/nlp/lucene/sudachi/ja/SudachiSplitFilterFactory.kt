@@ -22,8 +22,8 @@ import org.apache.lucene.analysis.TokenFilterFactory
 import org.apache.lucene.analysis.TokenStream
 
 class SudachiSplitFilterFactory(args: MutableMap<String, String>) : TokenFilterFactory(args) {
-  private val mode = Mode.from_string(args.remove(Mode.name))
-  private val splitMode = SplitMode.from_string(args.remove(Mode.name))
+  private val mode = Mode.fromString(args.remove(Mode.name))
+  private val splitMode = SplitMode.fromString(args.remove(Mode.name))
 
   init {
     require(args.isEmpty()) { "Unknown parameters: $args" }

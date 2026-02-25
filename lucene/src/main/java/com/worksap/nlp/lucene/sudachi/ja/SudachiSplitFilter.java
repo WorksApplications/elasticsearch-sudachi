@@ -18,7 +18,6 @@ package com.worksap.nlp.lucene.sudachi.ja;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.ListIterator;
 
 import com.worksap.nlp.lucene.sudachi.ja.attributes.*;
 import com.worksap.nlp.lucene.sudachi.ja.util.Strings;
@@ -118,7 +117,6 @@ public class SudachiSplitFilter extends TokenFilter {
     }
 
     private int correctOffset(int currectOff) {
-        // assert (0 <= currectOff && currectOff <= this.offsetMap.size());
         return this.offsetMap.get(currectOff);
     }
 

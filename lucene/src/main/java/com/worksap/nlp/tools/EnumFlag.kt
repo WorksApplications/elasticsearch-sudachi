@@ -25,7 +25,7 @@ import java.lang.reflect.ParameterizedType
  * Usage:
  * ```
  *   object: EnumFlag<FooEnum>("foo", FooEnum.DEFAULT)
- *   val mode = object.from_string(args.get(key, null))
+ *   val mode = object.fromString(args.get(key, null))
  * ```
  */
 public abstract class EnumFlag<T : Enum<T>>(val name: String, private val default: T? = null) {
@@ -37,7 +37,7 @@ public abstract class EnumFlag<T : Enum<T>>(val name: String, private val defaul
   }
   private val values: Array<T> = enumClazz.enumConstants
 
-  fun from_string(raw: String?): T {
+  fun fromString(raw: String?): T {
     if (raw == null) {
       if (default != null) {
         return default

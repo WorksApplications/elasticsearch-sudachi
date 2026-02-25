@@ -23,7 +23,10 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 
 public class InputExtractorBootstrap {
-    private final static Logger logger = LogManager.getLogger(InputExtractorBootstrap.class);
+    private static final Logger logger = LogManager.getLogger(InputExtractorBootstrap.class);
+
+    private InputExtractorBootstrap() {
+    }
 
     @NotNull
     public static final InputExtractor ZERO_COPY;

@@ -48,23 +48,19 @@ public class AnalysisCache(private val cache: InnerCache, private val extractor:
 
   /** Use [com.worksap.nlp.lucene.sudachi.ja.CachingTokenizer.tokenize] instead of this method. */
   internal fun analyze(tokenizer: Tokenizer, mode: SplitMode, input: Reader): MorphemeIterator {
-    if (cache.capacity <= 0) {
+    if (cache.capacity <= 0 || !extractor.canExtract(input)) {
       return NonCachedAnalysis(tokenizer, input, mode)
     }
-    if (extractor.canExtract(input)) {
-      val extracted = extractor.extract(input)
-      if (extracted.remaining) {
-        if (extracted.data.isEmpty()) {
-          return NonCachedAnalysis(tokenizer, input, mode)
-        }
-        val reader = ConcatenatingReader(extracted.data, input)
-        return NonCachedAnalysis(tokenizer, reader, mode)
-      } else {
-        return cached(extracted.data, mode, tokenizer)
-      }
-    } else {
+
+    val extracted = extractor.extract(input)
+    if (!extracted.remaining) {
+      return cached(extracted.data, mode, tokenizer)
+    }
+    if (extracted.data.isEmpty()) {
       return NonCachedAnalysis(tokenizer, input, mode)
     }
+    val reader = ConcatenatingReader(extracted.data, input)
+    return NonCachedAnalysis(tokenizer, reader, mode)
   }
 
   private fun cached(input: String, mode: SplitMode, tokenizer: Tokenizer): MorphemeIterator {

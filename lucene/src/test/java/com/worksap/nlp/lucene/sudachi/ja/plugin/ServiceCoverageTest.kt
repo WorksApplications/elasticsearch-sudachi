@@ -36,7 +36,7 @@ class ServiceCoverageTest {
             config,
             SplitMode.C,
             capacity = null,
-            max_input_size = null,
+            maxInputSize = null,
         )
     val second =
         service.analysisCache(
@@ -44,7 +44,7 @@ class ServiceCoverageTest {
             config,
             SplitMode.C,
             capacity = null,
-            max_input_size = null,
+            maxInputSize = null,
         )
     assertSame(first, second)
 
@@ -54,7 +54,7 @@ class ServiceCoverageTest {
             config,
             SplitMode.C,
             capacity = null,
-            max_input_size = null,
+            maxInputSize = null,
         )
     assertNotSame(first, another)
   }

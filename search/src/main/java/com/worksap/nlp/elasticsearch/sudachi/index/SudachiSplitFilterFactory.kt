@@ -32,8 +32,8 @@ class SudachiSplitFilterFactory(
     settings: Settings
 ) : AbstractTokenFilterFactory(indexSettings, env, name, settings) {
 
-  private val mode = Mode.from_string(settings.get(Mode.name, null))
-  private val splitMode = SplitMode.from_string(settings.get(SplitMode.name, null))
+  private val mode = Mode.fromString(settings.get(Mode.name, null))
+  private val splitMode = SplitMode.fromString(settings.get(SplitMode.name, null))
 
   override fun create(tokenStream: TokenStream): TokenStream {
     return SudachiSplitFilter(tokenStream, mode, splitMode)

@@ -22,11 +22,17 @@ import org.apache.lucene.util.AttributeImpl
 import org.apache.lucene.util.AttributeReflector
 
 class SudachiAttributeImpl : AttributeImpl(), SudachiAttribute {
+  /** No-op because all tokens from a Sudachi tokenizer shares same Sudahi instance. */
   override fun clear() {}
 
+  /** Skip explain api. */
   override fun reflectWith(reflector: AttributeReflector?) {}
 
-  override fun copyTo(target: AttributeImpl?) {}
+  override fun copyTo(target: AttributeImpl?) {
+    (target as? SudachiAttributeImpl)?.let {
+      it.dictionary = this.dictionary
+    }
+  }
 
   private var dictionary: ReloadableDictionary? = null
 

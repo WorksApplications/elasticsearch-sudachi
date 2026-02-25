@@ -32,7 +32,8 @@ public class Strings {
             return false;
         }
 
-        for (int idx = 0; idx < length;) {
+        int idx = 0;
+        while (idx < length) {
             int codePt = Character.codePointAt(str, idx);
             if (!hasType(codePt, PUNCTUATION_MASK)) {
                 return false;

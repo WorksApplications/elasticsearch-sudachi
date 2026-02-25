@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 
 public class Romanizer {
+    private Romanizer() {
+    }
 
     /*
      * Romanize katakana

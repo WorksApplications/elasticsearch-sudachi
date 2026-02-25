@@ -23,7 +23,7 @@ import java.lang.ref.WeakReference
 import java.util.concurrent.ConcurrentHashMap
 import org.apache.logging.log4j.LogManager
 
-public interface InnerCacheBuilder {
+public fun interface InnerCacheBuilder {
     fun build(capacity: Int): InnerCache
 }
 
@@ -44,13 +44,13 @@ public class AnalysisCacheService(private val cacheBuilder: InnerCacheBuilder) {
       config: Config,
       mode: SplitMode,
       capacity: Int?,
-      max_input_size: Int?,
+      maxInputSize: Int?,
   ): AnalysisCache {
     val actualCapacity = capacity ?: DEFAULT_CACHE_SIZE
     val key = Key(indexName, config, actualCapacity)
     val entry =
         caches.computeIfAbsent(key) { k ->
-          val extractor = InputExtractor.make(max_input_size)
+          val extractor = InputExtractor.make(maxInputSize)
           logger.debug(
               "creating new cache service for {}, size={}, extractor={}",
               key,
@@ -63,7 +63,7 @@ public class AnalysisCacheService(private val cacheBuilder: InnerCacheBuilder) {
     if (result == null) {
       caches.remove(key)
       // retry creation via recursion
-      return analysisCache(indexName, config, mode, actualCapacity, max_input_size)
+      return analysisCache(indexName, config, mode, actualCapacity, maxInputSize)
     }
     return result
   }

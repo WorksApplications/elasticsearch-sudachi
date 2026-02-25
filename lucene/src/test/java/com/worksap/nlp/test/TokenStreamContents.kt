@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Works Applications Co., Ltd.
+ * Copyright (c) 2022-2026 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,7 +56,7 @@ class TokenStreamContents(private val finalOffset: Int, private vararg val token
   fun check(stream: TokenStream) {
     // static methods seems to be non-callable from Kotlin classes
     // so going via Java class indirection
-    AssertRunnerTest.assertTokenStreamContents(
+    AssertRunnerTestCase.assertTokenStreamContents(
         stream, tokens, _startOffsets, _endOffsets, _posIncrements, _posLengths, finalOffset)
   }
 

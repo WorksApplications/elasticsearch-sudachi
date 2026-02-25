@@ -32,6 +32,7 @@ public class TestSudachiPartOfSpeechStopFilter extends BaseTokenStreamTestCase {
     SudachiPartOfSpeechStopFilterFactory factory;
 
     @Before
+    @Override
     public void setUp() throws Exception {
         super.setUp();
         InMemoryDictionary imd = new InMemoryDictionary();
@@ -42,60 +43,45 @@ public class TestSudachiPartOfSpeechStopFilter extends BaseTokenStreamTestCase {
         factory = new SudachiPartOfSpeechStopFilterFactory(args);
     }
 
-    @Test
-    public void testAllPOS() throws IOException {
-        String tags = "動詞,非自立可能\n名詞,固有名詞,地名,一般\n";
+    void assertFilteredContents(String tags, String[] expected) throws IOException {
         factory.inform(new StringResourceLoader(tags));
         tokenStream = factory.create(tokenStream);
-        assertTokenStreamContents(tokenStream, new String[] { "都", "に", "た" });
+        assertTokenStreamContents(tokenStream, expected);
+    }
+
+    @Test
+    public void testAllPOS() throws IOException {
+        assertFilteredContents("動詞,非自立可能\n名詞,固有名詞,地名,一般\n", new String[] { "都", "に", "た" });
     }
 
     @Test
     public void testPrefix() throws IOException {
-        String tags = "動詞\n名詞,固有名詞\n";
-        factory.inform(new StringResourceLoader(tags));
-        tokenStream = factory.create(tokenStream);
-        assertTokenStreamContents(tokenStream, new String[] { "都", "に", "た" });
+        assertFilteredContents("動詞\n名詞,固有名詞\n", new String[] { "都", "に", "た" });
     }
 
     @Test
     public void testConjugationType() throws IOException {
-        String tags = "*,*,*,*,五段-カ行\n";
-        factory.inform(new StringResourceLoader(tags));
-        tokenStream = factory.create(tokenStream);
-        assertTokenStreamContents(tokenStream, new String[] { "東京", "都", "に", "た" });
+        assertFilteredContents("*,*,*,*,五段-カ行\n", new String[] { "東京", "都", "に", "た" });
     }
 
     @Test
     public void testConjugationTypeAndForm() throws IOException {
-        String tags = "*,*,*,*,五段-カ行,終止形-一般\n";
-        factory.inform(new StringResourceLoader(tags));
-        tokenStream = factory.create(tokenStream);
-        assertTokenStreamContents(tokenStream, new String[] { "東京", "都", "に", "行っ", "た" });
+        assertFilteredContents("*,*,*,*,五段-カ行,終止形-一般\n", new String[] { "東京", "都", "に", "行っ", "た" });
     }
 
     @Test
     public void testConjugationForm() throws IOException {
-        String tags = "*,*,*,*,*,終止形-一般\n";
-        factory.inform(new StringResourceLoader(tags));
-        tokenStream = factory.create(tokenStream);
-        assertTokenStreamContents(tokenStream, new String[] { "東京", "都", "に", "行っ" });
+        assertFilteredContents("*,*,*,*,*,終止形-一般\n", new String[] { "東京", "都", "に", "行っ" });
     }
 
     @Test
     public void testPrefixWithUnmatchedSubcategory() throws IOException {
-        String tags = "助詞,格助詞\n助詞,格助詞,引用\n";
-        factory.inform(new StringResourceLoader(tags));
-        tokenStream = factory.create(tokenStream);
-        assertTokenStreamContents(tokenStream, new String[] { "東京", "都", "行っ", "た" });
+        assertFilteredContents("助詞,格助詞\n助詞,格助詞,引用\n", new String[] { "東京", "都", "行っ", "た" });
     }
 
     @Test
     public void testTooLongCategory() throws IOException {
-        String tags = "名詞,固有名詞,地名,一般,一般\n";
-        factory.inform(new StringResourceLoader(tags));
-        tokenStream = factory.create(tokenStream);
-        assertTokenStreamContents(tokenStream, new String[] { "東京", "都", "に", "行っ", "た" });
+        assertFilteredContents("名詞,固有名詞,地名,一般,一般\n", new String[] { "東京", "都", "に", "行っ", "た" });
     }
 
 }
