@@ -12,10 +12,6 @@ plugins {
     id 'com.worksap.nlp.sudachi.esc'
 }
 
-group = 'com.worksap.nlp'
-archivesBaseName = 'analysis-sudachi'
-version = properties["pluginVersion"]
-
 // JVM target is determined by engine version (OpenSearch 3.0+ requires JVM 21)
 def jvmVersion = sudachiEs.jvmVersion()
 def jvmTargetVersion = jvmVersion == 21 ? JvmTarget.JVM_21 : JvmTarget.JVM_17
@@ -76,7 +72,7 @@ spotless {
     java {
         // don't need to set target, it is inferred from java
         // version list: https://github.com/diffplug/spotless/tree/main/lib-extra/src/main/resources/com/diffplug/spotless/extra/eclipse_jdt_formatter
-        eclipse('4.21.0').configFile(formatter.resolve('eclipse-formatter.xml'))
+        eclipse('4.21').configFile(formatter.resolve('eclipse-formatter.xml'))
         licenseHeaderFile(formatter.resolve('license-header'))
     }
     kotlin {

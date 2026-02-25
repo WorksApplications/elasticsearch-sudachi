@@ -11,8 +11,6 @@ plugins {
     id 'com.worksap.nlp.sudachi.esc'
 }
 
-version = properties["pluginVersion"]
-
 // JVM target is determined by engine version (OpenSearch 3.0+ requires JVM 21)
 def jvmVersion = sudachiEs.jvmVersion()
 def jvmTargetVersion = jvmVersion == 21 ? JvmTarget.JVM_21 : JvmTarget.JVM_17

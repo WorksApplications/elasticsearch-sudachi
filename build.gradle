@@ -10,8 +10,7 @@ plugins {
     id 'com.worksap.nlp.sudachi.esc'
 }
 
-group = 'com.worksap.nlp'
-base.archivesName = 'analysis-sudachi'
+base.archivesName = properties["analysis-sudachi"]
 version = properties["pluginVersion"]
 
 // define dependencies for kover merged report

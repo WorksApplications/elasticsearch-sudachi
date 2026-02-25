@@ -8,7 +8,6 @@ plugins {
     id 'com.worksap.nlp.sudachi.esc'
 }
 
-group = 'com.worksap.nlp'
 version = properties["pluginVersion"]
 description = "Plugin interface for Sudachi search engine integrations (ElasticSearch and OpenSearch)"
 
