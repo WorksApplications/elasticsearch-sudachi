@@ -1,0 +1,70 @@
+/*
+ * Copyright (c) 2022-2026 Works Applications Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.worksap.nlp.lucene.sudachi.ja.plugin
+
+import com.worksap.nlp.lucene.sudachi.ja.input.InputExtractor
+import com.worksap.nlp.sudachi.Config
+import com.worksap.nlp.sudachi.Tokenizer.SplitMode
+import java.lang.ref.WeakReference
+import java.util.concurrent.ConcurrentHashMap
+import org.apache.logging.log4j.LogManager
+
+public fun interface InnerCacheBuilder {
+    fun build(capacity: Int): InnerCache
+}
+
+public class AnalysisCacheService(private val cacheBuilder: InnerCacheBuilder) {
+  data class Key(val indexName: String, val config: Config, val capacity: Int)
+  // we use WeakReference here because the main reference will reside in per-index factories
+  private val caches = ConcurrentHashMap<Key, WeakReference<AnalysisCache>>()
+
+  companion object {
+    const val CACHE_SIZE_SETTING_KEY = "cache-size"
+    const val DEFAULT_CACHE_SIZE = 32
+    const val MAX_INPUT_SETTING_KEY = InputExtractor.MAX_INPUT_SETTING_KEY
+    private val logger = LogManager.getLogger(AnalysisCacheService::class.java)
+  }
+
+  fun analysisCache(
+      indexName: String,
+      config: Config,
+      mode: SplitMode,
+      capacity: Int?,
+      maxInputSize: Int?,
+  ): AnalysisCache {
+    val actualCapacity = capacity ?: DEFAULT_CACHE_SIZE
+    val key = Key(indexName, config, actualCapacity)
+    val entry =
+        caches.computeIfAbsent(key) { k ->
+          val extractor = InputExtractor.make(maxInputSize)
+          logger.debug(
+              "creating new cache service for {}, size={}, extractor={}",
+              key,
+              k.capacity,
+              extractor)
+          val x = AnalysisCache(cacheBuilder.build(k.capacity), extractor)
+          WeakReference(x)
+        }
+    val result = entry.get()
+    if (result == null) {
+      caches.remove(key)
+      // retry creation via recursion
+      return analysisCache(indexName, config, mode, actualCapacity, maxInputSize)
+    }
+    return result
+  }
+}

@@ -2,15 +2,17 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id 'java-library'
+    id 'org.jetbrains.kotlin.jvm'
+    id 'org.jetbrains.kotlin.plugin.serialization'
+    id 'org.jetbrains.kotlinx.kover'
+    id 'com.diffplug.spotless'
     id 'com.worksap.nlp.sudachi.es'
     id 'com.worksap.nlp.sudachi.esc'
-    id 'com.diffplug.spotless'
-    id 'org.jetbrains.kotlin.jvm'
-    id 'org.jetbrains.kotlinx.kover'
-    id 'org.sonarqube'
 }
 
+group = 'com.worksap.nlp'
 version = properties["pluginVersion"]
+description = "Main logic for Sudachi search engine integrations (ElasticSearch and OpenSearch)"
 
 // JVM target is determined by engine version (OpenSearch 3.0+ requires JVM 21)
 def jvmVersion = sudachiEs.jvmVersion()
@@ -20,6 +22,8 @@ def javaVersion = jvmVersion == 21 ? JavaVersion.VERSION_21 : JavaVersion.VERSIO
 java {
     sourceCompatibility = javaVersion
     targetCompatibility = javaVersion
+    withJavadocJar()
+    withSourcesJar()
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -35,21 +39,30 @@ compileTestKotlin {
 }
 
 // For OpenSearch 3.0+, we need to tell Gradle that JDK 21+ libraries are compatible
-if (jvmVersion >= 21) {
+if (sudachiEs.jvmVersion() >= 21) {
     configurations.all {
         attributes {
-            attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, jvmVersion)
+            attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, sudachiEs.jvmVersion())
         }
     }
 }
 
 dependencies {
-    implementation(project(':spi'))
-    testCompileOnly('junit:junit:4.13.1')
+    api(project(':spi'))
+    api('com.worksap.nlp:sudachi:0.7.4')
+
+    testImplementation(project(':testlib'))
     testImplementation('org.apache.logging.log4j:log4j-core:2.17.2')
     testImplementation('org.jetbrains.kotlin:kotlin-test-junit') {
-        transitive = false
+        exclude(group: 'org.hamcrest')
     }
+    testImplementation('org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3')
+}
+
+tasks.named('jar', Jar) {
+    archiveBaseName.set("sudachi-search-lucene")
+    from(sourceSets.main.output)
+    dependsOn(tasks.named('classes'))
 }
 
 spotless {
@@ -72,9 +85,4 @@ spotless {
         eclipse('4.21.0').configFile(formatter.resolve('eclipse-formatter.xml'))
         licenseHeaderFile(formatter.resolve('license-header'))
     }
-}
-
-sonar {
-    // this project is only for tests, do not analyze it
-    skipProject = true
 }

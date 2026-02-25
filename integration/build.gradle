@@ -8,6 +8,7 @@ plugins {
     id 'com.worksap.nlp.sudachi.es.testenv'
     id 'com.diffplug.spotless'
     id 'org.jetbrains.kotlin.jvm'
+    id 'org.jetbrains.kotlinx.kover'
     id 'de.undercouch.download' version '5.4.0'
 }
 
@@ -48,7 +49,7 @@ configurations { buildSudachiDict }
 
 dependencies {
     buildSudachiDict (project(':spi'))
-    compileOnly(project(':'))
+    compileOnly(project(':search'))
     compileOnly(project(':spi'))
     testCompileOnly(project(':testlib'))
     testCompileOnly(project(':subplugin'))
@@ -65,7 +66,7 @@ def compileSystemDictionary = tasks.register("compileTestDictionary", JavaExec) 
     classpath = configurations.buildSudachiDict
     mainClass = "com.worksap.nlp.sudachi.dictionary.DictionaryBuilder"
     defaultCharacterEncoding = "utf-8"
-    def dictRoot = rootProject.file("src/test/resources/dict").toPath()
+    def dictRoot = rootProject.file("search/src/test/resources/dict").toPath()
     def matrixFile = dictRoot.resolve("matrix.def")
     def dataFile = dictRoot.resolve("lex.csv")
     def resultFile = buildDir.toPath().resolve("generated/dict/system.dict")
@@ -93,7 +94,7 @@ esTestEnv {
     def packageDir = rootDir.toPath().resolve("build/package/${version}/${esKind.engine.kind}-${esKind.version}")
     bundlePath = packageDir
     systemDic = compileSystemDictionary.get().outputs.files.singleFile.toPath()
-    configFile = rootProject.rootDir.toPath().resolve("src/test/resources/com/worksap/nlp/lucene/sudachi/ja/sudachi.json")
+    configFile = rootProject.rootDir.toPath().resolve("lucene/src/test/resources/com/worksap/nlp/lucene/sudachi/ja/sudachi.json")
     additionalJars.add(project(":testlib").getTasksByName('jar', false).first().outputs.files.singleFile.toPath())
     addPlugin("analysis-icu", downloadIcuPlugin)
     addPlugin('sudachi-sub', project(':subplugin').getTasksByName('distZip', false).first())
@@ -102,10 +103,7 @@ esTestEnv {
 test {
     onlyIf { ! (sudachiEs.isEs() && sudachiEs.kind.get().parsedVersion().ge(8, 9)) }
     dependsOn(
-            ':packageJars',
-            ':packageSpiJars',
-            ':embedVersion',
-            ':spi:jar',
+            ':stageBundle',
             compileSystemDictionary,
             ':testlib:jar',
             downloadIcuPlugin,

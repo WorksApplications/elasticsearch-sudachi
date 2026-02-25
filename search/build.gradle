@@ -2,14 +2,17 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id 'java-library'
-    id 'com.worksap.nlp.sudachi.es'
-    id 'com.worksap.nlp.sudachi.esc'
-    id 'com.diffplug.spotless'
     id 'org.jetbrains.kotlin.jvm'
+    id 'org.jetbrains.kotlin.plugin.serialization'
     id 'org.jetbrains.kotlinx.kover'
+    id 'com.diffplug.spotless'
     id 'org.sonarqube'
+    id 'com.worksap.nlp.sudachi.esc'
+    id 'com.worksap.nlp.sudachi.es'
 }
 
+group = 'com.worksap.nlp'
+archivesBaseName = 'analysis-sudachi'
 version = properties["pluginVersion"]
 
 // JVM target is determined by engine version (OpenSearch 3.0+ requires JVM 21)
@@ -26,14 +29,6 @@ tasks.withType(JavaCompile).configureEach {
     options.release = jvmVersion
 }
 
-compileKotlin {
-    compilerOptions.jvmTarget.set(jvmTargetVersion)
-}
-
-compileTestKotlin {
-    compilerOptions.jvmTarget.set(jvmTargetVersion)
-}
-
 // For OpenSearch 3.0+, we need to tell Gradle that JDK 21+ libraries are compatible
 if (jvmVersion >= 21) {
     configurations.all {
@@ -43,15 +38,27 @@ if (jvmVersion >= 21) {
     }
 }
 
-dependencies {
-    implementation(project(':spi'))
-    testCompileOnly('junit:junit:4.13.1')
-    testImplementation('org.apache.logging.log4j:log4j-core:2.17.2')
-    testImplementation('org.jetbrains.kotlin:kotlin-test-junit') {
-        transitive = false
-    }
+compileKotlin {
+    compilerOptions.jvmTarget.set(jvmTargetVersion)
 }
 
+compileTestKotlin {
+    compilerOptions.jvmTarget.set(jvmTargetVersion)
+}
+
+dependencies {
+    api(project(':spi'))
+    api(project(':lucene'))
+    implementation('com.worksap.nlp:sudachi:0.7.4')
+    testImplementation(project(':testlib'))
+    testImplementation('org.apache.logging.log4j:log4j-core:2.17.2')
+    testImplementation('org.jetbrains.kotlin:kotlin-test-junit') {
+        exclude(group: 'org.hamcrest')
+    }
+    testImplementation('org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3')
+}
+
+// See https://github.com/diffplug/spotless/tree/main/plugin-gradle
 spotless {
     // watch for https://github.com/diffplug/spotless/issues/911 to be closed
     ratchetFrom 'origin/develop'
@@ -68,13 +75,12 @@ spotless {
     java {
         // don't need to set target, it is inferred from java
         // version list: https://github.com/diffplug/spotless/tree/main/lib-extra/src/main/resources/com/diffplug/spotless/extra/eclipse_jdt_formatter
-
         eclipse('4.21.0').configFile(formatter.resolve('eclipse-formatter.xml'))
         licenseHeaderFile(formatter.resolve('license-header'))
     }
-}
-
-sonar {
-    // this project is only for tests, do not analyze it
-    skipProject = true
+    kotlin {
+        // by default the target is every '.kt' and '.kts` file in the java sourcesets
+        ktfmt('0.39')
+        licenseHeaderFile(formatter.resolve('license-header'))
+    }
 }

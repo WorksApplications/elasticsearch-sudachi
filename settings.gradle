@@ -1,5 +1,7 @@
 rootProject.name = "elasticsearch-sudachi"
 include 'spi'
+include 'lucene'
+include 'search'
 include 'testlib'
 include 'subplugin'
 include 'integration'
