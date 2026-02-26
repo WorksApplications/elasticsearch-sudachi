@@ -8,7 +8,9 @@ plugins {
     id 'org.jetbrains.kotlinx.kover'
     id 'org.sonarqube'
 
-    id 'com.worksap.nlp.sudachi.es'
+    id 'com.worksap.nlp.sudachi.es.extension'
+    id 'com.worksap.nlp.sudachi.es.sources'
+    id 'com.worksap.nlp.sudachi.es.dependencies'
     id 'com.worksap.nlp.sudachi.esc'
 }
 

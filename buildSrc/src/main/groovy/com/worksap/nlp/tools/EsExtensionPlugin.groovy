@@ -54,12 +54,10 @@ class EsExtension {
     }
 }
 
-class EsSudachiPlugin implements Plugin<Project> {
+class EsExtensionPlugin implements Plugin<Project> {
     @Override
     void apply(Project project) {
         EsPluginSupport.requireProjectKind(project)
         project.extensions.add("sudachiEs", EsExtension.class)
-        project.pluginManager.apply("com.worksap.nlp.sudachi.es.sources")
-        project.pluginManager.apply("com.worksap.nlp.sudachi.es.dependencies")
     }
 }

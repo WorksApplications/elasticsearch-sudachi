@@ -2,7 +2,9 @@ plugins {
     id 'com.diffplug.spotless'
     id 'java-library'
 
-    id 'com.worksap.nlp.sudachi.es'
+    id 'com.worksap.nlp.sudachi.es.extension'
+    id 'com.worksap.nlp.sudachi.es.sources'
+    id 'com.worksap.nlp.sudachi.es.dependencies'
     id 'com.worksap.nlp.sudachi.esc'
 }
 

@@ -155,7 +155,7 @@ class EsTestEnvPlugin implements Plugin<Project> {
             task.systemProperty("java.io.tmpdir", envRoot)
 
             // OpenSearch 3.0+ requires the Java agent for security framework
-            if (target.plugins.findPlugin(EsSudachiPlugin.class) != null) {
+            if (target.plugins.findPlugin(EsExtensionPlugin.class) != null) {
                 var esExt = target.extensions.getByType(EsExtension)
                 var kind = esExt.kind.get()
                 if (kind.engine == EngineType.OpenSearch && kind.parsedVersion().ge(3, 0)) {
@@ -177,7 +177,7 @@ class EsTestEnvPlugin implements Plugin<Project> {
 
         target.gradle.taskGraph.whenReady {
             boolean shouldRun = false
-            if (target.plugins.findPlugin(EsSudachiPlugin.class) != null) {
+            if (target.plugins.findPlugin(EsExtensionPlugin.class) != null) {
                 shouldRun = shouldTestsRun(target.extensions.getByType(EsExtension).kind.get())
             }
             target.tasks.findAll().forEach { Task task ->
@@ -298,5 +298,3 @@ class EsTestEnvPlugin implements Plugin<Project> {
                 .writeTo(outputStream.newWriter('utf-8'))
     }
 }
-
-
