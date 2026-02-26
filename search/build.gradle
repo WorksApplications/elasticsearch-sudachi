@@ -71,7 +71,7 @@ spotless {
         target '*.gradle', '*.md', '.gitignore', '*.txt', '*.csv'
 
         trimTrailingWhitespace()
-        indentWithSpaces(2)
+        leadingTabsToSpaces(2)
         endWithNewline()
     }
     java {

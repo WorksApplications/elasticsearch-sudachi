@@ -33,5 +33,3 @@ typealias NamedAnalyzer = org.opensearch.index.analysis.NamedAnalyzer
 typealias IndexAnalyzers = org.opensearch.index.analysis.IndexAnalyzers
 
 typealias XContentType = org.opensearch.common.xcontent.XContentType
-
-typealias Index = org.opensearch.core.index.Index
