@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2026 Works Applications Co., Ltd.
+ * Copyright (c) 2023-2026 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,6 @@ package com.worksap.nlp.search.aliases
 
 import org.apache.lucene.analysis.Analyzer
 
-/**
- * OpenSearch 3.0+ factory adapter types.
- *
- * Note: OpenSearch itself may change constructor signatures across majors. We keep the same
- * abstract class constructors that our plugin code expects, and delegate to the corresponding
- * OpenSearch base classes.
- */
 abstract class AbstractTokenizerFactory(
     indexSettings: IndexSettings?,
     environment: Environment?,

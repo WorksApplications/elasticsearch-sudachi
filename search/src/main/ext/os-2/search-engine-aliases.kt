@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2026 Works Applications Co., Ltd.
+ * Copyright (c) 2023-2026 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,6 @@
 
 package com.worksap.nlp.search.aliases
 
-/**
- * OpenSearch 3.0+ typealiases.
- *
- * This file must not contain any imports to ElasticSearch/OpenSearch classes. For clarity, all
- * OpenSearch classes are fully-qualified on every use.
- */
 import org.apache.lucene.analysis.CharArraySet
 
 typealias Settings = org.opensearch.common.settings.Settings
