@@ -78,21 +78,22 @@ def compileSystemDictionary = tasks.register("compileTestDictionary", JavaExec) 
 }
 
 def downloadIcuPlugin = tasks.register('downloadIcuPlugin', Download.class) {
-    String version = sudachiEs.version()
+    String engineVersion = sudachiEs.engineVersion()
     if (sudachiEs.isEs()) {
-        src("https://artifacts.elastic.co/downloads/elasticsearch-plugins/analysis-icu/analysis-icu-${version}.zip")
-        dest(new File(project.buildDir, "cache/analysis-icu-elasticsearch-${version}.zip"))
-    } else {
-        src("https://artifacts.opensearch.org/releases/plugins/analysis-icu/${version}/analysis-icu-${version}.zip")
-        dest(new File(project.buildDir, "cache/analysis-icu-opensearch-${version}.zip"))
+        src("https://artifacts.elastic.co/downloads/elasticsearch-plugins/analysis-icu/analysis-icu-${engineVersion}.zip")
+        dest(new File(project.buildDir, "cache/analysis-icu-elasticsearch-${engineVersion}.zip"))
+    } else { // OpenSearch
+        src("https://artifacts.opensearch.org/releases/plugins/analysis-icu/${engineVersion}/analysis-icu-${engineVersion}.zip")
+        dest(new File(project.buildDir, "cache/analysis-icu-opensearch-${engineVersion}.zip"))
     }
 
     overwrite(false)
 }
 
 esTestEnv {
-    def esKind = sudachiEs.kind.get()
-    def packageDir = rootDir.toPath().resolve("build/package/${version}/${esKind.engine.kind}-${esKind.version}")
+    var engineKind = sudachiEs.engineKind()
+    var engineVersion = sudachiEs.engineVersion()
+    def packageDir = rootDir.toPath().resolve("build/package/${version}/${engineKind}-${engineVersion}")
     bundlePath = packageDir
     systemDic = compileSystemDictionary.get().outputs.files.singleFile.toPath()
     configFile = rootProject.rootDir.toPath().resolve("lucene/src/test/resources/com/worksap/nlp/lucene/sudachi/ja/sudachi.json")
@@ -115,8 +116,9 @@ test {
 }
 
 def distZip = tasks.register('distZip', Zip) {
-    var esKind = sudachiEs.kind.get()
-    archiveBaseName.set("${esKind.engine.kind}-${esKind.version}-${project.name}")
+    var engineKind = sudachiEs.engineKind()
+    var engineVersion = sudachiEs.engineVersion()
+    archiveBaseName.set("${engineKind}-${engineVersion}-${project.name}")
     from(
         project(':subplugin').packageJars.outputs.files,
         project(':subplugin').embedVersion.outputs.files,
