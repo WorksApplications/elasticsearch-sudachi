@@ -55,8 +55,8 @@ if (sudachiEs.jvmVersion() >= 21) {
     }
 }
 
-tasks.withType(org.gradle.jvm.tasks.Jar.class).configureEach {
-    it.archiveBaseName.set("sudachi-search-spi")
+tasks.named('jar', Jar) {
+    archiveBaseName.set("sudachi-search-spi")
 }
 
 publishing {
