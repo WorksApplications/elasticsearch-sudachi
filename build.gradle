@@ -136,10 +136,10 @@ sonar {
 tasks.register("printVersionForGithubActions") {
     doLast {
         // https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#environment-files
-        var esKind = sudachiEs.kind.get()
-
+        var engineKind = sudachiEs.engineKind()
+        var engineVersion = sudachiEs.engineVersion()
         file(System.getenv("GITHUB_ENV")).write(
-                "PROJ_VERSION=${project.version}\nENGINE_VERSION=${esKind.version}\nENGINE_KIND=${esKind.engine.kind}"
+                "PROJ_VERSION=${project.version}\nENGINE_VERSION=${engineVersion}\nENGINE_KIND=${engineKind}"
         )
     }
 }
