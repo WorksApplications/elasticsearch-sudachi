@@ -110,6 +110,7 @@ enum EngineType {
 
         String getKind() { return "elasticsearch" }
     },
+
     OpenSearch{
         /**
          * Return the set of compatibility tags we want to include in the build.
@@ -155,7 +156,7 @@ enum EngineType {
 
 class ProjectKind {
     EngineType engine
-    String version
+    String versionString
 
     ProjectKind(String rawVersion) {
         var parts = rawVersion.split(":", 2)
@@ -176,15 +177,14 @@ class ProjectKind {
             default:
                 throw new IllegalArgumentException("unknown engine kind $kind")
         }
-        this.version = version
+        this.versionString = version
     }
 
-    EngineSupport supportVersion(String rawVersion) {
-        Version version = Version.fromRaw(rawVersion)
-        return engine.supportVersion(version)
+    EngineSupport supportVersion() {
+        return engine.supportVersion(parsedVersion())
     }
 
     Version parsedVersion() {
-        return Version.fromRaw(version)
+        return Version.fromRaw(versionString)
     }
 }
