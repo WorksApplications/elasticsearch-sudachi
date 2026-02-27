@@ -18,12 +18,6 @@
 
 package com.worksap.nlp.search.aliases
 
-/**
- * This file must not contain any imports to ElasticSearch/OpenSearch classes. For clarity, all
- * ElasticSearch/OpenSearch files must be fully-qualified on every use.
- *
- * Lucene classes can be imported.
- */
 import org.apache.lucene.analysis.CharArraySet
 
 typealias Settings = org.elasticsearch.common.settings.Settings

@@ -18,20 +18,4 @@
 
 package com.worksap.nlp.search.aliases
 
-typealias Version = org.opensearch.Version
-
-typealias LogConfigurator = org.opensearch.common.logging.LogConfigurator
-
-typealias TestEnvironment = org.opensearch.env.TestEnvironment
-
-typealias AnalysisModule = org.opensearch.indices.analysis.AnalysisModule
-
-typealias IndexSettingsModule = org.opensearch.test.IndexSettingsModule
-
-typealias NamedAnalyzer = org.opensearch.index.analysis.NamedAnalyzer
-
-typealias IndexAnalyzers = org.opensearch.index.analysis.IndexAnalyzers
-
-typealias XContentType = org.opensearch.common.xcontent.XContentType
-
 typealias Index = org.opensearch.core.index.Index

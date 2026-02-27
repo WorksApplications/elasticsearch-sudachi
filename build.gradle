@@ -6,12 +6,14 @@ plugins {
     id 'org.jetbrains.kotlinx.kover' version '0.9.7'
     id 'org.sonarqube' version '7.2.2.6593'
 
-    id 'com.worksap.nlp.sudachi.es'
+    id 'com.worksap.nlp.sudachi.es.extension'
+    id 'com.worksap.nlp.sudachi.es.sources'
+    id 'com.worksap.nlp.sudachi.es.dependencies'
     id 'com.worksap.nlp.sudachi.esc'
 }
 
 group = 'com.worksap.nlp'
-base.archivesName = 'analysis-sudachi'
+base.archivesName = properties["pluginName"]
 version = properties["pluginVersion"]
 
 // define dependencies for kover merged report
@@ -23,16 +25,17 @@ dependencies {
 }
 
 def embedVersion = tasks.register('embedVersion', Copy) {
-    var esKind = sudachiEs.kind.get()
+    var engineKind = sudachiEs.engineKind()
+    var engineVersion = sudachiEs.engineVersion()
     from 'search/src/main/extras/plugin-descriptor.properties'
-    into "build/package/${version}/${esKind.engine.kind}-${esKind.version}"
+    into "build/package/${version}/${engineKind}-${engineVersion}"
     expand([
             version: version,
-            engineVersion: esKind.version,
-            engineKind: esKind.engine.kind
+            engineVersion: engineVersion,
+            engineKind: engineKind
     ])
     inputs.property("version", version)
-    inputs.property("elasticSearchVersion", esKind.version)
+    inputs.property("elasticSearchVersion", engineVersion)
 }
 
 // list of projects that needs to be bundled beforehand.
@@ -50,9 +53,8 @@ def stageBundle = tasks.register('stageBundle', Copy) {
     dependsOn distProjects.collect { it.tasks.named('jar') }
     dependsOn embedVersion
 
-    var esKind = sudachiEs.kind.get()
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    into("build/package/${version}/${esKind.engine.kind}-${esKind.version}")
+    into("build/package/${version}/${sudachiEs.engineKind()}-${sudachiEs.engineVersion()}")
 
     // put spi to subdir if possible
     def spiJars = new LinkedHashSet(runtimeJarfiles(project('spi')))
@@ -79,9 +81,10 @@ def stageBundle = tasks.register('stageBundle', Copy) {
 def distZip = tasks.register('distZip', Zip) {
     dependsOn stageBundle
 
-    var esKind = sudachiEs.kind.get()
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    archiveBaseName.set("${esKind.engine.kind}-${esKind.version}-${base.archivesName.get()}")
+    var engineKind = sudachiEs.engineKind()
+    var engineVersion = sudachiEs.engineVersion()
+    archiveBaseName.set("${engineKind}-${engineVersion}-${base.archivesName.get()}")
 
     from(stageBundle.map { it.destinationDir }, 'LICENSE', 'README.md')
 }
@@ -134,10 +137,10 @@ sonar {
 tasks.register("printVersionForGithubActions") {
     doLast {
         // https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#environment-files
-        var esKind = sudachiEs.kind.get()
-
+        var engineKind = sudachiEs.engineKind()
+        var engineVersion = sudachiEs.engineVersion()
         file(System.getenv("GITHUB_ENV")).write(
-                "PROJ_VERSION=${project.version}\nENGINE_VERSION=${esKind.version}\nENGINE_KIND=${esKind.engine.kind}"
+                "PROJ_VERSION=${project.version}\nENGINE_VERSION=${engineVersion}\nENGINE_KIND=${engineKind}"
         )
     }
 }

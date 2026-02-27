@@ -143,10 +143,10 @@ class EsTestEnvPlugin implements Plugin<Project> {
                 }
             }
 
-            def gradle = target.getGradle()
-            def userHomeDir = target.getGradle().getGradleUserHomeDir().toPath()
-            def gradleCacheDir = userHomeDir.resolve("caches").resolve(gradle.gradleVersion)
-            def gradleRtDir = gradle.getGradleHomeDir().toPath()
+            var gradle = target.getGradle()
+            var userHomeDir = target.getGradle().getGradleUserHomeDir().toPath()
+            var gradleCacheDir = userHomeDir.resolve("caches").resolve(gradle.gradleVersion)
+            var gradleRtDir = gradle.getGradleHomeDir().toPath()
             // configuration for ES test framework
             task.systemProperty("tests.gradle", true)
             task.systemProperty("tests.task", task.getPath())
@@ -155,15 +155,15 @@ class EsTestEnvPlugin implements Plugin<Project> {
             task.systemProperty("java.io.tmpdir", envRoot)
 
             // OpenSearch 3.0+ requires the Java agent for security framework
-            if (target.plugins.findPlugin(EsSudachiPlugin.class) != null) {
-                def esExt = target.extensions.getByType(EsExtension)
-                def kind = esExt.kind.get()
+            if (target.plugins.findPlugin(EsExtensionPlugin.class) != null) {
+                var esExt = target.extensions.getByType(EsExtension)
+                var kind = esExt.kind.get()
                 if (kind.engine == EngineType.OpenSearch && kind.parsedVersion().ge(3, 0)) {
                     // Disable the old security manager setting
                     task.systemProperty("tests.security.manager", false)
                     // Find and attach the opensearch-agent jar
                     task.doFirst {
-                        def agentJar = target.configurations.testRuntimeClasspath.find { it.name.startsWith("opensearch-agent-") && !it.name.contains("bootstrap") && !it.name.contains("policy") }
+                        var agentJar = target.configurations.testRuntimeClasspath.find { it.name.startsWith("opensearch-agent-") && !it.name.contains("bootstrap") && !it.name.contains("policy") }
                         if (agentJar != null) {
                             task.jvmArgs("-javaagent:${agentJar}")
                             logger.warn("Using OpenSearch security agent: ${agentJar}")
@@ -177,7 +177,7 @@ class EsTestEnvPlugin implements Plugin<Project> {
 
         target.gradle.taskGraph.whenReady {
             boolean shouldRun = false
-            if (target.plugins.findPlugin(EsSudachiPlugin.class) != null) {
+            if (target.plugins.findPlugin(EsExtensionPlugin.class) != null) {
                 shouldRun = shouldTestsRun(target.extensions.getByType(EsExtension).kind.get())
             }
             target.tasks.findAll().forEach { Task task ->
@@ -198,18 +198,18 @@ class EsTestEnvPlugin implements Plugin<Project> {
     }
 
     private Path prepareEnvironment(Project project, Test testTask, Path basePath, EsTestEnvExtension ext) {
-        def formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HH-mm-ss", Locale.ROOT)
-        def now = Instant.now().atZone(ZoneId.of("UTC"))
-        def timepart = formatter.format(now)
-        def rootPath = basePath.resolve(timepart)
+        var formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HH-mm-ss", Locale.ROOT)
+        var now = Instant.now().atZone(ZoneId.of("UTC"))
+        var timepart = formatter.format(now)
+        var rootPath = basePath.resolve(timepart)
 
-        def pluginDir = rootPath.resolve("plugins")
-        def configPath = rootPath.resolve("config")
+        var pluginDir = rootPath.resolve("plugins")
+        var configPath = rootPath.resolve("config")
 
         Files.createDirectories(pluginDir)
         Files.createDirectories(configPath)
 
-        def sudachiPluginDir = pluginDir.resolve("analysis-sudachi")
+        var sudachiPluginDir = pluginDir.resolve("analysis-sudachi")
         copyTree(ext.bundlePath, sudachiPluginDir) {
             !(it.getFileName().toString().startsWith("kotlin")
                     || it.getFileName().toString().startsWith("annotations-"))
@@ -219,13 +219,13 @@ class EsTestEnvPlugin implements Plugin<Project> {
             Files.copy(jar, sudachiPluginDir.resolve(name))
         }
         for (plugin in ext.additionalPlugins) {
-            def task = plugin.task()
-            def extractedPath = pluginDir.resolve(plugin.name)
+            var task = plugin.task()
+            var extractedPath = pluginDir.resolve(plugin.name)
             // unfortunately, we can't make this a Copy plugin because it outputs to a different directory each execution
             extractZipArchive(task.outputs.files.singleFile.toPath(), extractedPath)
         }
 
-        def sudachiConfigDir = configPath.resolve("sudachi")
+        var sudachiConfigDir = configPath.resolve("sudachi")
         Files.createDirectories(sudachiConfigDir)
         Files.copy(ext.systemDic, sudachiConfigDir.resolve("system_core.dic"))
         Files.copy(ext.configFile, sudachiConfigDir.resolve("sudachi.json"))
@@ -266,18 +266,18 @@ class EsTestEnvPlugin implements Plugin<Project> {
 
     static void extractZipArchive(Path zip, Path result) {
         Files.createDirectories(result)
-        try (def descr = new ZipFile(zip.toFile())) {
-            def entries = descr.entries()
+        try (var descr = new ZipFile(zip.toFile())) {
+            var entries = descr.entries()
             while (entries.hasMoreElements()) {
-                def entry = entries.nextElement()
-                def fsPath = result.resolve(entry.name)
+                var entry = entries.nextElement()
+                var fsPath = result.resolve(entry.name)
                 if (entry.isDirectory() && Files.notExists(fsPath)) {
                     Files.createDirectory(fsPath)
                 } else {
                     Files.createDirectories(fsPath.parent)
-                    try (def stream = descr.getInputStream(entry)) {
+                    try (var stream = descr.getInputStream(entry)) {
                         if (entry.name.endsWith("plugin-descriptor.properties")) {
-                            try (def ostream = Files.newOutputStream(fsPath)) {
+                            try (var ostream = Files.newOutputStream(fsPath)) {
                                 filterPluginDescriptor(stream, ostream)
                             }
                         } else {
@@ -298,5 +298,3 @@ class EsTestEnvPlugin implements Plugin<Project> {
                 .writeTo(outputStream.newWriter('utf-8'))
     }
 }
-
-

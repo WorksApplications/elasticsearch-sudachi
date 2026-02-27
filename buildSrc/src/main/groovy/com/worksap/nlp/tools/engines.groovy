@@ -1,23 +1,31 @@
 package com.worksap.nlp.tools
 
 trait EngineSupport {
-    abstract String getTag()
+    abstract String getMajorTag()
+    abstract String getMinorTag()
+    abstract List<String> getTags()
 }
 
 enum EsSupport implements EngineSupport {
-    Es810("es-8.10"),
-    Es812("es-8.12"),
-    Es816("es-8.16")
+    Es810("es-8", "es-8.10"),
+    Es812("es-8", "es-8.12"),
+    Es816("es-8", "es-8.16")
 
-    String tag
-    List<String> keys
+    String majorTag
+    String minorTag
 
     @Override
-    String getTag() { return tag }
+    String getMajorTag() { return majorTag }
 
-    EsSupport(String tag, String... keys) {
-        this.tag = tag
-        this.keys = Arrays.asList(keys)
+    @Override
+    String getMinorTag() { return minorTag }
+
+    @Override
+    List<String> getTags() { return List.of(getMajorTag(), getMinorTag()) }
+
+    EsSupport(String majorTag, String minorTag) {
+        this.majorTag = majorTag
+        this.minorTag = minorTag
     }
 
     static EsSupport supportVersion(Version vers) {
@@ -36,20 +44,27 @@ enum EsSupport implements EngineSupport {
 }
 
 enum OsSupport implements EngineSupport {
-    Os20("os-2.00"),
-    Os27("os-2.07"),
-    Os210("os-2.10"),
-    Os30("os-3.00")
+    Os20("os-2", "os-2.00"),
+    Os27("os-2", "os-2.07"),
+    Os210("os-2", "os-2.10"),
+    Os30("os-3", "os-3.00")
 
-    String tag
+    String majorTag
+    String minorTag
 
     @Override
-    String getTag() { return tag }
+    String getMajorTag() { return majorTag }
 
-    OsSupport(String tag) {
-        this.tag = tag
+    @Override
+    String getMinorTag() { return minorTag }
+
+    @Override
+    List<String> getTags() { return List.of(getMajorTag(), getMinorTag()) }
+
+    OsSupport(String majorTag, String minorTag) {
+        this.majorTag = majorTag
+        this.minorTag = minorTag
     }
-
 
     static OsSupport supportVersion(Version version) {
         if (version.ge(2, 0) && version.lt(2, 7)) {
@@ -100,53 +115,20 @@ class Version {
 
 enum EngineType {
     ElasticSearch{
-        List<EngineSupport> allTags() {
-            return List.of(EsSupport.values())
-        }
-
         EngineSupport supportVersion(Version version) {
             return EsSupport.supportVersion(version)
         }
 
         String getKind() { return "elasticsearch" }
     },
+
     OpenSearch{
-        /**
-         * Return the set of compatibility tags we want to include in the build.
-         *
-         * IMPORTANT:
-         * Kotlin top-level functions under src/main/ext/** may share the same package and signatures.
-         * If we include multiple major-series directories together (e.g. os-2.* and os-3.*),
-         * it can cause "Conflicting overloads" compilation errors.
-         */
-        List<EngineSupport> allTags() {
-            return List.of(OsSupport.values())
-        }
-
-        /**
-         * Version-aware variant used by the plugin when configuring sourceSets.
-         *
-         * OpenSearch 3.0+ has breaking API differences from 2.x (e.g. Environment#configDir vs configFile),
-         * so we must not compile os-2.* sources together with os-3.* sources.
-         */
-        List<EngineSupport> allTags(Version targetVersion) {
-            if (targetVersion != null && targetVersion.ge(3, 0)) {
-                // For OpenSearch 3.0+, do NOT include 2.x series here.
-                // Mixing os-2.* and os-3.* main sources can cause Kotlin top-level function
-                // signature conflicts (e.g. resourcesPath, parseWords) and API mismatches.
-                return List.of(OsSupport.Os30)
-            }
-            return List.of(OsSupport.Os20, OsSupport.Os27, OsSupport.Os210)
-        }
-
         EngineSupport supportVersion(Version version) {
             return OsSupport.supportVersion(version)
         }
 
         String getKind() { return "opensearch" }
     }
-
-    abstract List<EngineSupport> allTags();
 
     abstract EngineSupport supportVersion(Version version);
 
@@ -155,7 +137,7 @@ enum EngineType {
 
 class ProjectKind {
     EngineType engine
-    String version
+    String versionString
 
     ProjectKind(String rawVersion) {
         var parts = rawVersion.split(":", 2)
@@ -176,15 +158,14 @@ class ProjectKind {
             default:
                 throw new IllegalArgumentException("unknown engine kind $kind")
         }
-        this.version = version
+        this.versionString = version
     }
 
-    EngineSupport supportVersion(String rawVersion) {
-        Version version = Version.fromRaw(rawVersion)
-        return engine.supportVersion(version)
+    EngineSupport supportVersion() {
+        return engine.supportVersion(parsedVersion())
     }
 
     Version parsedVersion() {
-        return Version.fromRaw(version)
+        return Version.fromRaw(versionString)
     }
 }

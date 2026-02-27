@@ -7,7 +7,8 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.serialization'
     id 'org.jetbrains.kotlinx.kover'
 
-    id 'com.worksap.nlp.sudachi.es'
+    id 'com.worksap.nlp.sudachi.es.extension'
+    id 'com.worksap.nlp.sudachi.es.dependencies'
     id 'com.worksap.nlp.sudachi.esc'
 }
 
@@ -62,8 +63,6 @@ dependencies {
 
 tasks.named('jar', Jar) {
     archiveBaseName.set("sudachi-search-lucene")
-    from(sourceSets.main.output)
-    dependsOn(tasks.named('classes'))
 }
 
 spotless {
@@ -76,14 +75,14 @@ spotless {
         target '*.gradle', '*.md', '.gitignore', '*.txt', '*.csv'
 
         trimTrailingWhitespace()
-        indentWithSpaces(2)
+        leadingTabsToSpaces(2)
         endWithNewline()
     }
     java {
         // don't need to set target, it is inferred from java
         // version list: https://github.com/diffplug/spotless/tree/main/lib-extra/src/main/resources/com/diffplug/spotless/extra/eclipse_jdt_formatter
 
-        eclipse('4.21.0').configFile(formatter.resolve('eclipse-formatter.xml'))
+        eclipse('4.21').configFile(formatter.resolve('eclipse-formatter.xml'))
         licenseHeaderFile(formatter.resolve('license-header'))
     }
 }

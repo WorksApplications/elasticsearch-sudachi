@@ -2,7 +2,9 @@ plugins {
     id 'com.diffplug.spotless'
     id 'java-library'
 
-    id 'com.worksap.nlp.sudachi.es'
+    id 'com.worksap.nlp.sudachi.es.extension'
+    id 'com.worksap.nlp.sudachi.es.sources'
+    id 'com.worksap.nlp.sudachi.es.dependencies'
     id 'com.worksap.nlp.sudachi.esc'
 }
 
@@ -36,31 +38,34 @@ dependencies {
 }
 
 def embedVersion = tasks.register('embedVersion', Copy) {
-    var esKind = sudachiEs.kind.get()
+    var engineKind = sudachiEs.engineKind()
+    var engineVersion = sudachiEs.engineVersion()
     from 'src/main/extras/plugin-descriptor.properties'
-    into "build/package/${version}/${esKind.engine.kind}-${esKind.version}"
+    into "build/package/${version}/${engineKind}-${engineVersion}"
     expand([
             version: version,
-            engineVersion: esKind.version,
-            engineKind: esKind.engine.kind
+            engineVersion: engineVersion,
+            engineKind: engineKind
     ])
     inputs.property("version", version)
-    inputs.property("elasticSearchVersion", esKind.version)
+    inputs.property("elasticSearchVersion", engineVersion)
 }
 
 def packageJars = tasks.register('packageJars', Copy) {
     from configurations.runtimeClasspath
     from tasks.jar.outputs
-    var esKind = sudachiEs.kind.get()
-    into "build/package/${version}/${esKind.engine.kind}-${esKind.version}"
+    var engineKind = sudachiEs.engineKind()
+    var engineVersion = sudachiEs.engineVersion()
+    into "build/package/${version}/${engineKind}-${engineVersion}"
     dependsOn tasks.jar
 }
 
 def distZip = tasks.register('distZip', Zip) {
-    var esKind = sudachiEs.kind.get()
+    var engineKind = sudachiEs.engineKind()
+    var engineVersion = sudachiEs.engineVersion()
     dependsOn embedVersion, packageJars
-    archiveBaseName.set("${esKind.engine.kind}-${esKind.version}-${project.name}")
-    from("build/package/${version}/${esKind.engine.kind}-${esKind.version}")
+    archiveBaseName.set("${engineKind}-${engineVersion}-${project.name}")
+    from("build/package/${version}/${engineKind}-${engineVersion}")
 }
 
 spotless {
