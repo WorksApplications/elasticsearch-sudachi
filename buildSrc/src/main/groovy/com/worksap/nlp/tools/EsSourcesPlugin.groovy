@@ -5,6 +5,9 @@ import org.gradle.api.Project
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+/**
+ * Adds version-specific ext source directories to main/test source sets.
+ */
 class EsSourcesPlugin implements Plugin<Project> {
     @Override
     void apply(Project project) {

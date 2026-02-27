@@ -15,6 +15,7 @@ plugins {
     id 'com.worksap.nlp.sudachi.esc'
 }
 
+group = 'com.worksap.nlp'
 version = properties["pluginVersion"]
 
 // JVM target is determined by engine version (OpenSearch 3.0+ requires JVM 21)

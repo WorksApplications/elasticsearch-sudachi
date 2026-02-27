@@ -3,6 +3,12 @@ package com.worksap.nlp.tools
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
+/**
+ * Adds compile/test dependencies for the target ElasticSearch/OpenSearch version.
+ *
+ * Note: The appropriate Lucene version is also provided transitively by these
+ * ElasticSearch/OpenSearch dependencies.
+ */
 class EsDependenciesPlugin implements Plugin<Project> {
     @Override
     void apply(Project project) {

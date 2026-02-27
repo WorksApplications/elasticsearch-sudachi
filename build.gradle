@@ -12,6 +12,7 @@ plugins {
     id 'com.worksap.nlp.sudachi.esc'
 }
 
+group = 'com.worksap.nlp'
 base.archivesName = properties["pluginName"]
 version = properties["pluginVersion"]
 

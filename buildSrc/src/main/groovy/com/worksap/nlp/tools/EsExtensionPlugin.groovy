@@ -7,6 +7,17 @@ import org.gradle.api.provider.ProviderFactory
 
 import javax.inject.Inject
 
+/**
+ * Registers the shared `sudachiEs` extension resolved from `engineVersion`.
+ */
+class EsExtensionPlugin implements Plugin<Project> {
+    @Override
+    void apply(Project project) {
+        EsPluginSupport.requireProjectKind(project)
+        project.extensions.add("sudachiEs", EsExtension.class)
+    }
+}
+
 class EsExtension {
     Provider<ProjectKind> kind
 
@@ -51,13 +62,5 @@ class EsExtension {
             }
         }
         return 17
-    }
-}
-
-class EsExtensionPlugin implements Plugin<Project> {
-    @Override
-    void apply(Project project) {
-        EsPluginSupport.requireProjectKind(project)
-        project.extensions.add("sudachiEs", EsExtension.class)
     }
 }

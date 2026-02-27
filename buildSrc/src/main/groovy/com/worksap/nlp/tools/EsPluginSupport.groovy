@@ -2,6 +2,9 @@ package com.worksap.nlp.tools
 
 import org.gradle.api.Project
 
+/**
+ * Validate and parse `engineVersion` property.
+ */
 class EsPluginSupport {
     static ProjectKind requireProjectKind(Project project) {
         var rawVersion = project.findProperty("engineVersion")
