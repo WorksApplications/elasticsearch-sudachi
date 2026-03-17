@@ -63,7 +63,7 @@ Elasticsearch / OpenSearch やそのバージョンによって API が異なる
   - test workflow：分割後ブランチがそれぞれのサポート対象バージョンを受け持つ
   - release workflow：分割後ブランチがそれぞれのサポート対象バージョンを受け持つ
   - backport workflow：バックポート先ブランチを分割後に更新する
-    - PR ラベルを更新・追加する
+    - バックポート用ラベルを更新・追加する
 - [ ] 既存の issue/PR を確認する
   - ベースブランチの更新
   - backport ラベルの付け替え
@@ -96,12 +96,18 @@ Elasticsearch / OpenSearch やそのバージョンによって API が異なる
 
 ### cherrypick / backport ルール
 
-cherrypick/backport の要否と対象ブランチの確認は PR 単位で行う
-該当する元 PR にラベル `backport [target branch]` を付与する
+cherrypick/backport の要否と対象ブランチの確認は PR 単位で行う。
 
-- e.g. `backport es-9`
-- 当該 PR のマージ時（マージ済みならラベル付与時）にバックポートアクションが実行されるので、これのマージをもって完了とする
-  - 自動作成 PR がテストに失敗した場合は適宜修正を行う
+該当する元 PR にラベル `backport [target branch]` (e.g. `backport es-9`) を付与することで backport 先を指定する。
+複数ブランチへのbackport が必要な場合は以下の省略形も使用可能。
+
+- `backport-es`：すべての Elasticsearch 系列に backport する
+- `backport-os`：すべての OpenSearch 系列に backport する
+- `backport-all`：すべての系列に backport する
+
+当該 PR のマージ時（マージ済みならラベル付与時）にバックポート PR 作成のアクションが実行されるので、これのマージをもって完了とする。
+
+- 自動作成 PR がテストに失敗した場合は適宜修正か手動バックポートを行うものとする
 
 ## CI / テスト運用
 

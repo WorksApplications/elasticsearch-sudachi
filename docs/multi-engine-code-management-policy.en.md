@@ -97,11 +97,17 @@ Updates to `search/` and related tests should generally target the applicable br
 ### Cherry-pick / Backport Rules
 
 Whether cherry-pick/backport is required, and which target branches are involved, must be determined for each PR.
-Add the label `backport [target branch]` to the source PR as needed.
 
-- e.g. `backport es-9`
-- The backport action is triggered when the PR is merged (or when the label is added if it has already been merged), and completion is defined as the merge of that generated backport PR.
-  - If the auto-generated PR fails tests, apply fixes as appropriate.
+Specify the backport target by adding the label `backport [target branch]` to the source PR (e.g. `backport es-9`).
+If backporting to multiple branches is required, the following shorthand labels may also be used.
+
+- `backport-es`: backport to all Elasticsearch lineages
+- `backport-os`: backport to all OpenSearch lineages
+- `backport-all`: backport to all lineages
+
+When the PR is merged (or when the label is added if it has already been merged), an action to create the backport PR is triggered, and completion is defined as the merge of that generated backport PR.
+
+- If the auto-generated PR fails tests, apply fixes as appropriate or perform a manual backport.
 
 ## CI / Test Operations
 
