@@ -10,9 +10,9 @@ This document defines the policy for managing those branches.
 ## Basic Principles
 
 - The default branch is responsible for shared functionality, and branch-based divergence should be kept to a minimum.
-- As a rule, maintain one branch for each API lineage (`engine + major version`).
-  - If API differences arise within the same lineage, further branch splitting is also allowed.
-- Changes should originate from the default branch and be cherry-picked/backported to the required lineages.
+- As a rule, maintain one branch for each API series (`engine + major version`).
+  - If API differences arise within the same series, further branch splitting is also allowed.
+- Changes should originate from the default branch and be cherry-picked/backported to the required series.
 
 ## Code Management Policy
 
@@ -37,13 +37,13 @@ Notes:
 
 ### Handling Code Divergence via the `ext` Directory
 
-- Do not add new version-specific differences to `src/main/ext`; implement them directly in the target lineage branch.
+- Do not add new version-specific differences to `src/main/ext`; implement them directly in the target series branch.
 - The use of `src/main/ext/` and `src/test/ext/` should be reduced gradually.
-  - `src/test/ext/` may still be used to absorb test-only differences within the same lineage.
+  - `src/test/ext/` may still be used to absorb test-only differences within the same series.
 
 ### Splitting Branches for Minor-Version Differences
 
-If additional code differences become necessary between minor versions within the same lineage (`engine + major version`), branch splitting is allowed.
+If additional code differences become necessary between minor versions within the same series (`engine + major version`), branch splitting is allowed.
 
 Use the following as guidance when deciding whether to split:
 
@@ -72,13 +72,13 @@ Checklist when splitting branches:
 
 ### Base Branch
 
-- For changes shared across multiple lineages, create the PR against `develop`.
-  - Changes must be propagated to the required lineages according to the cherry-pick/backport rules.
+- For changes shared across multiple series, create the PR against `develop`.
+  - Changes must be propagated to the required series according to the cherry-pick/backport rules.
   - Examples: shared logic such as filters and their tests, documentation, build configuration
-- For changes specific to a single lineage, create the PR against that lineage branch.
-  - Examples: lineage-specific bug fixes, dependency updates
+- For changes specific to a single series, create the PR against that series branch.
+  - Examples: series-specific bug fixes, dependency updates
 - For changes shared within a specific search engine or major version, create the PR against the latest applicable branch among them.
-  - Changes must be propagated to the required lineages according to the cherry-pick/backport rules.
+  - Changes must be propagated to the required series according to the cherry-pick/backport rules.
   - However, if the change is not expected to be backportable, create separate PRs as needed.
   - Example: a bug fix related to Elasticsearch
 
@@ -100,9 +100,9 @@ Whether cherry-pick/backport is required, and which target branches are involved
 Specify the backport target by adding the label `backport [target branch]` to the source PR (e.g. `backport es-9`).
 If backporting to multiple branches is required, the following shorthand labels may also be used.
 
-- `backport-es`: backport to all Elasticsearch lineages
-- `backport-os`: backport to all OpenSearch lineages
-- `backport-all`: backport to all lineages
+- `backport-es`: backport to all Elasticsearch series
+- `backport-os`: backport to all OpenSearch series
+- `backport-all`: backport to all series
 
 When the PR is merged (or when the label is added if it has already been merged), an action to create the backport PR is triggered, and completion is defined as the merge of that generated backport PR.
 
@@ -110,10 +110,10 @@ When the PR is merged (or when the label is added if it has already been merged)
 
 ## CI / Test Operations
 
-- Each lineage branch must have tests against its supported versions.
+- Each series branch must have tests against its supported versions.
   - Coverage should be at the `major.minor` level, with only the latest patch version covered.
   - A version is considered supported when these tests pass.
-- Within-lineage test differences should continue to be managed using `src/test/ext/*` (for test purposes only).
+- Within-series test differences should continue to be managed using `src/test/ext/*` (for test purposes only).
   - When adding code to `src/test/ext/*`, document the applicable version range in code comments or similar.
 
 ## Release Operations
@@ -123,25 +123,25 @@ Releases are made based on factors such as the development status of `develop`, 
 - Each release includes builds for all supported versions, even if the changes affect only some of them.
 - If only support for new versions is added and there are no functional changes, a release may be made as an extension of the latest existing release.
 
-The release point is the commit on each lineage branch that has the corresponding release tag, and builds for each supported version in that lineage are published as assets in the GitHub release.
+The release point is the commit on each series branch that has the corresponding release tag, and builds for each supported version in that series are published as assets in the GitHub release.
 
-- This tag must be in the form `[release version]-[branch]` so that the lineage can be identified in addition to the release version.
+- This tag must be in the form `[release version]-[branch]` so that the series can be identified in addition to the release version.
   - Examples: `v3.5.0-es-8`, `v3.5.0-es-8.10-8.13`, `v3.5.0-os-3.2-plus`
 
 ### Release Procedure
 
 Regular release
 
-- Add a tag in the form `[release version]-[branch]` at the release point on each lineage branch.
+- Add a tag in the form `[release version]-[branch]` at the release point on each series branch.
   - Examples: `v3.5.0-es-8.10-plus`, `v3.5.0-os-3`
 - Add a tag in the form `[release version]` to the default branch.
   - This triggers builds for each supported version from the `release-orchestrator` workflow.
-- If a lineage branch tag was missed or a build failed, fix the issue and then re-run the workflow manually.
+- If a series branch tag was missed or a build failed, fix the issue and then re-run the workflow manually.
 - Review the draft release contents and publish the release.
 
 Adding a new supported version
 
-- If adding support for a version does not require code changes, you may verify that build/test pass on the existing commit tagged with `[release version]-[branch]`, then run the `release-lineage` workflow manually to add assets only for the newly supported version(s) to the latest existing release.
+- If adding support for a version does not require code changes, you may verify that build/test pass on the existing commit tagged with `[release version]-[branch]`, then run the `release-series` workflow manually to add assets only for the newly supported version(s) to the latest existing release.
 - In this case, `.github/branch-support-matrix.json` must still be updated and backported.
 
 ## History and Background
@@ -152,7 +152,7 @@ Current management approach
 
 - Reasons for the policy change:
   - To move version-specific differences to branch boundaries and simplify the code within each branch.
-  - To make the target lineage of each code change explicit and simplify development and review.
+  - To make the target series of each code change explicit and simplify development and review.
 - Accepted drawbacks:
   - Increased synchronization, backport, and release decision costs as the number of branches grows.
   - Increased CI configuration and test matrix management overhead.

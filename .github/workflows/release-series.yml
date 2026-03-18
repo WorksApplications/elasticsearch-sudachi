@@ -1,4 +1,4 @@
-name: Build branch release assets
+name: Build and upload release assets for a series branch
 
 on:
   workflow_dispatch:
