@@ -95,6 +95,7 @@ jobs:
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v5
     - name: Extract version and set to github env
+      # see `./build.gradle` for the definition
       run: ./gradlew -PengineVersion=${{ matrix.engine_version }} printVersionForGithubActions
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -181,6 +182,11 @@ jobs:
         distribution: 'temurin'
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v5
+    - name: Extract version and set to github env
+      # see `./build.gradle` for the definition
+      run: ./gradlew -PengineVersion=${{ env.DEVELOP_ENGINE_VERSION }} printVersionForGithubActions
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Test buildSrc
       run: ./gradlew -p buildSrc --info test
     - name: Test engine-independent modules
@@ -201,7 +207,7 @@ jobs:
       uses: actions/upload-artifact@v6
       if: success()
       with:
-        name: build-artifacts-spi-${{ env.DEVELOP_ENGINE_VERSION }}
+        name: build-artifacts-spi-${{ env.ENGINE_KIND }}-${{ env.ENGINE_VERSION }}
         path: |
           spi/build/libs/sudachi-*.jar
     - name: Publish SPI jar to maven central
