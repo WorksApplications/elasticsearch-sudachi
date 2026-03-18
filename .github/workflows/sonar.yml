@@ -6,6 +6,11 @@ on:
     types:
       - completed
 
+env:
+  BRANCH_SUPPORT_MATRIX_FILE: .github/branch-support-matrix.json
+  DEVELOP_ENGINE_VERSION: es:8.17.10
+  DEVELOP_JAVA_VERSION: '17'
+
 jobs:
   sonar:
     name: Sonar
@@ -14,53 +19,107 @@ jobs:
 
     steps:
     - name: Checkout develop or PR branch
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         repository: ${{ github.event.workflow_run.head_repository.full_name }}
         ref: ${{ github.event.workflow_run.head_branch }}
         fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of Sonar analysis
-    - name: Setup JDK 17
+    - name: Resolve PR metadata
+      id: pr
+      if: github.event.workflow_run.event == 'pull_request'
+      uses: actions/github-script@v8
+      with:
+        script: |
+          const prs = context.payload.workflow_run.pull_requests || [];
+          let pr = prs[0];
+
+          if (!pr) {
+            const response = await github.rest.repos.listPullRequestsAssociatedWithCommit({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              commit_sha: context.payload.workflow_run.head_sha,
+            });
+            pr = response.data[0];
+          }
+
+          if (!pr) {
+            core.setFailed(`No pull request metadata found for ${context.payload.workflow_run.head_sha}`);
+            return;
+          }
+
+          core.setOutput('number', String(pr.number));
+          core.setOutput('head_ref', context.payload.workflow_run.head_branch);
+          core.setOutput('base_ref', pr.base.ref);
+    - name: Resolve sonar target
+      id: target
+      env:
+        PR_BASE_REF: ${{ steps.pr.outputs.base_ref }}
+        WORKFLOW_EVENT: ${{ github.event.workflow_run.event }}
+        WORKFLOW_HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+      run: |
+        python3 - <<'PY'
+        import json
+        import os
+
+        workflow_event = os.environ["WORKFLOW_EVENT"]
+        if workflow_event == "pull_request":
+            target_branch = os.environ["PR_BASE_REF"]
+        else:
+            target_branch = os.environ["WORKFLOW_HEAD_BRANCH"]
+
+        mode = "develop" if target_branch == "develop" else "series"
+        engine_version = os.environ["DEVELOP_ENGINE_VERSION"]
+        java_version = os.environ["DEVELOP_JAVA_VERSION"]
+
+        if mode == "series":
+            config = json.load(open(os.environ["BRANCH_SUPPORT_MATRIX_FILE"], encoding="utf-8"))
+            entry = next((item for item in config["branches"] if item["branch"] == target_branch), None)
+            if entry is None:
+                raise SystemExit(f"No branch config found for {target_branch}")
+            versions = entry.get("versions", [])
+            if not versions:
+                raise SystemExit(f"No engine versions configured for {target_branch}")
+            engine_version = versions[0]["engine_version"]
+            java_version = versions[0].get("java_version", "17")
+
+        with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as fh:
+            fh.write(f"mode={mode}\n")
+            fh.write(f"target_branch={target_branch}\n")
+            fh.write(f"engine_version={engine_version}\n")
+            fh.write(f"java_version={java_version}\n")
+        PY
+    - name: Setup JDK
       uses: actions/setup-java@v4
       with:
-        java-version: 17
+        java-version: ${{ steps.target.outputs.java_version }}
         distribution: 'temurin'
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v3
-
     - name: Cache SonarCloud packages
       uses: actions/cache@v4
       with:
         path: ~/.sonar/cache
         key: ${{ runner.os }}-sonar-${{ hashFiles('build.gradle') }}
-
-    - name: Download sonar artifact
-      uses: actions/download-artifact@v4
-      with:
-        name: sonar-artifact
-        run-id: ${{ github.event.workflow_run.id }}
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        merge-multiple: true
-    - name: Extract sonar artifact
+    - name: Rebuild coverage inputs for sonar
       run: |
-        tar -xf sonar.tar
-        echo "PR_NUMBER=$(sed '1q;d' PR_EVENT.txt)" >> "$GITHUB_ENV"
-        echo "PR_HEAD_REF=$(sed '2q;d' PR_EVENT.txt)" >> "$GITHUB_ENV"
-        echo "PR_BASE_REF=$(sed '3q;d' PR_EVENT.txt)" >> "$GITHUB_ENV"
+        ./gradlew -PengineVersion=${{ steps.target.outputs.engine_version }} --info build koverXmlReport
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   
-    - name: Analyze with sonarqube (push develop)
+    - name: Analyze with sonarqube (push)
       if: github.event.workflow_run.event == 'push'
-      run: ./gradlew --info sonar
+      run: ./gradlew -PengineVersion=${{ steps.target.outputs.engine_version }} --info sonar
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
     - name: Analyze with sonarqube (PR)
       if: github.event.workflow_run.event == 'pull_request'
       run: |
-        ./gradlew --info sonar \
+        ./gradlew -PengineVersion=${{ steps.target.outputs.engine_version }} --info sonar \
           -Dsonar.scm.provider=git \
-          -Dsonar.pullrequest.key=${{ env.PR_NUMBER }} \
-          -Dsonar.pullrequest.branch=${{ env.PR_HEAD_REF }} \
-          -Dsonar.pullrequest.base=${{ env.PR_BASE_REF }}
+          -Dsonar.pullrequest.key=${{ steps.pr.outputs.number }} \
+          -Dsonar.pullrequest.branch=${{ steps.pr.outputs.head_ref }} \
+          -Dsonar.pullrequest.base=${{ steps.pr.outputs.base_ref }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

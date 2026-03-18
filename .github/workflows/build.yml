@@ -2,96 +2,108 @@ name: Build and test
 
 on:
   push:
-    branches: [ develop ]
+    branches:
+      - develop
+      - es-*
+      - os-*
   pull_request:
     types: [opened, synchronize, reopened]
-    branches: [ develop ]
+    branches:
+      - develop
+      - es-*
+      - os-*
+
+env:
+  BRANCH_SUPPORT_MATRIX_FILE: .github/branch-support-matrix.json
+  DEVELOP_ENGINE_VERSION: es:8.17.10
+  DEVELOP_JAVA_VERSION: '17'
+  SUDACHI_DICTIONARY_KIND: core
+  SUDACHI_DICTIONARY_VERSION: 20241021
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
 
 jobs:
-  build:
-    name: Build
+  resolve-target:
+    name: Resolve target version
+    runs-on: ubuntu-latest
+    outputs:
+      mode: ${{ steps.resolve.outputs.mode }}
+      target_branch: ${{ steps.resolve.outputs.target_branch }}
+      matrix: ${{ steps.resolve.outputs.matrix }}
+    steps:
+    - uses: actions/checkout@v6
+    - id: resolve
+      run: |
+        python3 - <<'PY'
+        import json
+        import os
+
+        event_name = os.environ["GITHUB_EVENT_NAME"]
+        if event_name == "pull_request":
+            target_branch = os.environ["GITHUB_BASE_REF"]
+        else:
+            target_branch = os.environ["GITHUB_REF_NAME"]
+
+        mode = "develop" if target_branch == "develop" else "series"
+        matrix = {"include": []}
+
+        if mode == "series":
+            config = json.load(open(os.environ["BRANCH_SUPPORT_MATRIX_FILE"], encoding="utf-8"))
+            entry = next((item for item in config["branches"] if item["branch"] == target_branch), None)
+            if entry is None:
+                raise SystemExit(f"No branch config found for {target_branch}")
+            versions = entry.get("versions", [])
+            if not versions:
+                raise SystemExit(f"No engine versions configured for {target_branch}")
+
+            matrix = {
+                "include": [
+                    {
+                        "engine_version": version["engine_version"],
+                        "java_version": version.get("java_version", "17"),
+                        "main_job": index == 0,
+                    }
+                    for index, version in enumerate(versions)
+                ]
+            }
+
+        with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as fh:
+            fh.write(f"mode={mode}\n")
+            fh.write(f"target_branch={target_branch}\n")
+            fh.write(f"matrix={json.dumps(matrix, separators=(',', ':'))}\n")
+        PY
+
+  series-build:
+    name: Series build
+    needs: [ resolve-target ]
+    if: needs.resolve-target.outputs.mode == 'series'
     runs-on: ubuntu-latest
     strategy:
-      matrix:
-        es-version:
-          - 'es:8.17.10'
-          - 'es:8.16.6'
-          - 'es:8.15.5'
-          - 'es:8.14.3'
-          - 'es:8.13.4'
-          - 'es:8.12.2'
-          - 'es:8.11.4'
-          - 'es:8.10.4'
-          - 'os:2.19.4'
-          - 'os:2.18.0'
-          - 'os:2.17.1'
-          - 'os:2.16.0'
-          - 'os:2.15.0'
-          - 'os:2.14.0'
-          - 'os:2.13.0'
-          - 'os:2.12.0'
-          - 'os:2.11.1'
-          - 'os:2.10.0'
-          - 'os:2.9.0'
-          - 'os:2.8.0'
-          - 'os:2.7.0'
-          - 'os:2.6.0'
-        include:
-          # OpenSearch 3.x requires Java 21
-          - es-version: 'os:3.4.0'
-            java-version: '21'
-          - es-version: 'os:3.3.2'
-            java-version: '21'
-          - es-version: 'os:3.2.0'
-            java-version: '21'
-          - es-version: 'os:3.1.0'
-            java-version: '21'
-          - es-version: 'os:3.0.0'
-            java-version: '21'
-    env:
-      mainJob: ${{ matrix.es-version == 'es:8.17.10' }}
-      sudachiVersion: 20241021
-      sudachiKind: core
-    continue-on-error: true
-
+      fail-fast: false
+      matrix: ${{ fromJson(needs.resolve-target.outputs.matrix) }}
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
       with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          fetch-depth: 0
     - name: Setup JDK
       uses: actions/setup-java@v4
       with:
-        java-version: ${{ matrix.java-version || '17' }}
+        java-version: ${{ matrix.java_version }}
         distribution: 'temurin'
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v3
     - name: Extract version and set to github env
-      run: ./gradlew -PengineVersion=${{ matrix.es-version }} printVersionForGithubActions
+      run: ./gradlew -PengineVersion=${{ matrix.engine_version }} printVersionForGithubActions
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
     - name: Build
-      run: ./gradlew -PengineVersion=${{ matrix.es-version }} --info clean build koverXmlReport
+      run: ./gradlew -PengineVersion=${{ matrix.engine_version }} --info clean build koverXmlReport
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Prepare artifact for sonar analysis
-      if: env.mainJob == 'true'
-      run: |
-        find -iname build -type d -exec tar -cf sonar.tar {} \+
-        echo ${{ github.event.number }} >> PR_EVENT.txt
-        echo ${{ github.event.pull_request.head.ref }} >> PR_EVENT.txt
-        echo ${{ github.event.pull_request.base.ref }} >> PR_EVENT.txt
-    - name: Upload artifact for sonar analysis
-      if: env.mainJob == 'true'
-      uses: actions/upload-artifact@v4
-      with:
-        name: sonar-artifact
-        path: |
-          sonar.tar
-          PR_EVENT.txt
-
-    - name: Cache elasticsearch download
+    - name: Cache search engine download
       uses: actions/cache@v4
       with:
         path: build/integration/${{ env.ENGINE_KIND }}-${{ env.ENGINE_VERSION }}-linux-x86_64.tar.gz
@@ -99,16 +111,16 @@ jobs:
     - name: Cache dictionary download
       uses: actions/cache@v4
       with:
-        path: build/integration/sudachi-dictionary-${{ env.sudachiVersion }}-${{ env.sudachiKind }}.zip
-        key: sudachi-dictionary-${{ env.sudachiVersion }}-${{ env.sudachiKind }}
+        path: build/integration/sudachi-dictionary-${{ env.SUDACHI_DICTIONARY_VERSION }}-${{ env.SUDACHI_DICTIONARY_KIND }}.zip
+        key: sudachi-dictionary-${{ env.SUDACHI_DICTIONARY_VERSION }}-${{ env.SUDACHI_DICTIONARY_KIND }}
     - name: Integration test
       env:
         ES_KIND: ${{ env.ENGINE_KIND }}
         ES_VERSION: ${{ env.ENGINE_VERSION }}
         PLUGIN_VERSION: ${{ env.PROJ_VERSION }}
         RUN_ES_DAEMON: 1
-        DIC_VERSION: ${{ env.sudachiVersion }}
-        DIC_KIND: ${{ env.sudachiKind }}
+        DIC_VERSION: ${{ env.SUDACHI_DICTIONARY_VERSION }}
+        DIC_KIND: ${{ env.SUDACHI_DICTIONARY_KIND }}
       run: |
         bash test-scripts/00-install-elasticsearch.sh
         sleep 30
@@ -129,33 +141,72 @@ jobs:
         python3 test-scripts/20-put-docs.py
         python3 test-scripts/30-test-docs.py
         bash test-scripts/80-delete-index.sh
-    - uses: actions/upload-artifact@v4
-      name: Upload reports when failed
+
+    - name: Upload reports when failed
+      uses: actions/upload-artifact@v4
       if: failure()
       with:
         name: failure-reports-${{ env.ENGINE_KIND }}-${{ env.ENGINE_VERSION }}
         path: |
           build/reports
           build/integration/elasticsearch-*/logs
-
-    - uses: actions/upload-artifact@v4
-      name: Upload built packages
+    - name: Upload built packages
+      uses: actions/upload-artifact@v4
       if: success()
       with:
         name: build-artifacts-${{ env.ENGINE_KIND }}-${{ env.ENGINE_VERSION }}
         path: |
           build/distributions/*.zip
-    - uses: actions/upload-artifact@v4
-      name: Upload SPI jar
-      if: env.mainJob == 'true'
+    - name: Upload SPI jar
+      uses: actions/upload-artifact@v4
+      if: matrix.main_job
       with:
         name: build-artifacts-spi-${{ env.ENGINE_KIND }}-${{ env.ENGINE_VERSION }}
         path: |
           spi/build/libs/sudachi-*.jar
 
-    - name: 'Publish SPI jar to maven central'
-      if: env.mainJob == 'true' && success() && startsWith(github.ref, 'refs/heads/develop')
-      run: ./gradlew -PengineVersion=${{ matrix.es-version }} --info publishToSonatype closeAndReleaseSonatypeStagingRepository
+  develop-build:
+    name: Develop non-engine tests
+    needs: [ resolve-target ]
+    if: needs.resolve-target.outputs.mode == 'develop'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
+    - name: Setup JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ env.DEVELOP_JAVA_VERSION }}
+        distribution: 'temurin'
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v3
+    - name: Test buildSrc
+      run: ./gradlew -p buildSrc --info test
+    - name: Test engine-independent modules
+      run: ./gradlew -PengineVersion=${{ env.DEVELOP_ENGINE_VERSION }} --info :spi:check :lucene:test koverXmlReport
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Upload reports when failed
+      uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: failure-reports-develop
+        path: |
+          build/reports
+          lucene/build/reports
+          buildSrc/build/reports
+    - name: Upload SPI jar
+      uses: actions/upload-artifact@v4
+      if: success()
+      with:
+        name: build-artifacts-spi-${{ env.DEVELOP_ENGINE_VERSION }}
+        path: |
+          spi/build/libs/sudachi-*.jar
+    - name: Publish SPI jar to maven central
+      if: success() && github.event_name == 'push'
+      run: ./gradlew -PengineVersion=${{ env.DEVELOP_ENGINE_VERSION }} --info publishToSonatype closeAndReleaseSonatypeStagingRepository
       env:
         GITHUB_USERNAME: GITHUB_ACTOR
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
