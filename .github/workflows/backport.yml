@@ -61,6 +61,7 @@ jobs:
 
       - name: Create backport PRs
         id: backport
+        # Keep third-party actions pinned to a commit SHA for supply-chain safety.
         uses: korthout/backport-action@4aaf0e03a94ff0a619c9a511b61aeb42adea5b02
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}

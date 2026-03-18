@@ -16,6 +16,10 @@ on:
         required: false
         type: string
 
+env:
+  BRANCH_SUPPORT_MATRIX_FILE: .github/branch-support-matrix.json
+  DISPATCH_WORKFLOW_FILE: release-series.yml
+
 permissions:
   actions: write
   contents: write
@@ -28,8 +32,6 @@ jobs:
   prepare:
     name: Prepare draft release and discover target branches
     runs-on: ubuntu-latest
-    env:
-      BRANCH_SUPPORT_MATRIX_FILE: .github/branch-support-matrix.json
     outputs:
       branches: ${{ steps.resolve.outputs.branches }}
       release_tag: ${{ steps.meta.outputs.release_tag }}
@@ -102,8 +104,6 @@ jobs:
     name: Dispatch branch workflows
     needs: [ prepare ]
     runs-on: ubuntu-latest
-    env:
-      DISPATCH_WORKFLOW_FILE: release-series.yml
     strategy:
       fail-fast: false
       matrix:

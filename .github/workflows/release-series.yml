@@ -20,6 +20,9 @@ on:
         required: true
         type: string
 
+env:
+  BRANCH_SUPPORT_MATRIX_FILE: .github/branch-support-matrix.json
+
 permissions:
   contents: write
 
@@ -54,7 +57,7 @@ jobs:
 
         branch = os.environ["INPUT_BRANCH"]
         override_versions_json = os.environ.get("INPUT_ENGINE_VERSIONS_JSON", "").strip()
-        config = json.load(open(".github/branch-support-matrix.json", encoding="utf-8"))
+        config = json.load(open(os.environ["BRANCH_SUPPORT_MATRIX_FILE"], encoding="utf-8"))
         entry = next((item for item in config["branches"] if item["branch"] == branch), None)
         if entry is None:
             raise SystemExit(f"No branch config found for {branch}")
@@ -97,12 +100,12 @@ jobs:
       with:
         ref: ${{ inputs.target_ref }}
     - name: Setup JDK
-      uses: actions/setup-java@v4
+      uses: actions/setup-java@v5
       with:
         java-version: ${{ matrix.java_version }}
         distribution: 'temurin'
     - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v3
+      uses: gradle/actions/setup-gradle@v5
 
     - name: Extract version and set to github env
       # see `./build.gradle` for the definition
@@ -115,13 +118,13 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Upload built package
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: artifact-${{ env.ENGINE_KIND }}-${{ env.ENGINE_VERSION }}
         path: build/distributions/*.zip
     - name: Upload SPI jar
       if: matrix.upload_spi
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: artifact-spi
         path: spi/build/libs/sudachi-*.jar
@@ -132,7 +135,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Download artifacts
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v6
       with:
         pattern: artifact-*
         path: dist/
