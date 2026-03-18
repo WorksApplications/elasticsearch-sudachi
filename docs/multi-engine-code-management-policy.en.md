@@ -23,13 +23,14 @@ This document defines the policy for managing those branches.
 In addition, maintain branches for each supported search engine and its major version.
 
 - `es-9`: Elasticsearch v9.\* and later (not yet supported in v3.4.0)
-- `es-8.10+`: Elasticsearch v8.10.\* and later
+- `es-8.10-plus`: Elasticsearch v8.10.\* and later
 - `os-3`: OpenSearch v3.\* and later
-- `os-2.6+`: OpenSearch v2.6.\* and later
+- `os-2.6-plus`: OpenSearch v2.6.\* and later
 
 Notes:
 
-- The supported versions for each branch must be clearly documented in `README.md` and the CI matrix.
+- The supported versions for each branch are managed in `.github/branch-support-matrix.json`.
+  - When the supported versions are updated, the change must be backported to each relevant branch.
 - Branches must be kept even after support has ended.
   - They are kept for history preservation only and are not subject to releases or updates.
   - No explicit maintenance will be provided even for security fixes or buildability.
@@ -53,17 +54,15 @@ Checklist when splitting branches:
 
 - [ ] Split the branch.
   - New branch names must follow `[engine]-[min major.minor]-[max major.minor]`.
-  - The original branch must be renamed to `[engine]-[major.minor]+`.
-  - e.g. splitting out versions up to `9.2` from `es-9`: `es-9.0-9.2`, `es-9.3+`
-  - e.g. splitting out versions up to `8.15` from `es-8.14+`: `es-8.14-8.15`, `es-8.16+`
+  - The original branch must be renamed to `[engine]-[major.minor]-plus`.
+  - e.g. splitting out versions up to `9.2` from `es-9`: `es-9.0-9.2`, `es-9.3-plus`
+  - e.g. splitting out versions up to `8.15` from `es-8.14-plus`: `es-8.14-8.15`, `es-8.16-plus`
 - [ ] Update the documentation.
   - Document the versions supported by each branch (`README.md`).
   - Document the reason for the split (`README.md`).
 - [ ] Update GitHub workflows.
-  - Test workflow: make each split branch responsible for its supported versions.
-  - Release workflow: make each split branch responsible for its supported versions.
-  - Backport workflow: update the post-split backport target branches.
-    - Update or add PR labels.
+  - Update and backport `./github/branch-support-matrix.json`
+  - Update or add PR labels for backport workflow.
 - [ ] Review existing issues and PRs.
   - Update base branches.
   - Replace backport labels as needed.
@@ -119,13 +118,31 @@ When the PR is merged (or when the label is added if it has already been merged)
 
 ## Release Operations
 
-- Releases are made based on factors such as the development status of `develop`, fixes for critical bugs, and the addition of support for new versions.
-  - In each release, builds for all supported lineages are released even if changes exist only for some of them.
-  - If only new support is added and there are no functional changes, a release may be made as an extension of the latest existing release.
-- The git tag attached to the commit to be released from each branch is used as the release target.
-  - Tags must make the lineage identifiable in addition to the release version, such as `[version]-[engine]-[engine major version]`.
-    - Examples: `v3.5.0-es-8`, `v3.5.0-es-8.10-8.13`, `v3.5.0-os-3.2+`
-- For each branch, create builds for each version supported by that branch and publish them as assets in the GitHub release.
+Releases are made based on factors such as the development status of `develop`, fixes for critical bugs, and the addition of support for new versions.
+
+- Each release includes builds for all supported versions, even if the changes affect only some of them.
+- If only support for new versions is added and there are no functional changes, a release may be made as an extension of the latest existing release.
+
+The release point is the commit on each lineage branch that has the corresponding release tag, and builds for each supported version in that lineage are published as assets in the GitHub release.
+
+- This tag must be in the form `[release version]-[branch]` so that the lineage can be identified in addition to the release version.
+  - Examples: `v3.5.0-es-8`, `v3.5.0-es-8.10-8.13`, `v3.5.0-os-3.2-plus`
+
+### Release Procedure
+
+Regular release
+
+- Add a tag in the form `[release version]-[branch]` at the release point on each lineage branch.
+  - Examples: `v3.5.0-es-8.10-plus`, `v3.5.0-os-3`
+- Add a tag in the form `[release version]` to the default branch.
+  - This triggers builds for each supported version from the `release-orchestrator` workflow.
+- If a lineage branch tag was missed or a build failed, fix the issue and then re-run the workflow manually.
+- Review the draft release contents and publish the release.
+
+Adding a new supported version
+
+- If adding support for a version does not require code changes, you may verify that build/test pass on the existing commit tagged with `[release version]-[branch]`, then run the `release-lineage` workflow manually to add assets only for the newly supported version(s) to the latest existing release.
+- In this case, `.github/branch-support-matrix.json` must still be updated and backported.
 
 ## History and Background
 

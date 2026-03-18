@@ -32,8 +32,8 @@ jobs:
           script: |
             // definitions
             const labelPattern = /^backport (.+)$/
-            const esBranches = ["es-8.10+"]
-            const osBranches = ["os-3", "os-2.6+"]
+            const esBranches = ["es-8.10-plus"]
+            const osBranches = ["os-3", "os-2.6-plus"]
             const groups = {
               "es": esBranches,
               "os": osBranches,
