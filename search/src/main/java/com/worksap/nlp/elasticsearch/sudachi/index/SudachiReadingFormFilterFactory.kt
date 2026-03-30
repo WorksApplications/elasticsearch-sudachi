@@ -17,18 +17,18 @@
 package com.worksap.nlp.elasticsearch.sudachi.index
 
 import com.worksap.nlp.lucene.sudachi.ja.SudachiReadingFormFilter
-import com.worksap.nlp.search.aliases.AbstractTokenFilterFactory
-import com.worksap.nlp.search.aliases.Environment
-import com.worksap.nlp.search.aliases.IndexSettings
-import com.worksap.nlp.search.aliases.Settings
 import org.apache.lucene.analysis.TokenStream
+import org.opensearch.common.settings.Settings
+import org.opensearch.env.Environment
+import org.opensearch.index.IndexSettings
+import org.opensearch.index.analysis.AbstractTokenFilterFactory
 
 class SudachiReadingFormFilterFactory(
     indexSettings: IndexSettings?,
     environment: Environment?,
     name: String?,
     settings: Settings
-) : AbstractTokenFilterFactory(indexSettings, environment, name, settings) {
+) : AbstractTokenFilterFactory(indexSettings, name, settings) {
   private val useRomaji = settings.getAsBoolean("use_romaji", false)
 
   override fun create(tokenStream: TokenStream): TokenStream {
