@@ -20,22 +20,22 @@ import com.worksap.nlp.lucene.sudachi.ja.SudachiPartOfSpeechStopFilter
 import com.worksap.nlp.lucene.sudachi.ja.attributes.SudachiAttribute
 import com.worksap.nlp.lucene.sudachi.ja.existingAttribute
 import com.worksap.nlp.lucene.sudachi.ja.util.Stoptags
-import com.worksap.nlp.search.aliases.AbstractTokenFilterFactory
-import com.worksap.nlp.search.aliases.Environment
-import com.worksap.nlp.search.aliases.IndexSettings
-import com.worksap.nlp.search.aliases.Settings
-import com.worksap.nlp.search.aliases.getWordList
 import org.apache.lucene.analysis.TokenStream
+import org.opensearch.common.settings.Settings
+import org.opensearch.env.Environment
+import org.opensearch.index.IndexSettings
+import org.opensearch.index.analysis.AbstractTokenFilterFactory
+import org.opensearch.index.analysis.Analysis
 
 class SudachiPartOfSpeechFilterFactory(
     indexSettings: IndexSettings?,
     env: Environment?,
     name: String?,
     settings: Settings?
-) : AbstractTokenFilterFactory(indexSettings, env, name, settings) {
+) : AbstractTokenFilterFactory(indexSettings, name, settings) {
 
   private val stopTags = run {
-    val tagList = getWordList(env, settings, "stoptags")
+    val tagList = Analysis.parseWordList(env, settings, "stoptags") { it }
     tagList?.let { tags -> tags.asIterable().map { Stoptags.parse(it) } } ?: emptyList()
   }
 

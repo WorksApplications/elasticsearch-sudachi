@@ -16,14 +16,20 @@
 
 package com.worksap.nlp.elasticsearch.sudachi
 
-import com.worksap.nlp.search.aliases.Environment
-import com.worksap.nlp.search.aliases.Settings
 import com.worksap.nlp.sudachi.Config
 import com.worksap.nlp.sudachi.PathAnchor
 import com.worksap.nlp.sudachi.Tokenizer.SplitMode
 import com.worksap.nlp.tools.EnumFlag
 import java.nio.file.Path
 import kotlin.io.path.exists
+import org.opensearch.common.settings.Settings
+import org.opensearch.env.Environment
+
+fun resourcesPath(env: Environment, settings: Settings): Path {
+  return env.configDir()
+      .resolve(
+          settings.get(ConfigAdapter.PARAM_RESOURCES_PATH, ConfigAdapter.DEFAULT_RESOURCE_PATH))
+}
 
 class ConfigAdapter(anchor: PathAnchor, settings: Settings, env: Environment) {
   private val basePath = resourcesPath(env, settings)
