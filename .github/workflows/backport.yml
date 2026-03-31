@@ -1,0 +1,72 @@
+name: Backport merged PR
+
+on:
+  pull_request_target:
+    types:
+      - closed
+      - labeled
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  backport:
+    name: Backport merged PR
+    runs-on: ubuntu-latest
+    # closed: when PR is merged with label `backport-*`
+    # labeled: when `backport-*` label is added to a merged PR
+    if: >
+      (github.event.action == 'closed' &&
+       github.event.pull_request.merged == true &&
+       contains(join(github.event.pull_request.labels.*.name, ' '), 'backport-'))
+      ||
+      (github.event.action == 'labeled' &&
+       github.event.pull_request.merged == true &&
+       startsWith(github.event.label.name, 'backport-'))
+    steps:
+      - name: Expand backport label into target branches
+        id: targets
+        uses: actions/github-script@v8
+        with:
+          script: |
+            // definitions
+            const labelPattern = /^backport (.+)$/
+            const esBranches = ["es-8.10-plus"]
+            const osBranches = ["os-3", "os-2.6-plus"]
+            const groups = {
+              "es": esBranches,
+              "os": osBranches,
+              "all": [...esBranches, ...osBranches],
+            }
+
+            const labels = new Set(
+              (context.payload.pull_request.labels || []).map(l => l.name)
+            )
+            const targets = new Set()
+            for (const label of labels) {
+              const m = labelPattern.exec(label)
+              if (!m) continue
+              const key = m[1]
+
+              if (groups[key]) {
+                for (const branch of groups[key]) {
+                  targets.add(branch)
+                }
+              } else {
+                targets.add(key)
+              }
+            }
+            core.setOutput("target_branches", Array.from(targets).join(" "))
+
+      - name: Create backport PRs
+        id: backport
+        # Keep third-party actions pinned to a commit SHA for supply-chain safety.
+        uses: korthout/backport-action@4aaf0e03a94ff0a619c9a511b61aeb42adea5b02
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          target_branches: ${{ steps.targets.outputs.target_branches }}
+          branch_name: 'backport/${target_branch}/${pull_number}'
+          pull_title: '[Backport ${target_branch}] #${pull_number} ${pull_title}'
+          experimental: >-
+            { "conflict_resolution": "draft_commit_conflicts" }

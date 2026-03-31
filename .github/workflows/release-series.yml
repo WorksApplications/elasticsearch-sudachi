@@ -1,0 +1,149 @@
+name: Build and upload release assets for a series branch
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: Branch to build
+        required: true
+        type: string
+      target_ref:
+        description: Tag ref to checkout for the build
+        required: true
+        type: string
+      engine_versions_json:
+        description: Optional JSON array of engine versions to build instead of branch-support-matrix.json
+        required: false
+        type: string
+      release_tag:
+        description: GitHub Release tag to upload assets to
+        required: true
+        type: string
+
+env:
+  BRANCH_SUPPORT_MATRIX_FILE: .github/branch-support-matrix.json
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ inputs.release_tag }}-${{ inputs.target_ref }}
+  cancel-in-progress: false
+
+jobs:
+  resolve-branch:
+    name: Resolve branch matrix
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.resolve.outputs.matrix }}
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        ref: ${{ inputs.target_ref }}
+        fetch-depth: 0
+    - name: Verify target tag exists
+      env:
+        TARGET_REF: ${{ inputs.target_ref }}
+      run: |
+        git rev-parse --verify "refs/tags/$TARGET_REF"
+    - id: resolve
+      env:
+        INPUT_BRANCH: ${{ inputs.branch }}
+        INPUT_ENGINE_VERSIONS_JSON: ${{ inputs.engine_versions_json }}
+      run: |
+        python3 - <<'PY'
+        import json
+        import os
+
+        branch = os.environ["INPUT_BRANCH"]
+        override_versions_json = os.environ.get("INPUT_ENGINE_VERSIONS_JSON", "").strip()
+        config = json.load(open(os.environ["BRANCH_SUPPORT_MATRIX_FILE"], encoding="utf-8"))
+        entry = next((item for item in config["branches"] if item["branch"] == branch), None)
+        if entry is None:
+            raise SystemExit(f"No branch config found for {branch}")
+        if not entry.get("release_enabled", False):
+            raise SystemExit(f"Release is not enabled for {branch}")
+
+        if override_versions_json:
+            versions = json.loads(override_versions_json)
+        else:
+            versions = entry.get("versions", [])
+        if not versions:
+            raise SystemExit(f"No engine versions configured for {branch}")
+
+        upload_spi = entry.get("upload_spi", False)
+
+        matrix = {
+            "include": [
+                {
+                    "engine_version": version["engine_version"],
+                    "java_version": version.get("java_version", "17"),
+                    "upload_spi": upload_spi and index == 0,
+                }
+                for index, version in enumerate(versions)
+            ]
+        }
+
+        with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as fh:
+            fh.write(f"matrix={json.dumps(matrix, separators=(',', ':'))}\n")
+        PY
+
+  build:
+    name: Build
+    needs: [ resolve-branch ]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.resolve-branch.outputs.matrix) }}
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        ref: ${{ inputs.target_ref }}
+    - name: Setup JDK
+      uses: actions/setup-java@v5
+      with:
+        java-version: ${{ matrix.java_version }}
+        distribution: 'temurin'
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v5
+
+    - name: Extract version and set to github env
+      # see `./build.gradle` for the definition
+      run: ./gradlew -PengineVersion=${{ matrix.engine_version }} printVersionForGithubActions
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Build
+      run: ./gradlew -PengineVersion=${{ matrix.engine_version }} --info clean build koverXmlReport
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Upload built package
+      uses: actions/upload-artifact@v6
+      with:
+        name: artifact-${{ env.ENGINE_KIND }}-${{ env.ENGINE_VERSION }}
+        path: build/distributions/*.zip
+    - name: Upload SPI jar
+      if: matrix.upload_spi
+      uses: actions/upload-artifact@v6
+      with:
+        name: artifact-spi
+        path: spi/build/libs/sudachi-*.jar
+
+  release:
+    name: Upload assets to GitHub release
+    needs: [ build ]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download artifacts
+      uses: actions/download-artifact@v6
+      with:
+        pattern: artifact-*
+        path: dist/
+        merge-multiple: true
+    - name: List files to upload
+      run: ls -R dist/
+    - name: Upload assets to existing release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        RELEASE_TAG: ${{ inputs.release_tag }}
+      run: gh release upload "$RELEASE_TAG" dist/* --clobber

@@ -1,9 +1,15 @@
+plugins {
+    id 'groovy'
+}
+
 repositories {
     mavenLocal()
     mavenCentral()
 }
 
-
 dependencies {
+    compileOnly gradleApi()
+    compileOnly localGroovy()
+    testImplementation localGroovy()
     testImplementation 'junit:junit:[4.12,)'
 }

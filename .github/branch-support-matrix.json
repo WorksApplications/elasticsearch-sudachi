@@ -1,0 +1,139 @@
+{
+  "branches": [
+    {
+      "branch": "es-9",
+      "release_enabled": false,
+      "upload_spi": false,
+      "versions": []
+    },
+    {
+      "branch": "es-8.10-plus",
+      "release_enabled": true,
+      "upload_spi": true,
+      "versions": [
+        {
+          "engine_version": "es:8.17.10",
+          "java_version": "17"
+        },
+        {
+          "engine_version": "es:8.16.6",
+          "java_version": "17"
+        },
+        {
+          "engine_version": "es:8.15.5",
+          "java_version": "17"
+        },
+        {
+          "engine_version": "es:8.14.3",
+          "java_version": "17"
+        },
+        {
+          "engine_version": "es:8.13.4",
+          "java_version": "17"
+        },
+        {
+          "engine_version": "es:8.12.2",
+          "java_version": "17"
+        },
+        {
+          "engine_version": "es:8.11.4",
+          "java_version": "17"
+        },
+        {
+          "engine_version": "es:8.10.4",
+          "java_version": "17"
+        }
+      ]
+    },
+    {
+      "branch": "os-3",
+      "release_enabled": true,
+      "upload_spi": false,
+      "versions": [
+        {
+          "engine_version": "os:3.4.0",
+          "java_version": "21"
+        },
+        {
+          "engine_version": "os:3.3.2",
+          "java_version": "21"
+        },
+        {
+          "engine_version": "os:3.2.0",
+          "java_version": "21"
+        },
+        {
+          "engine_version": "os:3.1.0",
+          "java_version": "21"
+        },
+        {
+          "engine_version": "os:3.0.0",
+          "java_version": "21"
+        }
+      ]
+    },
+    {
+      "branch": "os-2.6-plus",
+      "release_enabled": true,
+      "upload_spi": false,
+      "versions": [
+        {
+          "engine_version": "os:2.19.4",
+          "java_version": "17"
+        },
+        {
+          "engine_version": "os:2.18.0",
+          "java_version": "17"
+        },
+        {
+          "engine_version": "os:2.17.1",
+          "java_version": "17"
+        },
+        {
+          "engine_version": "os:2.16.0",
+          "java_version": "17"
+        },
+        {
+          "engine_version": "os:2.15.0",
+          "java_version": "17"
+        },
+        {
+          "engine_version": "os:2.14.0",
+          "java_version": "17"
+        },
+        {
+          "engine_version": "os:2.13.0",
+          "java_version": "17"
+        },
+        {
+          "engine_version": "os:2.12.0",
+          "java_version": "17"
+        },
+        {
+          "engine_version": "os:2.11.1",
+          "java_version": "17"
+        },
+        {
+          "engine_version": "os:2.10.0",
+          "java_version": "17"
+        },
+        {
+          "engine_version": "os:2.9.0",
+          "java_version": "17"
+        },
+        {
+          "engine_version": "os:2.8.0",
+          "java_version": "17"
+        },
+        {
+          "engine_version": "os:2.7.0",
+          "java_version": "17"
+        },
+        {
+          "engine_version": "os:2.6.0",
+          "java_version": "17"
+        }
+      ]
+    }
+  ]
+}

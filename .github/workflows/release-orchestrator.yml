@@ -1,0 +1,135 @@
+name: Create draft release and Dispatch release build workflows
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+      - "!v*.*.*-*"
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Release tag to dispatch branch builds for
+        required: true
+        type: string
+      target_branch:
+        description: Optional single branch to redispatch
+        required: false
+        type: string
+
+env:
+  BRANCH_SUPPORT_MATRIX_FILE: .github/branch-support-matrix.json
+  DISPATCH_WORKFLOW_FILE: release-series.yml
+
+permissions:
+  actions: write
+  contents: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    name: Prepare draft release and discover target branches
+    runs-on: ubuntu-latest
+    outputs:
+      branches: ${{ steps.resolve.outputs.branches }}
+      release_tag: ${{ steps.meta.outputs.release_tag }}
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
+    - name: Ensure tag commit is on default branch
+      if: github.event_name == 'push'
+      run: |
+        git fetch origin develop --depth=1
+        git merge-base --is-ancestor "$GITHUB_SHA" origin/develop
+    - id: meta
+      env:
+        INPUT_RELEASE_TAG: ${{ inputs.release_tag }}
+      run: |
+        if [ "${GITHUB_EVENT_NAME}" = "workflow_dispatch" ]; then
+          echo "release_tag=${INPUT_RELEASE_TAG}" >> "$GITHUB_OUTPUT"
+        else
+          echo "release_tag=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+        fi
+    - name: Resolve target branches
+      id: resolve
+      env:
+        RELEASE_TAG: ${{ steps.meta.outputs.release_tag }}
+        INPUT_TARGET_BRANCH: ${{ inputs.target_branch }}
+      run: |
+        python3 - <<'PY'
+        import json
+        import os
+
+        config = json.load(open(os.environ["BRANCH_SUPPORT_MATRIX_FILE"], encoding="utf-8"))
+        release_tag = os.environ["RELEASE_TAG"]
+        only_branch = os.environ.get("INPUT_TARGET_BRANCH", "").strip()
+        branches = []
+
+        for entry in config["branches"]:
+            if not entry.get("release_enabled", False):
+                continue
+            if only_branch and entry["branch"] != only_branch:
+                continue
+            branches.append({
+                "branch": entry["branch"],
+                "target_ref": f"{release_tag}-{entry['branch']}",
+            })
+
+        if only_branch and not branches:
+            raise SystemExit(f"Configured release branch not found: {only_branch}")
+
+        with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as fh:
+            fh.write(f"branches={json.dumps(branches, separators=(',', ':'))}\n")
+        PY
+    - name: Create or reuse release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        RELEASE_TAG: ${{ steps.meta.outputs.release_tag }}
+      run: |
+        if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+          echo "Release already exists for $RELEASE_TAG"
+          exit 0
+        fi
+        gh release create "$RELEASE_TAG" \
+          --draft \
+          --verify-tag \
+          --title "$RELEASE_TAG" \
+          --generate-notes \
+          --notes "Release assets are uploaded by branch workflows."
+
+  dispatch:
+    name: Dispatch branch workflows
+    needs: [ prepare ]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJson(needs.prepare.outputs.branches) }}
+    steps:
+    - name: Trigger branch workflow
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        RELEASE_TAG: ${{ needs.prepare.outputs.release_tag }}
+        TARGET_BRANCH: ${{ matrix.branch }}
+        TARGET_REF: ${{ matrix.target_ref }}
+      run: |
+        gh api \
+          --method POST \
+          -H "Accept: application/vnd.github+json" \
+          "/repos/${{ github.repository }}/actions/workflows/$DISPATCH_WORKFLOW_FILE/dispatches" \
+          -f ref="$TARGET_REF" \
+          -F inputs[branch]="$TARGET_BRANCH" \
+          -F inputs[target_ref]="$TARGET_REF" \
+          -F inputs[release_tag]="$RELEASE_TAG"
+    - name: Summarize dispatched branches
+      run: |
+        {
+          echo "### Dispatched branch builds"
+          echo
+          echo "- Release tag: \`${{ needs.prepare.outputs.release_tag }}\`"
+          echo "- Branch: \`${{ matrix.branch }}\`"
+          echo "- Build ref: \`${{ matrix.target_ref }}\`"
+        } >> "$GITHUB_STEP_SUMMARY"
