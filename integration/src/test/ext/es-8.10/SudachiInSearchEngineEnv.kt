@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Works Applications Co., Ltd.
+ * Copyright (c) 2024-2026 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,7 @@ import org.elasticsearch.indices.analysis.AnalysisModule
 import org.elasticsearch.plugins.AnalysisPlugin
 import org.elasticsearch.plugins.PluginsService
 
-typealias PluginsServiceAlias = PluginsService
-
-fun SudachiInSearchEngineEnv.makePluginService(): PluginsServiceAlias {
+fun SudachiInSearchEngineEnv.makePluginService(): PluginsService {
   return PluginsService(settings(), configPath, null, pluginsPath)
 }
 

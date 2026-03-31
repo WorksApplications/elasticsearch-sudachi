@@ -17,9 +17,13 @@
 package com.worksap.nlp.elasticsearch.sudachi.index
 
 import com.worksap.nlp.elasticsearch.sudachi.plugin.AnalysisSudachiPlugin
-import com.worksap.nlp.search.aliases.*
 import com.worksap.nlp.test.TestDictionary
 import java.nio.file.Path
+import org.elasticsearch.common.settings.Settings
+import org.elasticsearch.env.Environment
+import org.elasticsearch.env.TestEnvironment
+import org.elasticsearch.indices.analysis.AnalysisModule
+import org.elasticsearch.plugins.AnalysisPlugin
 import org.junit.rules.ExternalResource
 import org.junit.runner.Description
 import org.junit.runners.model.Statement

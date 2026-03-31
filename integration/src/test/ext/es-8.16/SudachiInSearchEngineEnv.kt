@@ -20,9 +20,7 @@ import org.elasticsearch.indices.analysis.AnalysisModule
 import org.elasticsearch.plugins.AnalysisPlugin
 import org.elasticsearch.plugins.PluginsService
 
-typealias PluginsServiceAlias = PluginsService
-
-fun SudachiInSearchEngineEnv.makePluginService(): PluginsServiceAlias {
+fun SudachiInSearchEngineEnv.makePluginService(): PluginsService {
   return PluginsService(settings(), configPath, null, pluginsPath)
 }
 

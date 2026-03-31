@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Works Applications Co., Ltd.
+ * Copyright (c) 2023-2026 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,18 @@ package com.worksap.nlp.elasticsearch.sudachi
 
 import java.nio.file.Path
 import kotlin.io.path.Path
+import org.elasticsearch.common.settings.Settings
+import org.elasticsearch.env.Environment
+import org.elasticsearch.index.analysis.AnalysisRegistry
+import org.elasticsearch.test.ESTestCase
 
 class SudachiInSearchEngineEnv {
   val rootPath = Path(requireNotNull(System.getProperty("sudachi.es.root")))
 
-  fun settings(parent: SettingsAlias = SettingsAlias.EMPTY): SettingsAlias {
-    val bldr = SettingsAlias.builder()
+  fun settings(parent: Settings = Settings.EMPTY): Settings {
+    val bldr = Settings.builder()
     bldr.put(parent)
-    bldr.put(EnvironmentAlias.PATH_HOME_SETTING.key, rootPath.toString())
+    bldr.put(Environment.PATH_HOME_SETTING.key, rootPath.toString())
     return bldr.build()
   }
 
@@ -34,14 +38,14 @@ class SudachiInSearchEngineEnv {
   val configPath: Path
     get() = rootPath.resolve("config")
 
-  fun environment(): EnvironmentAlias {
-    return EnvironmentAlias(settings(), configPath)
+  fun environment(): Environment {
+    return Environment(settings(), configPath)
   }
 }
 
-abstract class SudachiEnvTest : SearchEngineTestCase() {
+abstract class SudachiEnvTest : ESTestCase() {
   internal val sudachiEnv = SudachiInSearchEngineEnv()
 
   private val analysisModule by lazy { sudachiEnv.makeAnalysisModule() }
-  fun analysisRegistry(): AnalysisRegistryAlias = analysisModule.analysisRegistry
+  fun analysisRegistry(): AnalysisRegistry = analysisModule.analysisRegistry
 }

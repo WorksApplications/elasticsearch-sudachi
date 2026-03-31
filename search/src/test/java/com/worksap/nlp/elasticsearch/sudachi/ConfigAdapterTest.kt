@@ -16,15 +16,15 @@
 
 package com.worksap.nlp.elasticsearch.sudachi
 
-import com.worksap.nlp.search.aliases.Environment
-import com.worksap.nlp.search.aliases.Settings
-import com.worksap.nlp.search.aliases.TestEnvironment
 import com.worksap.nlp.sudachi.PathAnchor
 import com.worksap.nlp.sudachi.Tokenizer.SplitMode
 import com.worksap.nlp.test.TestDictionary
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
+import org.elasticsearch.common.settings.Settings
+import org.elasticsearch.env.Environment
+import org.elasticsearch.env.TestEnvironment
 import org.junit.Rule
 import org.junit.Test
 

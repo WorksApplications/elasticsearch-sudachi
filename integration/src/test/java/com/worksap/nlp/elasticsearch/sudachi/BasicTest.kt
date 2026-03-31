@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Works Applications Co., Ltd.
+ * Copyright (c) 2023-2026 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,9 @@
 
 package com.worksap.nlp.elasticsearch.sudachi
 
+import org.elasticsearch.action.admin.indices.analyze.AnalyzeAction.Request
+import org.elasticsearch.action.admin.indices.analyze.TransportAnalyzeAction
+import org.elasticsearch.plugins.AnalysisPlugin
 import org.junit.Assert
 import org.junit.Test
 
@@ -23,7 +26,7 @@ class BasicTest : SudachiEnvTest() {
   @Test
   fun canLoadPlugin() {
     val plugins = sudachiEnv.makePluginService()
-    val analysisPlugins = plugins.filterPlugins(AnalysisPluginAlias::class.java).toList()
+    val analysisPlugins = plugins.filterPlugins(AnalysisPlugin::class.java).toList()
     Assert.assertEquals(2, analysisPlugins.size)
     val plugin =
         analysisPlugins.find {
@@ -41,12 +44,12 @@ class BasicTest : SudachiEnvTest() {
 
   @Test
   fun testAnalysisAction() {
-    val req = AnalyzeActionRequestAlias("sudachi_test")
+    val req = Request("sudachi_test")
     req.tokenizer("sudachi_tokenizer")
     req.text("京都に行った")
     val analyzers = analysisRegistry()
     val response =
-        TransportAnalyzeActionAlias.analyze(
+        TransportAnalyzeAction.analyze(
             req,
             analyzers,
             null,

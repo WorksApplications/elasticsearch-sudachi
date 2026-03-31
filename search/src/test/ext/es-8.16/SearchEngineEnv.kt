@@ -16,13 +16,15 @@
 
 package com.worksap.nlp.elasticsearch.sudachi.index
 
-import com.worksap.nlp.elasticsearch.sudachi.aliases.MetadataConstants
-import com.worksap.nlp.search.aliases.*
+import org.elasticsearch.Version
 import org.elasticsearch.cluster.metadata.IndexMetadata
 import org.elasticsearch.common.settings.IndexScopedSettings
 import org.elasticsearch.common.settings.Settings
+import org.elasticsearch.index.IndexService.IndexCreationContext
 import org.elasticsearch.index.IndexSettings
 import org.elasticsearch.index.IndexVersion
+import org.elasticsearch.index.analysis.IndexAnalyzers
+import org.elasticsearch.index.analysis.TokenizerFactory
 
 fun SearchEngineEnv.indexAnalyzers(settings: Settings): IndexAnalyzers {
   val indexSettings = newIndexSettings("test", settings)
@@ -33,7 +35,7 @@ fun SearchEngineEnv.indexAnalyzers(settings: Settings): IndexAnalyzers {
 fun SearchEngineEnv.tokenizers(settings: Map<String, String>): Map<String, TokenizerFactory> {
   val builder = Settings.builder()
   settings.forEach { (key: String?, value: String?) -> builder.put(key, value) }
-  builder.put(MetadataConstants.SETTING_VERSION_CREATED, Version.CURRENT)
+  builder.put(IndexMetadata.SETTING_VERSION_CREATED, Version.CURRENT)
   val indexSettings = newIndexSettings("test", builder.build())
   return analysisRegistry.buildTokenizerFactories(indexSettings)
 }
