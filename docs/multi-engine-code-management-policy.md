@@ -100,9 +100,9 @@ cherrypick/backport の要否と対象ブランチの確認は PR 単位で行�
 該当する元 PR にラベル `backport [target branch]` (e.g. `backport es-9`) を付与することで backport 先を指定する。
 複数ブランチへのbackport が必要な場合は以下の省略形も使用可能。
 
-- `backport-es`：すべての Elasticsearch 系列に backport する
-- `backport-os`：すべての OpenSearch 系列に backport する
-- `backport-all`：すべての系列に backport する
+- `backport es`：すべての Elasticsearch 系列に backport する
+- `backport os`：すべての OpenSearch 系列に backport する
+- `backport all`：すべての系列に backport する
 
 当該 PR のマージ時（マージ済みならラベル付与時）にバックポート PR 作成のアクションが実行されるので、これのマージをもって完了とする。
 

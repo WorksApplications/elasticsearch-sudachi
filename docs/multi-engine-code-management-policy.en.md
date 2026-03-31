@@ -100,9 +100,9 @@ Whether cherry-pick/backport is required, and which target branches are involved
 Specify the backport target by adding the label `backport [target branch]` to the source PR (e.g. `backport es-9`).
 If backporting to multiple branches is required, the following shorthand labels may also be used.
 
-- `backport-es`: backport to all Elasticsearch series
-- `backport-os`: backport to all OpenSearch series
-- `backport-all`: backport to all series
+- `backport es`: backport to all Elasticsearch series
+- `backport os`: backport to all OpenSearch series
+- `backport all`: backport to all series
 
 When the PR is merged (or when the label is added if it has already been merged), an action to create the backport PR is triggered, and completion is defined as the merge of that generated backport PR.
 
