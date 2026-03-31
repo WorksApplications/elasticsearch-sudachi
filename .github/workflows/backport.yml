@@ -14,16 +14,16 @@ jobs:
   backport:
     name: Backport merged PR
     runs-on: ubuntu-latest
-    # closed: when PR is merged with label `backport-*`
-    # labeled: when `backport-*` label is added to a merged PR
+    # closed: when PR is merged with label `backport *`
+    # labeled: when `backport *` label is added to a merged PR
     if: >
       (github.event.action == 'closed' &&
        github.event.pull_request.merged == true &&
-       contains(join(github.event.pull_request.labels.*.name, ' '), 'backport-'))
+       contains(join(github.event.pull_request.labels.*.name, ' '), 'backport '))
       ||
       (github.event.action == 'labeled' &&
        github.event.pull_request.merged == true &&
-       startsWith(github.event.label.name, 'backport-'))
+       startsWith(github.event.label.name, 'backport '))
     steps:
       - name: Expand backport label into target branches
         id: targets
