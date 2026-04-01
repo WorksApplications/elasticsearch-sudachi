@@ -25,6 +25,9 @@ jobs:
        github.event.pull_request.merged == true &&
        startsWith(github.event.label.name, 'backport '))
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
       - name: Expand backport label into target branches
         id: targets
         uses: actions/github-script@v8
@@ -65,6 +68,10 @@ jobs:
         uses: korthout/backport-action@4aaf0e03a94ff0a619c9a511b61aeb42adea5b02
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          # Target branches are resolved by the github-script step above.
+          # Disable the action's own label parsing so shorthand keys such as
+          # "all" are not treated as literal branch names.
+          label_pattern: '^$'
           target_branches: ${{ steps.targets.outputs.target_branches }}
           branch_name: 'backport/${target_branch}/${pull_number}'
           pull_title: '[Backport ${target_branch}] #${pull_number} ${pull_title}'
