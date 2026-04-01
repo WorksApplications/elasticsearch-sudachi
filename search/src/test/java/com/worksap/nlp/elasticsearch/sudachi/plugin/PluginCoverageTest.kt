@@ -16,9 +16,9 @@
 
 package com.worksap.nlp.elasticsearch.sudachi.plugin
 
-import com.worksap.nlp.search.aliases.Settings
 import kotlin.test.assertTrue
 import org.junit.Test
+import org.opensearch.common.settings.Settings
 
 class PluginCoverageTest {
   @Test

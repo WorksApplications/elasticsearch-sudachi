@@ -21,13 +21,13 @@ import com.worksap.nlp.lucene.sudachi.ja.CachingTokenizer
 import com.worksap.nlp.lucene.sudachi.ja.SudachiTokenizer
 import com.worksap.nlp.lucene.sudachi.ja.plugin.AnalysisCacheService
 import com.worksap.nlp.lucene.sudachi.ja.plugin.DictionaryService
-import com.worksap.nlp.search.aliases.AbstractTokenizerFactory
-import com.worksap.nlp.search.aliases.AnalysisProvider
-import com.worksap.nlp.search.aliases.Environment
-import com.worksap.nlp.search.aliases.IndexSettings
-import com.worksap.nlp.search.aliases.Settings
-import com.worksap.nlp.search.aliases.TokenizerFactory
 import org.apache.lucene.analysis.Tokenizer
+import org.opensearch.common.settings.Settings
+import org.opensearch.env.Environment
+import org.opensearch.index.IndexSettings
+import org.opensearch.index.analysis.AbstractTokenizerFactory
+import org.opensearch.index.analysis.TokenizerFactory
+import org.opensearch.indices.analysis.AnalysisModule.AnalysisProvider
 
 class SudachiTokenizerFactory(
     private val service: DictionaryService,
@@ -36,7 +36,7 @@ class SudachiTokenizerFactory(
     private val env: Environment,
     name: String,
     settings: Settings
-) : AbstractTokenizerFactory(indexSettings, env, name, settings) {
+) : AbstractTokenizerFactory(indexSettings, settings, name) {
 
   companion object {
     @JvmStatic

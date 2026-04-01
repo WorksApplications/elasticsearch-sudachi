@@ -17,12 +17,22 @@
 package com.worksap.nlp.elasticsearch.sudachi.index
 
 import com.worksap.nlp.elasticsearch.sudachi.plugin.AnalysisSudachiPlugin
-import com.worksap.nlp.search.aliases.*
 import com.worksap.nlp.test.TestDictionary
 import java.nio.file.Path
 import org.junit.rules.ExternalResource
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
+import org.opensearch.Version
+import org.opensearch.cluster.metadata.IndexMetadata
+import org.opensearch.common.settings.Settings
+import org.opensearch.core.index.Index
+import org.opensearch.env.Environment
+import org.opensearch.env.TestEnvironment
+import org.opensearch.index.analysis.IndexAnalyzers
+import org.opensearch.index.analysis.TokenizerFactory
+import org.opensearch.indices.analysis.AnalysisModule
+import org.opensearch.plugins.AnalysisPlugin
+import org.opensearch.test.IndexSettingsModule
 
 class SearchEngineEnv(vararg components: String = arrayOf("system")) : ExternalResource() {
   private val testDic = TestDictionary(*components)
@@ -48,6 +58,20 @@ class SearchEngineEnv(vararg components: String = arrayOf("system")) : ExternalR
   val analysisRegistry
     get() = analysisModule.analysisRegistry
 
+  fun indexAnalyzers(settings: Settings): IndexAnalyzers {
+    val indexSettings = IndexSettingsModule.newIndexSettings(Index("test", "_na_"), settings)
+    return analysisRegistry.build(indexSettings)
+  }
+
+  fun tokenizers(settings: Map<String, String>): Map<String, TokenizerFactory> {
+    val builder = Settings.builder()
+    settings.forEach { (key: String?, value: String?) -> builder.put(key, value) }
+    builder.put(IndexMetadata.SETTING_VERSION_CREATED, Version.CURRENT)
+    val indexSettings = builder.build()
+    return analysisRegistry.buildTokenizerFactories(
+        IndexSettingsModule.newIndexSettings(Index("test", "_na_"), indexSettings))
+  }
+
   /**
    * Reflection hack for instantiating AnalysisModule
    *
@@ -59,7 +83,7 @@ class SearchEngineEnv(vararg components: String = arrayOf("system")) : ExternalR
     val pluginList = plugins.asList()
     val clz =
         try {
-          Class.forName("org.elasticsearch.plugins.scanners.StablePluginsRegistry")
+          Class.forName("org.opensearch.plugins.scanners.StablePluginsRegistry")
         } catch (_: ClassNotFoundException) {
           null
         }
