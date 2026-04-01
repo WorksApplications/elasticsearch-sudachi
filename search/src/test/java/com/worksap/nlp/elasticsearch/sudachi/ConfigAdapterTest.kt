@@ -16,9 +16,6 @@
 
 package com.worksap.nlp.elasticsearch.sudachi
 
-import com.worksap.nlp.search.aliases.Environment
-import com.worksap.nlp.search.aliases.Settings
-import com.worksap.nlp.search.aliases.TestEnvironment
 import com.worksap.nlp.sudachi.PathAnchor
 import com.worksap.nlp.sudachi.Tokenizer.SplitMode
 import com.worksap.nlp.test.TestDictionary
@@ -27,6 +24,9 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 import org.junit.Rule
 import org.junit.Test
+import org.opensearch.common.settings.Settings
+import org.opensearch.env.Environment
+import org.opensearch.env.TestEnvironment
 
 class ConfigAdapterTest {
   @JvmField @Rule var testDic = TestDictionary("system")

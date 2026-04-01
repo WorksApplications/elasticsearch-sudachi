@@ -20,10 +20,15 @@ import com.worksap.nlp.elasticsearch.sudachi.ConfigAdapter
 import com.worksap.nlp.lucene.sudachi.ja.SudachiAnalyzer
 import com.worksap.nlp.lucene.sudachi.ja.plugin.AnalysisCacheService
 import com.worksap.nlp.lucene.sudachi.ja.plugin.DictionaryService
-import com.worksap.nlp.search.aliases.*
-import com.worksap.nlp.search.aliases.AbstractIndexAnalyzerProvider
 import org.apache.lucene.analysis.Analyzer
 import org.apache.lucene.analysis.CharArraySet
+import org.opensearch.common.settings.Settings
+import org.opensearch.env.Environment
+import org.opensearch.index.IndexSettings
+import org.opensearch.index.analysis.AbstractIndexAnalyzerProvider
+import org.opensearch.index.analysis.Analysis.parseStopWords
+import org.opensearch.index.analysis.AnalyzerProvider
+import org.opensearch.indices.analysis.AnalysisModule.AnalysisProvider
 
 class SudachiAnalyzerProvider(
     cacheService: AnalysisCacheService,
@@ -32,7 +37,7 @@ class SudachiAnalyzerProvider(
     env: Environment,
     name: String,
     settings: Settings
-) : AbstractIndexAnalyzerProvider<SudachiAnalyzer>(indexSettings, env, name, settings) {
+) : AbstractIndexAnalyzerProvider<SudachiAnalyzer>(indexSettings, name, settings) {
 
   private val stopWords: Set<*> by lazy {
     parseStopWords(env, settings, SudachiAnalyzer.getDefaultStopSet(), false)
