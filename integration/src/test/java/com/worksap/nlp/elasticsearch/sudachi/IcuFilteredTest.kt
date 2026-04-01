@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Works Applications Co., Ltd.
+ * Copyright (c) 2023-2026 Works Applications Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,18 +17,20 @@
 package com.worksap.nlp.elasticsearch.sudachi
 
 import kotlin.test.Test
+import org.elasticsearch.action.admin.indices.analyze.AnalyzeAction.Request
+import org.elasticsearch.action.admin.indices.analyze.TransportAnalyzeAction
 import org.junit.Assert
 
 class IcuFilteredTest : SudachiEnvTest() {
   @Test
   fun icuFilteredStuffIsNotTrimmed() {
-    val req = AnalyzeActionRequestAlias("sudachi_test")
+    val req = Request("sudachi_test")
     req.tokenizer("sudachi_tokenizer")
     req.addCharFilter(mapOf("type" to "icu_normalizer", "name" to "nfkc_cf", "mode" to "compose"))
     req.text("white")
     val analyzers = analysisRegistry()
     val response =
-        TransportAnalyzeActionAlias.analyze(
+        TransportAnalyzeAction.analyze(
             req,
             analyzers,
             null,

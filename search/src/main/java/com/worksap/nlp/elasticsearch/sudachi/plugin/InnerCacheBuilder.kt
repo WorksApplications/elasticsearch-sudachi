@@ -20,9 +20,9 @@ import com.worksap.nlp.lucene.sudachi.ja.plugin.AnalysisCache
 import com.worksap.nlp.lucene.sudachi.ja.plugin.AnalysisCacheStats
 import com.worksap.nlp.lucene.sudachi.ja.plugin.InnerCache
 import com.worksap.nlp.lucene.sudachi.ja.plugin.InnerCacheBuilder
-import com.worksap.nlp.search.aliases.Cache
-import com.worksap.nlp.search.aliases.CacheBuilder
 import com.worksap.nlp.sudachi.MorphemeList
+import org.elasticsearch.common.cache.Cache
+import org.elasticsearch.common.cache.CacheBuilder
 
 class InnerCacheBuilderImpl : InnerCacheBuilder {
   override fun build(capacity: Int): InnerCacheImpl {

@@ -20,12 +20,22 @@ import com.worksap.nlp.elasticsearch.sudachi.index.*
 import com.worksap.nlp.lucene.sudachi.ja.SudachiResourceAccess
 import com.worksap.nlp.lucene.sudachi.ja.plugin.AnalysisCacheService
 import com.worksap.nlp.lucene.sudachi.ja.plugin.DictionaryService
-import com.worksap.nlp.search.aliases.*
 import java.io.IOException
 import java.util.*
 import kotlin.collections.ArrayList
 import org.apache.logging.log4j.LogManager
 import org.apache.lucene.analysis.Analyzer
+import org.elasticsearch.common.settings.Settings
+import org.elasticsearch.env.Environment
+import org.elasticsearch.index.IndexSettings
+import org.elasticsearch.index.analysis.AnalyzerProvider
+import org.elasticsearch.index.analysis.TokenFilterFactory
+import org.elasticsearch.index.analysis.TokenizerFactory
+import org.elasticsearch.indices.analysis.AnalysisModule.AnalysisProvider
+import org.elasticsearch.plugins.AnalysisPlugin
+import org.elasticsearch.plugins.ExtensiblePlugin
+import org.elasticsearch.plugins.ExtensiblePlugin.ExtensionLoader
+import org.elasticsearch.plugins.Plugin
 
 private inline fun <reified T> provider(
     crossinline fn: (IndexSettings, Environment, String, Settings) -> T

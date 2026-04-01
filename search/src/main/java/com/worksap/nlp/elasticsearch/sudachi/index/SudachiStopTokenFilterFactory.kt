@@ -17,21 +17,21 @@
 package com.worksap.nlp.elasticsearch.sudachi.index
 
 import com.worksap.nlp.lucene.sudachi.ja.SudachiAnalyzer
-import com.worksap.nlp.search.aliases.AbstractTokenFilterFactory
-import com.worksap.nlp.search.aliases.Environment
-import com.worksap.nlp.search.aliases.IndexSettings
-import com.worksap.nlp.search.aliases.Settings
-import com.worksap.nlp.search.aliases.parseWords
 import org.apache.lucene.analysis.TokenStream
 import org.apache.lucene.analysis.core.StopFilter
 import org.apache.lucene.search.suggest.analyzing.SuggestStopFilter
+import org.elasticsearch.common.settings.Settings
+import org.elasticsearch.env.Environment
+import org.elasticsearch.index.IndexSettings
+import org.elasticsearch.index.analysis.AbstractTokenFilterFactory
+import org.elasticsearch.index.analysis.Analysis.parseWords
 
 class SudachiStopTokenFilterFactory(
     indexSettings: IndexSettings?,
     env: Environment?,
     name: String?,
     settings: Settings
-) : AbstractTokenFilterFactory(indexSettings, env, name, settings) {
+) : AbstractTokenFilterFactory(name, settings) {
   private val ignoreCase = settings.getAsBoolean("ignore_case", false)
   private val removeTrailing = settings.getAsBoolean("remove_trailing", true)
   private val stopWords =

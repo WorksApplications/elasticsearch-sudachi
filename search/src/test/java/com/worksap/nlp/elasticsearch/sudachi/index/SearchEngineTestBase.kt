@@ -16,16 +16,16 @@
 
 package com.worksap.nlp.elasticsearch.sudachi.index
 
-import com.worksap.nlp.search.aliases.LogConfigurator
-import com.worksap.nlp.search.aliases.NamedAnalyzer
-import com.worksap.nlp.search.aliases.Settings
-import com.worksap.nlp.search.aliases.TokenizerFactory
-import com.worksap.nlp.search.aliases.XContentType
 import java.io.StringReader
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import org.apache.lucene.analysis.TokenStream
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute
+import org.elasticsearch.common.logging.LogConfigurator
+import org.elasticsearch.common.settings.Settings
+import org.elasticsearch.index.analysis.NamedAnalyzer
+import org.elasticsearch.index.analysis.TokenizerFactory
+import org.elasticsearch.xcontent.XContentType
 import org.intellij.lang.annotations.Language
 
 /** Interface for search engine-based tests. It performs logging initialization. */
