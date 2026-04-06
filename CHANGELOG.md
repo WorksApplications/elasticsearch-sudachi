@@ -2,6 +2,21 @@
 
 ## [Unreleased](https://github.com/WorksApplications/elasticsearch-sudachi/releases/)
 
+## [3.5.0](https://github.com/WorksApplications/elasticsearch-sudachi/releases/tag/v3.5.0) - 2026-04-06
+
+### Added
+
+- Add multi-engine code management policy documents for branch-based ES/OS version management ([#183](https://github.com/WorksApplications/elasticsearch-sudachi/pull/183))
+
+### Changed
+
+- Update Gradle and build tooling, including Gradle 8.14, Kotlin 2.3.0, Spotless 8.1.0, Kover 0.9.7, SonarQube 7.2.2, and Nexus Publish 2.0.0, and switch packaging and coverage aggregation to subproject-aware tasks ([#180](https://github.com/WorksApplications/elasticsearch-sudachi/pull/180))
+- Reorganize codebase to prepare for branch-based management:
+  - Separate Lucene and search-engine sources under `lucene/` and `search/` ([#179](https://github.com/WorksApplications/elasticsearch-sudachi/pull/179))
+  - Separate es-sudachi plugins into version-parsing/dependency management/source code management ([#181](https://github.com/WorksApplications/elasticsearch-sudachi/pull/179))
+  - Merge search-engine-specific plugin code previously managed in `ext` ([#184](https://github.com/WorksApplications/elasticsearch-sudachi/pull/184), [#185](https://github.com/WorksApplications/elasticsearch-sudachi/pull/185), [#186](https://github.com/WorksApplications/elasticsearch-sudachi/pull/186))
+  - Replace the release workflow with branch support matrix based CI, release orchestration, release-by-series workflows, and automated backport handling for engine-specific branches ([#183](https://github.com/WorksApplications/elasticsearch-sudachi/pull/183), [#188](https://github.com/WorksApplications/elasticsearch-sudachi/pull/188))
+
 ## [3.4.0](https://github.com/WorksApplications/elasticsearch-sudachi/releases/tag/v3.4.0) - 2026-01-27
 
 ### Added
