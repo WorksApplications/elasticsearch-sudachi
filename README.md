@@ -7,17 +7,20 @@ analysis-sudachi is an Elasticsearch plugin for tokenization of Japanese text us
 
 # What's new?
 
-- [3.4.0]
-  - Support Elasticsearch 8.16.6 and 8.17.10.
-  - Support OpenSearch 2.18.0 and 2.19.4.
-  - Elasticsearch 7.x and versions earlier than 8.10 will no longer be supported.
-  - Update Java version from 11 to 17
+- [3.5.0]
+  - Introduce [branch-based code management policy](docs/multi-engine-code-management-policy.en.md)
+  - Reorganize codebase. The overall behavior of the plugin does not change.
+  - Update Gradle (to 8.14) and plugins (including kotlin 2.3.0).
 
 Check [changelog](./CHANGELOG.md) for more.
 
 # Build (if necessary)
 
-1. Build analysis-sudachi.
+1. Check the branch which supports the target version and checkout.
+  - Either `es-8.10-plus`, `os-2.6-plus`, `os-3`.
+  - See [support martix file](.github/branch-support-matrix.json).
+2. Build analysis-sudachi.
+
 ```
    $ ./gradlew -PengineVersion=es:8.17.10 build
 ```
@@ -26,11 +29,12 @@ Use `-PengineVersion=os:2.19.3` for OpenSearch.
 
 ## Supported ElasticSearch versions
 
-1. 8.10.* until 8.17.* supported, integration tests in CI
+1. (`es-8.10-plus`) 8.10.* until 8.17.* supported, integration tests in CI
 
 ## Supported OpenSearch versions
 
-1. 2.6.* until 3.4.* supported, integration tests in CI
+1. (`os-2.6-plus`) 2.6.* until 2.19.* supported, integration tests in CI
+2. (`os-3`) 3.0.* until 3.4.* supported, integration tests in CI
 
 # Installation
 
@@ -39,11 +43,11 @@ Use `-PengineVersion=os:2.19.3` for OpenSearch.
 
    a. Using the release package
    ```
-   $ bin/elasticsearch-plugin install https://github.com/WorksApplications/elasticsearch-sudachi/releases/download/v3.1.1/analysis-sudachi-8.13.4-3.1.1.zip
+   $ bin/elasticsearch-plugin install https://github.com/WorksApplications/elasticsearch-sudachi/releases/download/v3.5.0/analysis-sudachi-8.13.4-3.5.0.zip
    ```
    b. Using self-build package
    ```
-   $ bin/elasticsearch-plugin install file:///path/to/analysis-sudachi-8.13.4-3.1.1.zip
+   $ bin/elasticsearch-plugin install file:///path/to/analysis-sudachi-8.13.4-3.5.0.zip
    ```
    (Specify the absolute path in URI format)
 3. Download sudachi dictionary archive from https://github.com/WorksApplications/SudachiDict
