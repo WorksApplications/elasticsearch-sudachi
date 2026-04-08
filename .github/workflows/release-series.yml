@@ -99,6 +99,8 @@ jobs:
     - uses: actions/checkout@v6
       with:
         ref: ${{ inputs.target_ref }}
+    - name: Fetch base branch for spotless/ratchetFrom
+      run: git fetch origin "${{ inputs.branch }}:refs/remotes/origin/${{ inputs.branch }}"
     - name: Setup JDK
       uses: actions/setup-java@v5
       with:
