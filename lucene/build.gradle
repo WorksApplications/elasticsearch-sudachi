@@ -67,7 +67,7 @@ tasks.named('jar', Jar) {
 
 spotless {
     // watch for https://github.com/diffplug/spotless/issues/911 to be closed
-    ratchetFrom 'origin/develop'
+    ratchetFrom 'origin/os-2.6-plus'
     encoding 'UTF-8' // all formats will be interpreted as UTF-8
     def formatter = rootProject.projectDir.toPath().resolve(".formatter")
 
