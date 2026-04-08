@@ -120,7 +120,7 @@ jobs:
           --method POST \
           -H "Accept: application/vnd.github+json" \
           "/repos/${{ github.repository }}/actions/workflows/$DISPATCH_WORKFLOW_FILE/dispatches" \
-          -f ref="$TARGET_REF" \
+          -f ref="develop" \
           -F inputs[branch]="$TARGET_BRANCH" \
           -F inputs[target_ref]="$TARGET_REF" \
           -F inputs[release_tag]="$RELEASE_TAG"
