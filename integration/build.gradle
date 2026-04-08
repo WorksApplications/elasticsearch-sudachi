@@ -134,7 +134,7 @@ artifacts {
 
 spotless {
     // watch for https://github.com/diffplug/spotless/issues/911 to be closed
-    ratchetFrom 'origin/develop'
+    ratchetFrom 'origin/os-3'
     encoding 'UTF-8' // all formats will be interpreted as UTF-8
     def formatter = rootProject.projectDir.toPath().resolve(".formatter")
 
