@@ -68,7 +68,6 @@ def distZip = tasks.register('distZip', Zip) {
 }
 
 spotless {
-    // watch for https://github.com/diffplug/spotless/issues/911 to be closed
     ratchetFrom 'origin/es-8.10-plus'
     encoding 'UTF-8' // all formats will be interpreted as UTF-8
     def formatter = rootProject.projectDir.toPath().resolve(".formatter")
@@ -82,9 +81,8 @@ spotless {
     }
     java {
         // don't need to set target, it is inferred from java
-        // version list: https://github.com/diffplug/spotless/tree/main/lib-extra/src/main/resources/com/diffplug/spotless/extra/eclipse_jdt_formatter
-
-        eclipse('4.21').configFile(formatter.resolve('eclipse-formatter.xml'))
+        // check version: https://github.com/diffplug/spotless/blob/main/plugin-gradle/CHANGES.md
+        eclipse('4.35').configFile(formatter.resolve('eclipse-formatter.xml'))
         licenseHeaderFile(formatter.resolve('license-header'))
     }
 }
