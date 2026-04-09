@@ -1,5 +1,5 @@
 plugins {
-    id 'com.diffplug.spotless' version '8.1.0'
+    id 'com.diffplug.spotless' version '8.4.0'
     id 'io.github.gradle-nexus.publish-plugin' version '2.0.0'
     id 'org.jetbrains.kotlin.jvm' version '2.3.0'
     id 'org.jetbrains.kotlin.plugin.serialization' version '2.3.0'
@@ -93,7 +93,6 @@ artifacts {
 
 // See https://github.com/diffplug/spotless/tree/main/plugin-gradle
 spotless {
-    // watch for https://github.com/diffplug/spotless/issues/911 to be closed
     ratchetFrom 'origin/es-8.10-plus'
     encoding 'UTF-8' // all formats will be interpreted as UTF-8
 
