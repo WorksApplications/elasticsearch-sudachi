@@ -84,4 +84,9 @@ spotless {
         eclipse('4.35').configFile(formatter.resolve('eclipse-formatter.xml'))
         licenseHeaderFile(formatter.resolve('license-header'))
     }
+    kotlin {
+        // by default the target is every '.kt' and '.kts` file in the java sourcesets
+        ktfmt('0.61')
+        licenseHeaderFile(formatter.resolve('license-header'))
+    }
 }

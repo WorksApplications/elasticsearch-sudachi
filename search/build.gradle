@@ -84,7 +84,7 @@ spotless {
     }
     kotlin {
         // by default the target is every '.kt' and '.kts` file in the java sourcesets
-        ktfmt('0.39')
+        ktfmt('0.61')
         licenseHeaderFile(formatter.resolve('license-header'))
     }
 }
