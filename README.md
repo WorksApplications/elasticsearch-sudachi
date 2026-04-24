@@ -34,7 +34,7 @@ Use `-PengineVersion=os:2.19.3` for OpenSearch.
 ## Supported OpenSearch versions
 
 1. (`os-2.6-plus`) 2.6.* until 2.19.* supported, integration tests in CI
-2. (`os-3`) 3.0.* until 3.4.* supported, integration tests in CI
+2. (`os-3`) 3.0.* until 3.5.* supported, integration tests in CI
 
 # Installation
 
