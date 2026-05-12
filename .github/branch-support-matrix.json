@@ -51,6 +51,10 @@
       "upload_spi": false,
       "versions": [
         {
+          "engine_version": "os:3.5.0",
+          "java_version": "21"
+        },
+        {
           "engine_version": "os:3.4.0",
           "java_version": "21"
         },
