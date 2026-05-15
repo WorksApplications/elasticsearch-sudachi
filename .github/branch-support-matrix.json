@@ -7,9 +7,24 @@
       "versions": []
     },
     {
-      "branch": "es-8.10-plus",
+      "branch": "es-8.18-plus",
       "release_enabled": true,
       "upload_spi": true,
+      "versions": [
+        {
+          "engine_version": "es:8.19.15",
+          "java_version": "17"
+        },
+        {
+          "engine_version": "es:8.18.8",
+          "java_version": "17"
+        }
+      ]
+    },
+    {
+      "branch": "es-8.10-8.17",
+      "release_enabled": true,
+      "upload_spi": false,
       "versions": [
         {
           "engine_version": "es:8.17.10",
