@@ -21,6 +21,10 @@ import kotlin.io.path.Path
 import org.elasticsearch.common.settings.Settings
 import org.elasticsearch.env.Environment
 import org.elasticsearch.index.analysis.AnalysisRegistry
+import org.elasticsearch.indices.analysis.AnalysisModule
+import org.elasticsearch.plugins.AnalysisPlugin
+import org.elasticsearch.plugins.PluginsLoader
+import org.elasticsearch.plugins.PluginsService
 import org.elasticsearch.test.ESTestCase
 
 class SudachiInSearchEngineEnv {
@@ -35,11 +39,29 @@ class SudachiInSearchEngineEnv {
 
   val pluginsPath: Path
     get() = rootPath.resolve("plugins")
+
   val configPath: Path
     get() = rootPath.resolve("config")
 
   fun environment(): Environment {
     return Environment(settings(), configPath)
+  }
+
+  fun makePluginService(): PluginsService {
+    val loader =
+        PluginsLoader.createPluginsLoader(
+            PluginsLoader.loadModulesBundles(environment().modulesDir()),
+            PluginsLoader.loadPluginsBundles(pluginsPath),
+            emptyMap(),
+        )
+    return PluginsService(settings(), configPath, loader)
+  }
+
+  fun makeAnalysisModule(): AnalysisModule {
+    val plugins = makePluginService()
+    val analysisPlugins = plugins.filterPlugins(AnalysisPlugin::class.java).toList()
+    val env = environment()
+    return AnalysisModule(env, analysisPlugins, plugins.stablePluginRegistry)
   }
 }
 
@@ -47,5 +69,6 @@ abstract class SudachiEnvTest : ESTestCase() {
   internal val sudachiEnv = SudachiInSearchEngineEnv()
 
   private val analysisModule by lazy { sudachiEnv.makeAnalysisModule() }
+
   fun analysisRegistry(): AnalysisRegistry = analysisModule.analysisRegistry
 }
