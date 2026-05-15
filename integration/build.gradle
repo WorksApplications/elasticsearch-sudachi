@@ -134,7 +134,7 @@ artifacts {
 }
 
 spotless {
-    ratchetFrom 'origin/es-8.10-plus'
+    ratchetFrom 'origin/es-8.10-8.17'
     encoding 'UTF-8' // all formats will be interpreted as UTF-8
     def formatter = rootProject.projectDir.toPath().resolve(".formatter")
 
