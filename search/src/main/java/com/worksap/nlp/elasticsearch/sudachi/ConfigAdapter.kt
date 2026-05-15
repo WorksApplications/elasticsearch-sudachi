@@ -26,9 +26,10 @@ import org.elasticsearch.common.settings.Settings
 import org.elasticsearch.env.Environment
 
 fun resourcesPath(env: Environment, settings: Settings): Path {
-  return env.configFile()
+  return env.configDir()
       .resolve(
-          settings.get(ConfigAdapter.PARAM_RESOURCES_PATH, ConfigAdapter.DEFAULT_RESOURCE_PATH))
+          settings.get(ConfigAdapter.PARAM_RESOURCES_PATH, ConfigAdapter.DEFAULT_RESOURCE_PATH)
+      )
 }
 
 class ConfigAdapter(anchor: PathAnchor, settings: Settings, env: Environment) {
