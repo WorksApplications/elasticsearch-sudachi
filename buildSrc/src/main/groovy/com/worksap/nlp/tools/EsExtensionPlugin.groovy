@@ -31,7 +31,7 @@ class EsExtension {
         var k = kind.get()
         if (k.engine == EngineType.ElasticSearch) {
             var version = k.parsedVersion()
-            return version.ge(8, 0)
+            return version.ge(8, 0) && version.lt(8, 18)
         } else {
             return false
         }
