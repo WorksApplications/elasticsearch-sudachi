@@ -68,7 +68,7 @@ def distZip = tasks.register('distZip', Zip) {
 }
 
 spotless {
-    ratchetFrom 'origin/es-8.10-plus'
+    ratchetFrom 'origin/es-8.18-plus'
     encoding 'UTF-8' // all formats will be interpreted as UTF-8
     def formatter = rootProject.projectDir.toPath().resolve(".formatter")
 
