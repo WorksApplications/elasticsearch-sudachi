@@ -18,7 +18,6 @@ package com.worksap.nlp.lucene.sudachi.ja.input
 
 import java.io.Reader
 import java.lang.ref.SoftReference
-import kotlin.text.StringBuilder
 
 data class ExtractionResult(
     val data: String,
@@ -32,6 +31,7 @@ data class ExtractionResult(
 
 interface InputExtractor {
   fun extract(input: Reader): ExtractionResult
+
   fun canExtract(input: Reader): Boolean
 
   companion object {
@@ -39,20 +39,13 @@ interface InputExtractor {
     const val DEFAUlT_MAX_INPUT = Short.MAX_VALUE.toInt()
 
     @JvmStatic
-    fun make(maxSize: Int?): InputExtractor {
-      val actualMaxSize = maxSize ?: DEFAUlT_MAX_INPUT
-      return if (InputExtractorBootstrap.ZERO_COPY === NoopInputExtractor.INSTANCE) {
-        // skip chaining because the initialization of ZERO_COPY seems failed.
-        CopyingInputExtractor(actualMaxSize)
-      } else {
-        ChainedExtractor(InputExtractorBootstrap.ZERO_COPY, CopyingInputExtractor(actualMaxSize))
-      }
-    }
+    fun make(maxSize: Int?): InputExtractor = CopyingInputExtractor(maxSize ?: DEFAUlT_MAX_INPUT)
   }
 }
 
 class NoopInputExtractor : InputExtractor {
   override fun extract(input: Reader) = ExtractionResult.EMPTY_HAS_REMAINING
+
   override fun canExtract(input: Reader) = false
 
   companion object {
@@ -62,6 +55,7 @@ class NoopInputExtractor : InputExtractor {
 
 class CopyingInputExtractor(private val maxSize: Int) : InputExtractor {
   private val bufferLocal = ThreadLocal<SoftReference<CharArray>>()
+
   override fun extract(input: Reader): ExtractionResult {
     val buf = getBuffer()
     var offset = input.read(buf)
@@ -96,42 +90,8 @@ class CopyingInputExtractor(private val maxSize: Int) : InputExtractor {
   }
 
   override fun canExtract(input: Reader): Boolean = true
+
   override fun toString(): String {
     return super.toString() + "(maxSize=$maxSize)"
-  }
-}
-
-class ChainedExtractor(private val first: InputExtractor, private val fallback: InputExtractor) :
-    InputExtractor {
-  override fun extract(input: Reader): ExtractionResult {
-    if (first.canExtract(input)) {
-      return first.extract(input)
-    }
-    return fallback.extract(input)
-  }
-
-  override fun canExtract(input: Reader): Boolean {
-    return first.canExtract(input) || fallback.canExtract(input)
-  }
-
-  private fun describe(builder: StringBuilder) {
-    if (first is ChainedExtractor) {
-      first.describe(builder)
-    } else {
-      builder.append(first.toString())
-    }
-    builder.append(", ")
-    if (fallback is ChainedExtractor) {
-      fallback.describe(builder)
-    } else {
-      builder.append(fallback.toString())
-    }
-  }
-
-  override fun toString(): String {
-    val bldr = StringBuilder("ChainedExtractor[")
-    describe(bldr)
-    bldr.append("]")
-    return bldr.toString()
   }
 }
