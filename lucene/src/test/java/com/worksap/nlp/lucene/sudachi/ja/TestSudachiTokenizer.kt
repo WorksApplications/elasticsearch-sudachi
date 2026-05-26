@@ -19,7 +19,6 @@ package com.worksap.nlp.lucene.sudachi.ja
 import com.worksap.nlp.lucene.sudachi.ja.input.CopyingInputExtractor
 import com.worksap.nlp.lucene.sudachi.ja.input.NoopInputExtractor
 import com.worksap.nlp.lucene.sudachi.ja.plugin.AnalysisCache
-import com.worksap.nlp.lucene.sudachi.ja.ResourceUtil
 import com.worksap.nlp.lucene.sudachi.ja.plugin.ReloadableDictionary
 import com.worksap.nlp.sudachi.Config
 import com.worksap.nlp.sudachi.PathAnchor
@@ -48,7 +47,7 @@ open class TestSudachiTokenizer : BaseTokenStreamTestCase() {
       mode: SplitMode,
       noPunctuation: Boolean = true,
       allowEmptyMorpheme: Boolean = false,
-      capacity: Int = 0
+      capacity: Int = 0,
   ): SudachiTokenizer {
     val dict = ReloadableDictionary(config.allowEmptyMorpheme(allowEmptyMorpheme))
     val extractor =
@@ -57,7 +56,12 @@ open class TestSudachiTokenizer : BaseTokenStreamTestCase() {
         } else {
           CopyingInputExtractor(Short.MAX_VALUE.toInt())
         }
-    val tok = CachingTokenizer(dict.newTokenizer(), mode, AnalysisCache(InnerCacheBuilderImpl().build(capacity), extractor))
+    val tok =
+        CachingTokenizer(
+            dict.newTokenizer(),
+            mode,
+            AnalysisCache(InnerCacheBuilderImpl().build(capacity), extractor),
+        )
     return SudachiTokenizer(tok, noPunctuation, AttributeFactory.DEFAULT_ATTRIBUTE_FACTORY)
   }
 
@@ -315,7 +319,7 @@ open class TestSudachiTokenizer : BaseTokenStreamTestCase() {
     )
 
     var anchor = PathAnchor.filesystem(testDic.root.toPath().resolve("config/sudachi"))
-    anchor = anchor.andThen(PathAnchor.classpath(ResourceUtil::class.java))
+    anchor = anchor.andThen(PathAnchor.classpath())
     config =
         Config.fromClasspath(ResourceUtil::class.java.getResource("additional.json"), anchor)
             .withFallback(config)
