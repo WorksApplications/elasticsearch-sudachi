@@ -22,7 +22,7 @@ Elasticsearch / OpenSearch やそのバージョンによって API が異なる
 
 さらに対応する検索エンジンおよびそのメジャーバージョン毎にブランチを持つ
 
-- `es-9`: Elasticsearch v9.\* 以降（v3.4.0 では未対応）
+- `es-9`: Elasticsearch v9.\* 以降
 - `es-8.18-plus`: Elasticsearch v8.18.\* 以降
 - `es-8.10-8.17`: Elasticsearch v8.10.\* から v8.17.\*
 - `os-3`: OpenSearch v3.\* 以降

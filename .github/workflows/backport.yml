@@ -35,7 +35,7 @@ jobs:
           script: |
             // definitions
             const labelPattern = /^backport (.+)$/
-            const esBranches = ["es-8.18-plus", "es-8.10-8.17"]
+            const esBranches = ["es-9", "es-8.18-plus", "es-8.10-8.17"]
             const osBranches = ["os-3", "os-2.6-plus"]
             const groups = {
               "es": esBranches,
@@ -65,6 +65,7 @@ jobs:
       - name: Create backport PRs
         id: backport
         # Keep third-party actions pinned to a commit SHA for supply-chain safety.
+        # https://github.com/korthout/backport-action/releases/tag/v4.5.2
         uses: korthout/backport-action@4aaf0e03a94ff0a619c9a511b61aeb42adea5b02
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}

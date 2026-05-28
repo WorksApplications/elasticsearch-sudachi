@@ -17,7 +17,7 @@ Check [changelog](./CHANGELOG.md) for more.
 # Build (if necessary)
 
 1. Check the branch which supports the target version and checkout.
-  - Either `es-8.10-8.17`, `es-8.18-plus`, `os-2.6-plus`, `os-3`.
+  - Either `es-8.10-8.17`, `es-8.18-plus`, `es-9`, `os-2.6-plus`, `os-3`.
   - See [support martix file](.github/branch-support-matrix.json).
 2. Build analysis-sudachi.
 
@@ -31,6 +31,7 @@ Use `-PengineVersion=os:2.19.3` for OpenSearch.
 
 1. (`es-8.10-8.17`) 8.10.* until 8.17.* supported, integration tests in CI
 2. (`es-8.18-plus`) 8.18.* until 8.19.* supported, integration tests in CI
+3. (`es-9`) 9.0.* until 9.4.* supported, integration tests in CI
 
 ## Supported OpenSearch versions
 
