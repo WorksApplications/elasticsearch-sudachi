@@ -95,7 +95,7 @@ artifacts {
 
 // See https://github.com/diffplug/spotless/tree/main/plugin-gradle
 spotless {
-    ratchetFrom 'origin/es-8.18-plus'
+    ratchetFrom 'origin/es-9'
     encoding 'UTF-8' // all formats will be interpreted as UTF-8
 
     format 'misc', {
