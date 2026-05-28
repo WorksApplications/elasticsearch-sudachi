@@ -1,0 +1,5 @@
+ALL-UNNAMED:
+  - files:
+    - relative_path: sudachi
+      relative_to: config
+      mode: read

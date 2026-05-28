@@ -25,13 +25,15 @@ dependencies {
 def embedVersion = tasks.register('embedVersion', Copy) {
     var engineKind = sudachiEs.engineKind()
     var engineVersion = sudachiEs.engineVersion()
-    from 'search/src/main/extras/plugin-descriptor.properties'
+    from('search/src/main/extras/plugin-descriptor.properties'){
+        expand([
+                version: version,
+                engineVersion: engineVersion,
+                engineKind: engineKind
+        ])
+    }
+    from('search/src/main/extras/entitlement-policy.yaml')
     into "build/package/${version}/${engineKind}-${engineVersion}"
-    expand([
-            version: version,
-            engineVersion: engineVersion,
-            engineKind: engineKind
-    ])
     inputs.property("version", version)
     inputs.property("elasticSearchVersion", engineVersion)
 }
