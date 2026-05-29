@@ -7,9 +7,8 @@ trait EngineSupport {
 }
 
 enum EsSupport implements EngineSupport {
-    Es810("es-8", "es-8.10"),
-    Es812("es-8", "es-8.12"),
-    Es816("es-8", "es-8.16")
+    Es900("es-9", "es-9.0"),
+    Es940("es-9", "es-9.4"),
 
     String majorTag
     String minorTag
@@ -29,14 +28,12 @@ enum EsSupport implements EngineSupport {
     }
 
     static EsSupport supportVersion(Version vers) {
-        if (vers.lt(8, 10)) {
-            throw new IllegalArgumentException("versions below 8.10 are not supported")
-        } else if (vers.ge(8, 10) && vers.lt(8, 12)) {
-            return Es810
-        } else if (vers.ge(8, 12) && vers.lt(8, 16)) {
-            return Es812
-        } else if (vers.ge(8, 16) && vers.lt(9, 0)) {
-            return Es816
+        if (vers.lt(9, 0)) {
+            throw new IllegalArgumentException("versions below 9.0 are not supported")
+        } else if (vers.ge(9, 0) && vers.lt(9, 4)) {
+            return Es900
+        } else if (vers.ge(9, 4)) {
+            return Es940
         } else {
             throw new IllegalArgumentException("unsupported ElasticSearch version: " + vers.raw)
         }

@@ -27,8 +27,8 @@ class SudachiReadingFormFilterFactory(
     indexSettings: IndexSettings?,
     environment: Environment?,
     name: String?,
-    settings: Settings
-) : AbstractTokenFilterFactory(name, settings) {
+    settings: Settings,
+) : AbstractTokenFilterFactory(name) {
   private val useRomaji = settings.getAsBoolean("use_romaji", false)
 
   override fun create(tokenStream: TokenStream): TokenStream {

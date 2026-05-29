@@ -30,8 +30,8 @@ class SudachiStopTokenFilterFactory(
     indexSettings: IndexSettings?,
     env: Environment?,
     name: String?,
-    settings: Settings
-) : AbstractTokenFilterFactory(name, settings) {
+    settings: Settings,
+) : AbstractTokenFilterFactory(name) {
   private val ignoreCase = settings.getAsBoolean("ignore_case", false)
   private val removeTrailing = settings.getAsBoolean("remove_trailing", true)
   private val stopWords =

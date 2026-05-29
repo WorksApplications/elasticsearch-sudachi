@@ -36,8 +36,8 @@ class SudachiAnalyzerProvider(
     indexSettings: IndexSettings,
     env: Environment,
     name: String,
-    settings: Settings
-) : AbstractIndexAnalyzerProvider<SudachiAnalyzer>(name, settings) {
+    settings: Settings,
+) : AbstractIndexAnalyzerProvider<SudachiAnalyzer>(name) {
 
   private val stopWords: Set<*> by lazy {
     parseStopWords(env, settings, SudachiAnalyzer.getDefaultStopSet(), false)
@@ -69,7 +69,7 @@ class SudachiAnalyzerProvider(
     @JvmStatic
     fun maker(
         dictionaryService: DictionaryService,
-        cacheService: AnalysisCacheService
+        cacheService: AnalysisCacheService,
     ): AnalysisProvider<AnalyzerProvider<out Analyzer?>> {
       return AnalysisProvider { indexSettings, environment, name, settings ->
         SudachiAnalyzerProvider(

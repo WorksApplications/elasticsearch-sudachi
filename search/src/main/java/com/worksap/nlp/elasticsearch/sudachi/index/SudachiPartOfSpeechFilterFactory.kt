@@ -31,8 +31,8 @@ class SudachiPartOfSpeechFilterFactory(
     indexSettings: IndexSettings?,
     env: Environment?,
     name: String?,
-    settings: Settings?
-) : AbstractTokenFilterFactory(name, settings) {
+    settings: Settings?,
+) : AbstractTokenFilterFactory(name) {
 
   private val stopTags = run {
     val tagList = getWordList(env, settings, "stoptags")
