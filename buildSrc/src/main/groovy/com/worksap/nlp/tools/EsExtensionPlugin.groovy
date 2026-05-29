@@ -48,19 +48,4 @@ class EsExtension {
     String engineVersion() {
         return kind.get().versionString
     }
-
-    /**
-     * Returns the required JVM version for the current engine.
-     * OpenSearch 3.0+ requires JVM 21, others use JVM 17.
-     */
-    int jvmVersion() {
-        var k = kind.get()
-        if (k.engine == EngineType.OpenSearch) {
-            var version = k.parsedVersion()
-            if (version.ge(3, 0)) {
-                return 21
-            }
-        }
-        return 17
-    }
 }

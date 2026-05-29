@@ -17,37 +17,6 @@ plugins {
 group = 'com.worksap.nlp'
 version = properties["pluginVersion"]
 
-// JVM target is determined by engine version (OpenSearch 3.0+ requires JVM 21)
-def jvmVersion = sudachiEs.jvmVersion()
-def jvmTargetVersion = jvmVersion == 21 ? JvmTarget.JVM_21 : JvmTarget.JVM_17
-def javaVersion = jvmVersion == 21 ? JavaVersion.VERSION_21 : JavaVersion.VERSION_17
-
-java {
-    sourceCompatibility = javaVersion
-    targetCompatibility = javaVersion
-}
-
-tasks.withType(JavaCompile).configureEach {
-    options.release = jvmVersion
-}
-
-compileKotlin {
-    compilerOptions.jvmTarget.set(jvmTargetVersion)
-}
-
-compileTestKotlin {
-    compilerOptions.jvmTarget.set(jvmTargetVersion)
-}
-
-// For OpenSearch 3.0+, we need to tell Gradle that JDK 21+ libraries are compatible
-if (jvmVersion >= 21) {
-    configurations.all {
-        attributes {
-            attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, jvmVersion)
-        }
-    }
-}
-
 configurations { buildSudachiDict }
 
 dependencies {

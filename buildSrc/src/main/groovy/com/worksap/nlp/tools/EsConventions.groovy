@@ -8,10 +8,9 @@ class EsConventions implements Plugin<Project> {
     @Override
     void apply(Project target) {
         target.tasks.withType(JavaCompile).configureEach {
-            options.release.set(17)
+            options.release.set(21)
             options.encoding = 'UTF-8'
         }
-
 
         target.repositories {
             mavenLocal()
