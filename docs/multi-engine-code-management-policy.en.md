@@ -22,7 +22,7 @@ This document defines the policy for managing those branches.
 
 In addition, maintain branches for each supported search engine and its major version.
 
-- `es-9`: Elasticsearch v9.\* and later (not yet supported in v3.4.0)
+- `es-9`: Elasticsearch v9.\* and later
 - `es-8.18-plus`: Elasticsearch v8.18.\* and later
 - `es-8.10-8.17`: Elasticsearch v8.10.\* till v8.17.\*
 - `os-3`: OpenSearch v3.\* and later
