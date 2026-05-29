@@ -2,14 +2,35 @@
   "branches": [
     {
       "branch": "es-9",
-      "release_enabled": false,
-      "upload_spi": false,
-      "versions": []
+      "release_enabled": true,
+      "upload_spi": true,
+      "versions": [
+        {
+          "engine_version": "es:9.4.1",
+          "java_version": "21"
+        },
+        {
+          "engine_version": "es:9.3.4",
+          "java_version": "21"
+        },
+        {
+          "engine_version": "es:9.2.8",
+          "java_version": "21"
+        },
+        {
+          "engine_version": "es:9.1.10",
+          "java_version": "21"
+        },
+        {
+          "engine_version": "es:9.0.8",
+          "java_version": "21"
+        }
+      ]
     },
     {
       "branch": "es-8.18-plus",
       "release_enabled": true,
-      "upload_spi": true,
+      "upload_spi": false,
       "versions": [
         {
           "engine_version": "es:8.19.15",
