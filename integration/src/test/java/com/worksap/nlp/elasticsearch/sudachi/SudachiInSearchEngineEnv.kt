@@ -23,8 +23,6 @@ import org.elasticsearch.env.Environment
 import org.elasticsearch.index.analysis.AnalysisRegistry
 import org.elasticsearch.indices.analysis.AnalysisModule
 import org.elasticsearch.plugins.AnalysisPlugin
-import org.elasticsearch.plugins.PluginsLoader
-import org.elasticsearch.plugins.PluginsService
 import org.elasticsearch.test.ESTestCase
 
 class SudachiInSearchEngineEnv {
@@ -47,20 +45,10 @@ class SudachiInSearchEngineEnv {
     return Environment(settings(), configPath)
   }
 
-  fun makePluginService(): PluginsService {
-    val loader =
-        PluginsLoader.createPluginsLoader(
-            PluginsLoader.loadModulesBundles(environment().modulesDir()),
-            PluginsLoader.loadPluginsBundles(pluginsPath),
-            emptyMap(),
-        )
-    return PluginsService(settings(), configPath, loader)
-  }
-
   fun makeAnalysisModule(): AnalysisModule {
+    val env = environment()
     val plugins = makePluginService()
     val analysisPlugins = plugins.filterPlugins(AnalysisPlugin::class.java).toList()
-    val env = environment()
     return AnalysisModule(env, analysisPlugins, plugins.stablePluginRegistry)
   }
 }

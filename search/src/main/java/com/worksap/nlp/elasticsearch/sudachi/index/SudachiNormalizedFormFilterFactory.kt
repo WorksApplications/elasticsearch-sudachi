@@ -27,8 +27,8 @@ class SudachiNormalizedFormFilterFactory(
     indexSettings: IndexSettings?,
     environment: Environment?,
     name: String?,
-    settings: Settings?
-) : AbstractTokenFilterFactory(name, settings) {
+    settings: Settings?,
+) : AbstractTokenFilterFactory(name) {
   override fun create(tokenStream: TokenStream): TokenStream {
     return SudachiNormalizedFormFilter(tokenStream)
   }

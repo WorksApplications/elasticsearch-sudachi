@@ -35,14 +35,13 @@ class SudachiTokenizerFactory(
     indexSettings: IndexSettings,
     private val env: Environment,
     name: String,
-    settings: Settings
-) : AbstractTokenizerFactory(indexSettings, settings, name) {
-
+    settings: Settings,
+) : AbstractTokenizerFactory(name) {
   companion object {
     @JvmStatic
     fun maker(
         service: DictionaryService,
-        caches: AnalysisCacheService
+        caches: AnalysisCacheService,
     ): AnalysisProvider<TokenizerFactory> {
       return AnalysisProvider { indexSettings, environment, name, settings ->
         SudachiTokenizerFactory(service, caches, indexSettings, environment, name, settings)

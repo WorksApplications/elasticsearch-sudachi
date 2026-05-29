@@ -29,8 +29,8 @@ class SudachiSplitFilterFactory(
     indexSettings: IndexSettings?,
     env: Environment?,
     name: String?,
-    settings: Settings
-) : AbstractTokenFilterFactory(name, settings) {
+    settings: Settings,
+) : AbstractTokenFilterFactory(name) {
 
   private val mode = Mode.fromString(settings.get(Mode.name, null))
   private val splitMode = SplitMode.fromString(settings.get(SplitMode.name, null))
@@ -40,8 +40,8 @@ class SudachiSplitFilterFactory(
   }
 
   companion object {
-    private object Mode :
-        EnumFlag<SudachiSplitFilter.Mode>("mode", SudachiSplitFilter.DEFAULT_MODE)
+    private object Mode : EnumFlag<SudachiSplitFilter.Mode>("mode", SudachiSplitFilter.DEFAULT_MODE)
+
     private object SplitMode : EnumFlag<Tokenizer.SplitMode>("split_mode", Tokenizer.SplitMode.A)
   }
 }

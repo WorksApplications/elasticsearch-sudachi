@@ -10,6 +10,7 @@ plugins {
 
     id 'com.worksap.nlp.sudachi.es.extension'
     id 'com.worksap.nlp.sudachi.es.dependencies'
+    id 'com.worksap.nlp.sudachi.es.sources'
     id 'com.worksap.nlp.sudachi.es.testenv'
     id 'com.worksap.nlp.sudachi.esc'
 }
