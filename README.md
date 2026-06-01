@@ -7,10 +7,10 @@ analysis-sudachi is an Elasticsearch plugin for tokenization of Japanese text us
 
 # What's new?
 
-- [3.5.0]
-  - Introduce [branch-based code management policy](docs/multi-engine-code-management-policy.en.md)
-  - Reorganize codebase. The overall behavior of the plugin does not change.
-  - Update Gradle (to 8.14) and plugins (including kotlin 2.3.0).
+- [3.6.0]
+  - Update internal Sudachi version to v0.8.0.
+  - Add support for es 8.18-8.19, and 9.0-9.4
+  - Add support for os 3.5
 
 Check [changelog](./CHANGELOG.md) for more.
 
