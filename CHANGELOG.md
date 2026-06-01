@@ -2,6 +2,21 @@
 
 ## [Unreleased](https://github.com/WorksApplications/elasticsearch-sudachi/releases/)
 
+## [3.6.0](https://github.com/WorksApplications/elasticsearch-sudachi/releases/tag/v3.6.0) - 2026-06-01
+
+### Changed
+
+- Update Sudachi version to v0.8.0(#223)
+  - See https://github.com/WorksApplications/Sudachi/releases/tag/v0.8.0.
+- Remove ReusableReaderVarHandleExtractor (#220)
+  - Behavior would not change as it had not succeeded with recent es/os versions.
+
+### Added
+
+- Support Elasticsearch 9.0.8, 9.1.10, 9.2.8, 9.3.4 and 9.4.1 (#216, #219)
+- Support Elasticsearch 8.18.8 and 8.19.15 (#228, #229)
+- Support OpenSearch 3.5.0 (#214)
+
 ## [3.5.0](https://github.com/WorksApplications/elasticsearch-sudachi/releases/tag/v3.5.0) - 2026-04-06
 
 ### Added
