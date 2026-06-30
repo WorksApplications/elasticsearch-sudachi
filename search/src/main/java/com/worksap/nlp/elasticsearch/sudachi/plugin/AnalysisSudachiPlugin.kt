@@ -53,6 +53,7 @@ class AnalysisSudachiPlugin(settings: Settings?) : Plugin(), AnalysisPlugin, Ext
     classloaders.add(javaClass.classLoader)
     logger.info("loaded Sudachi plugin")
   }
+
   // this method is guaranteed to run before any other methods
   override fun loadExtensions(loader: ExtensionLoader) {
     loader.loadExtensions(SudachiResourceAccess::class.java).forEach {
@@ -68,12 +69,14 @@ class AnalysisSudachiPlugin(settings: Settings?) : Plugin(), AnalysisPlugin, Ext
         "sudachi_readingform" to provider(::SudachiReadingFormFilterFactory),
         "sudachi_split" to provider(::SudachiSplitFilterFactory),
         "sudachi_ja_stop" to provider(::SudachiStopTokenFilterFactory),
+        "sudachi_completion" to provider(::SudachiCompletionFilterFactory),
     )
   }
 
   override fun getTokenizers(): Map<String, AnalysisProvider<TokenizerFactory>> {
     return mapOf(
-        "sudachi_tokenizer" to SudachiTokenizerFactory.maker(dictionaryService, cacheService))
+        "sudachi_tokenizer" to SudachiTokenizerFactory.maker(dictionaryService, cacheService)
+    )
   }
 
   override fun getAnalyzers(): Map<String, AnalysisProvider<AnalyzerProvider<out Analyzer>>> {
