@@ -68,6 +68,7 @@ class AnalysisSudachiPlugin(settings: Settings?) : Plugin(), AnalysisPlugin, Ext
         "sudachi_readingform" to provider(::SudachiReadingFormFilterFactory),
         "sudachi_split" to provider(::SudachiSplitFilterFactory),
         "sudachi_ja_stop" to provider(::SudachiStopTokenFilterFactory),
+        "sudachi_completion" to provider(::SudachiCompletionFilterFactory),
     )
   }
 
