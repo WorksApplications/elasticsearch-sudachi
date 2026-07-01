@@ -20,6 +20,14 @@
         "katakana_readingform": {
           "type": "sudachi_readingform",
           "use_romaji": false
+        },
+        "sudachi_completion_index": {
+          "type": "sudachi_completion",
+          "mode": "index"
+        },
+        "sudachi_completion_query": {
+          "type": "sudachi_completion",
+          "mode": "query"
         }
       },
       "analyzer": {
@@ -75,6 +83,20 @@
           "filter": [],
           "type": "custom",
           "tokenizer": "sudachi_a_tokenizer"
+        },
+        "sudachi_completion_index": {
+          "filter": [
+            "sudachi_completion_index"
+          ],
+          "type": "custom",
+          "tokenizer": "sudachi_tokenizer"
+        },
+        "sudachi_completion_query": {
+          "filter": [
+            "sudachi_completion_query"
+          ],
+          "type": "custom",
+          "tokenizer": "sudachi_tokenizer"
         }
       },
       "tokenizer": {
