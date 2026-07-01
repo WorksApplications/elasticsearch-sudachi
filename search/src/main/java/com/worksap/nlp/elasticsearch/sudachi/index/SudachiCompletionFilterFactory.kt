@@ -17,7 +17,6 @@
 package com.worksap.nlp.elasticsearch.sudachi.index
 
 import com.worksap.nlp.lucene.sudachi.ja.SudachiCompletionFilter
-import com.worksap.nlp.tools.EnumFlag
 import org.apache.lucene.analysis.TokenStream
 import org.opensearch.common.settings.Settings
 import org.opensearch.env.Environment
@@ -28,17 +27,13 @@ class SudachiCompletionFilterFactory(
     indexSettings: IndexSettings?,
     environment: Environment?,
     name: String?,
-    settings: Settings?,
-) : AbstractTokenFilterFactory(name) {
-
-  private val mode = Mode.fromString(settings?.get(Mode.name, null))
+    settings: Settings
+) : AbstractTokenFilterFactory(indexSettings, name, settings) {
+  private val mode = SudachiCompletionFilter.Mode.valueOf(
+      settings.get("mode", SudachiCompletionFilter.DEFAULT_MODE.name).uppercase()
+  )
 
   override fun create(tokenStream: TokenStream): TokenStream {
     return SudachiCompletionFilter(tokenStream, mode)
-  }
-
-  companion object {
-    private object Mode :
-        EnumFlag<SudachiCompletionFilter.Mode>("mode", SudachiCompletionFilter.DEFAULT_MODE)
   }
 }
