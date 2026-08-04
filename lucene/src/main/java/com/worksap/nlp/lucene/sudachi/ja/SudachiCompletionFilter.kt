@@ -50,6 +50,7 @@ public class SudachiCompletionFilter(input: TokenStream, mode: Mode = DEFAULT_MO
       val term: String,
       val isFirst: Boolean,
       val offsetMap: List<Int>,
+      val morpheme: Morpheme? = null,
   )
 
   init {
@@ -67,8 +68,13 @@ public class SudachiCompletionFilter(input: TokenStream, mode: Mode = DEFAULT_MO
   override fun incrementToken(): Boolean {
     while (!tokenGenerator.hasNext()) {
       if (!inputStreamConsumed && input.incrementToken()) {
-        val m: Morpheme = morphemeAtt.getMorpheme()
-        val surface: String = m.surface()
+        val m: Morpheme? = morphemeAtt.getMorpheme()
+        // If the upstream filter did not set a morpheme, there is nothing we can add to the
+        // completion generator, so skip this input token.
+        if (m == null) {
+          continue
+        }
+        val surface: String = termAtt.toString()
         val reading: String? = m.readingForm()
         val offsetMap: List<Int> = listOf(offsetAtt.startOffset(), offsetAtt.endOffset())
 
@@ -79,8 +85,9 @@ public class SudachiCompletionFilter(input: TokenStream, mode: Mode = DEFAULT_MO
               reading?.ifEmpty { null }
             }
 
-        tokenGenerator.addToken(surface, effectiveReading, offsetMap)
+        tokenGenerator.addToken(surface, effectiveReading, offsetMap, m)
       } else {
+        // No more input tokens: drain any remaining pending token and stop.
         inputStreamConsumed = true
         if (tokenGenerator.hasPendingToken()) tokenGenerator.finish() else break
       }
@@ -93,6 +100,14 @@ public class SudachiCompletionFilter(input: TokenStream, mode: Mode = DEFAULT_MO
       termAtt.setEmpty().append(token.term)
       if (token.isFirst) posIncAtt.setPositionIncrement(1) else posIncAtt.setPositionIncrement(0)
       offsetAtt.setOffset(token.offsetMap[0], token.offsetMap[1])
+
+      if (token.morpheme != null) {
+        morphemeAtt.setMorpheme(token.morpheme)
+        morphemeAtt.setOffsets(token.offsetMap)
+      } else {
+        morphemeAtt.setMorpheme(null)
+        morphemeAtt.setOffsets(emptyList())
+      }
       return true
     } else return false
   }
@@ -105,6 +120,7 @@ public class SudachiCompletionFilter(input: TokenStream, mode: Mode = DEFAULT_MO
     private var pdgSurface = StringBuilder()
     private var pdgReading = StringBuilder()
     private var pdgOffsetMap = mutableListOf(0, 0)
+    private var pdgMorpheme: Morpheme? = null
 
     private var hasPdgToken = false
 
@@ -125,39 +141,51 @@ public class SudachiCompletionFilter(input: TokenStream, mode: Mode = DEFAULT_MO
       return outputs.removeAt(0)
     }
 
-    public fun addToken(surface: CharSequence, reading: CharSequence?, offsetMap: List<Int>) {
+    public fun addToken(
+        surface: CharSequence,
+        reading: CharSequence?,
+        offsetMap: List<Int>,
+        morpheme: Morpheme?,
+    ) {
       if (hasPendingToken()) {
         if (mode == Mode.QUERY) {
           when {
-            !isAllLowercaseAlphabet(pdgSurface.toString()) &&
+            pdgReading != null &&
+                !isAllLowercaseAlphabet(pdgSurface.toString()) &&
                 isAllLowercaseAlphabet(surface.toString()) -> {
+              // Concatenation of non-alphabet + alphabet (e.g. "東京" + "h" -> "東京h",
+              // "アイ" + "h" -> "アイh"). The alphabet following kanji/kana is emitted
+              // immediately as a completion candidate. Once concatenated, the pending token
+              // no longer represents a single morpheme, so clear pdgMorpheme.
               pdgSurface.append(surface)
               pdgReading.append(surface)
               pdgOffsetMap[1] = offsetMap[1]
+              pdgMorpheme = null
               generateOutputs()
               clearPendingToken()
             }
             isKanaOnly(pdgSurface.toString()) && isKanaOnly(surface.toString()) -> {
+              // Kana + kana concatenation (e.g. "アイ" + "アイ" -> "アイアイ").
+              // Note: this is implemented for compatibility with Lucene's JapaneseCompletionFilter.
+              // In the future, this responsibility may be consolidated into the Sudachi plugin.
+              // A concatenated kana token is not a single morpheme, so clear pdgMorpheme.
               pdgSurface.append(surface)
               if (reading != null) pdgReading.append(reading)
               pdgOffsetMap[1] = offsetMap[1]
-            }
-            isKanaOnly(pdgSurface.toString()) && isAllLowercaseAlphabet(surface.toString()) -> {
-              pdgSurface.append(surface)
-              pdgReading.append(surface)
-              pdgOffsetMap[1] = offsetMap[1]
+              pdgMorpheme = null
             }
             else -> {
               generateOutputs()
-              resetPendingToken(surface.toString(), reading?.toString(), offsetMap)
+              resetPendingToken(surface.toString(), reading?.toString(), offsetMap, morpheme)
             }
           }
         } else {
+          // In INDEX mode there is no concatenation.
           generateOutputs()
-          resetPendingToken(surface.toString(), reading?.toString(), offsetMap)
+          resetPendingToken(surface.toString(), reading?.toString(), offsetMap, morpheme)
         }
       } else {
-        resetPendingToken(surface.toString(), reading?.toString(), offsetMap)
+        resetPendingToken(surface.toString(), reading?.toString(), offsetMap, morpheme)
       }
     }
 
@@ -167,7 +195,7 @@ public class SudachiCompletionFilter(input: TokenStream, mode: Mode = DEFAULT_MO
     }
 
     private fun generateOutputs() {
-      outputs.add(CompletionToken(pdgSurface.toString(), true, pdgOffsetMap.toList()))
+      outputs.add(CompletionToken(pdgSurface.toString(), true, pdgOffsetMap.toList(), pdgMorpheme))
       val reading = pdgReading.toString()
       if (reading.isEmpty() || !isRomanizableReading(reading)) return
 
@@ -179,7 +207,12 @@ public class SudachiCompletionFilter(input: TokenStream, mode: Mode = DEFAULT_MO
       return hasPdgToken
     }
 
-    private fun resetPendingToken(surface: String, reading: String?, offsetMap: List<Int>) {
+    private fun resetPendingToken(
+        surface: String,
+        reading: String?,
+        offsetMap: List<Int>,
+        morpheme: Morpheme?,
+    ) {
       this.hasPdgToken = true
       this.pdgSurface.clear()
       this.pdgReading.clear()
@@ -188,6 +221,7 @@ public class SudachiCompletionFilter(input: TokenStream, mode: Mode = DEFAULT_MO
         this.pdgReading.append(reading)
       }
       this.pdgOffsetMap = offsetMap.toMutableList()
+      this.pdgMorpheme = morpheme
     }
 
     private fun clearPendingToken() {
@@ -195,8 +229,15 @@ public class SudachiCompletionFilter(input: TokenStream, mode: Mode = DEFAULT_MO
       this.pdgSurface.clear()
       this.pdgReading.clear()
       this.pdgOffsetMap = mutableListOf(0, 0)
+      this.pdgMorpheme = null
     }
 
+    /**
+     * Romanize katakana text.
+     *
+     * This implementation follows the MS-IME style romanization used in the Sudachi
+     * project. It does not cover other romanization systems such as Hepburn or Kunrei-shiki.
+     */
     private fun romanize(text: String): List<String> {
       val output = mutableListOf<String>()
       val romaji: String = convertFullWidthAlphabetToHalfWidth(Romanizer.romanize(text))
