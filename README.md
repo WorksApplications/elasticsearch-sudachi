@@ -613,6 +613,76 @@ Returns `スシ`.
 
 Returns `susi`.
 
+## sudachi\_completion
+
+The `sudachi_completion` token filter adds romanized reading tokens for completion and suggestion use cases. It emits the surface form first, then the romanized reading form as an additional token at the same position.
+
+- mode
+  - `index`: Emit surface and romanized reading for each token. This is the default.
+  - `query`: Same as `index`, but also concatenates adjacent kana tokens and kana/alphanumeric combinations. Useful for query-time completion.
+
+### PUT sudachi_sample
+
+```json
+{
+  "settings": {
+    "index": {
+      "analysis": {
+        "tokenizer": {
+          "sudachi_tokenizer": {
+            "type": "sudachi_tokenizer"
+          }
+        },
+        "analyzer": {
+          "sudachi_analyzer": {
+            "filter": ["my_completionfilter"],
+            "tokenizer": "sudachi_tokenizer",
+            "type": "custom"
+          }
+        },
+        "filter":{
+          "my_completionfilter": {
+            "type": "sudachi_completion",
+            "mode": "index"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+### POST sudachi_sample/_analyze
+
+```json
+{
+  "analyzer": "sudachi_analyzer",
+  "text": "東京都"
+}
+```
+
+Which responds with:
+
+```json
+{
+  "tokens": [
+    {
+      "token": "東京都",
+      "start_offset": 0,
+      "end_offset": 3,
+      "type": "word",
+      "position": 0
+    },
+    {
+      "token": "toukyouto",
+      "start_offset": 0,
+      "end_offset": 3,
+      "type": "word",
+      "position": 0
+    }
+  ]
+}
+```
 
 # Synonym
 
