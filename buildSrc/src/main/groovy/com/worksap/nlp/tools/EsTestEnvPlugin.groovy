@@ -154,25 +154,6 @@ class EsTestEnvPlugin implements Plugin<Project> {
             task.systemProperty("gradle.worker.jar", gradleCacheDir.resolve("workerMain/gradle-worker.jar").toString())
             task.systemProperty("java.io.tmpdir", envRoot)
 
-            // OpenSearch 3.0+ requires the Java agent for security framework
-            if (target.plugins.findPlugin(EsExtensionPlugin.class) != null) {
-                var esExt = target.extensions.getByType(EsExtension)
-                var kind = esExt.kind.get()
-                if (kind.engine == EngineType.OpenSearch && kind.parsedVersion().ge(3, 0)) {
-                    // Disable the old security manager setting
-                    task.systemProperty("tests.security.manager", false)
-                    // Find and attach the opensearch-agent jar
-                    task.doFirst {
-                        var agentJar = target.configurations.testRuntimeClasspath.find { it.name.startsWith("opensearch-agent-") && !it.name.contains("bootstrap") && !it.name.contains("policy") }
-                        if (agentJar != null) {
-                            task.jvmArgs("-javaagent:${agentJar}")
-                            logger.warn("Using OpenSearch security agent: ${agentJar}")
-                        } else {
-                            logger.warn("OpenSearch agent jar not found in testRuntimeClasspath")
-                        }
-                    }
-                }
-            }
         }
 
         target.gradle.taskGraph.whenReady {

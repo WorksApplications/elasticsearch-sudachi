@@ -2,6 +2,13 @@
 
 ## [Unreleased](https://github.com/WorksApplications/elasticsearch-sudachi/releases/)
 
+### Added
+
+- Support OpenSearch 3.6.0
+- Support OpenSearch 3.7.0
+- Support OpenSearch 3.8.0
+- Support OpenSearch 3.9.0
+
 ## [3.6.0](https://github.com/WorksApplications/elasticsearch-sudachi/releases/tag/v3.6.0) - 2026-06-01
 
 ### Changed

@@ -1,6 +1,17 @@
 import de.undercouch.gradle.tasks.download.Download
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
+buildscript {
+    def engineVersion = project.findProperty('engineVersion') ?: ''
+    if (engineVersion.startsWith('os:')) {
+        def osVersion = engineVersion.split(':', 2)[1]
+        repositories { mavenCentral() }
+        dependencies {
+            classpath "org.opensearch.gradle:build-tools:${osVersion}"
+        }
+    }
+}
+
 plugins {
     id 'com.diffplug.spotless'
     id 'de.undercouch.download' version '5.4.0'
@@ -17,6 +28,14 @@ plugins {
 
 group = 'com.worksap.nlp'
 version = properties["pluginVersion"]
+
+// Apply the OpenSearch java-agent plugin for OpenSearch 3.0+.
+// The plugin requires an `opensearch_version` project property.
+def projectKind = sudachiEs.kind.get()
+if (projectKind.engine.toString() == 'OpenSearch' && projectKind.parsedVersion().ge(3, 0)) {
+    ext.opensearch_version = projectKind.versionString
+    apply plugin: 'opensearch.java-agent'
+}
 
 // JVM target is determined by engine version (OpenSearch 3.0+ requires JVM 21)
 def jvmVersion = sudachiEs.jvmVersion()
@@ -114,7 +133,10 @@ test {
             downloadIcuPlugin,
             ':subplugin:distZip'
     )
-    systemProperty("tests.security.manager", true)
+    // OpenSearch 3.0+ uses the Java agent security framework; Security Manager must be disabled.
+    // For older versions the legacy Security Manager is still active.
+    def useJavaAgent = !sudachiEs.isEs() && sudachiEs.kind.get().parsedVersion().ge(3, 0)
+    systemProperty("tests.security.manager", !useJavaAgent)
     defaultCharacterEncoding = 'utf-8'
 }
 
